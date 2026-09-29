@@ -1,0 +1,2269 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Lab Maya Kimia – Senyawa Karbon: Identifikasi Aldehida & Keton</title>
+<link href="https://fonts.googleapis.com/css2?family=Nunito:wght@400;600;700;800;900&family=Poppins:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg: #0d1b2a;
+    --surface: #1a2d42;
+    --surface2: #243855;
+    --accent: #00d4ff;
+    --accent2: #ff6b35;
+    --accent3: #00ff9d;
+    --accent4: #ffcc00;
+    --text: #e8f4fd;
+    --text2: #9bbdd4;
+    --danger: #ff4d6d;
+    --success: #06d6a0;
+    --red-brick: #c0392b;
+    --silver: #c0c0c0;
+    --fehling-blue: #1a6bab;
+    --border: rgba(0,212,255,0.2);
+    --glow: 0 0 20px rgba(0,212,255,0.3);
+    --glow2: 0 0 20px rgba(255,107,53,0.3);
+    --r: 12px;
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  html, body {
+    width: 100%; height: 100%; overflow: hidden;
+    font-family: 'Poppins', sans-serif;
+    background: var(--bg); color: var(--text);
+  }
+  #app {
+    width: 100vw; height: 100vh;
+    display: flex; flex-direction: column;
+    position: relative; overflow: hidden;
+  }
+  /* Enforce 16:9 aspect for content if wider than needed */
+  @media (min-aspect-ratio: 16/9) {
+    html, body { background: #050e1a; }
+  }
+
+  /* ──────── HEADER ──────── */
+  #header {
+    height: 48px; min-height: 48px;
+    background: linear-gradient(90deg,#0a1628,#1a2d42,#0a1628);
+    border-bottom: 1.5px solid var(--border);
+    display: flex; align-items: center;
+    padding: 0 20px; gap: 14px;
+    box-shadow: 0 2px 20px rgba(0,0,0,0.4);
+    z-index: 100;
+  }
+  #header .logo-icon {
+    width:36px;height:36px;border-radius:50%;
+    background:linear-gradient(135deg,var(--accent),var(--accent2));
+    display:flex;align-items:center;justify-content:center;
+    font-size:18px;box-shadow:var(--glow);
+    animation: pulse-logo 3s ease-in-out infinite;
+  }
+  @keyframes pulse-logo{0%,100%{box-shadow:0 0 10px rgba(0,212,255,0.4)}50%{box-shadow:0 0 25px rgba(0,212,255,0.8)}}
+  #header h1 { font-size: 14px; font-weight: 700; color: var(--accent); letter-spacing: 0.3px; }
+  #header h1 span { color: var(--text2); font-weight: 400; }
+  #header .spacer { flex: 1; }
+  #header .badge {
+    background: rgba(0,212,255,0.1); border: 1px solid var(--border);
+    padding: 4px 10px; border-radius: 20px; font-size: 11px; color: var(--accent);
+    display: flex; align-items: center; gap: 5px;
+  }
+  #header .badge .dot { width:7px;height:7px;border-radius:50%;background:var(--accent3);
+    animation:blink 1.5s ease-in-out infinite; }
+  @keyframes blink{0%,100%{opacity:1}50%{opacity:0.3}}
+
+  /* ──────── NAV TABS ──────── */
+  #nav {
+    height: 40px; min-height: 40px;
+    background: var(--surface);
+    border-bottom: 1px solid var(--border);
+    display: flex; align-items: flex-end;
+    padding: 0 16px; gap: 4px;
+    overflow-x: auto;
+  }
+  #nav::-webkit-scrollbar{display:none;}
+  .tab-btn {
+    padding: 8px 14px 10px;
+    border: none; background: transparent;
+    color: var(--text2); font-family: 'Poppins',sans-serif;
+    font-size: 12px; font-weight: 600;
+    cursor: pointer; border-radius: 8px 8px 0 0;
+    transition: all 0.2s; white-space: nowrap;
+    display: flex; align-items: center; gap: 6px;
+    position: relative; border-bottom: 3px solid transparent;
+  }
+  .tab-btn:hover { color: var(--text); background: rgba(255,255,255,0.05); }
+  .tab-btn.active {
+    color: var(--accent); background: var(--bg);
+    border-bottom: 3px solid var(--accent);
+  }
+  .tab-btn .tab-icon { font-size: 15px; }
+
+  /* ──────── CONTENT AREA ──────── */
+  #content {
+    flex: 1; overflow: hidden;
+    position: relative;
+  }
+  .tab-panel {
+    display: none; width: 100%; height: 100%;
+    overflow: hidden; padding: 10px;
+    animation: fadeIn 0.3s ease;
+  }
+  .tab-panel.active { display: flex; flex-direction: column; }
+  @keyframes fadeIn { from{opacity:0;transform:translateY(4px)} to{opacity:1;transform:translateY(0)} }
+
+  /* ──────── SAMPUL ──────── */
+  #panel-sampul {
+    background: radial-gradient(ellipse at center, #0d2a44 0%, #050e1a 100%);
+    align-items: center; justify-content: center;
+    gap: 0; padding: 0; position: relative;
+    overflow: hidden;
+  }
+  #panel-sampul .bg-particles {
+    position:absolute;inset:0;pointer-events:none;
+    background:
+      radial-gradient(circle at 20% 20%, rgba(0,212,255,0.05) 0%, transparent 50%),
+      radial-gradient(circle at 80% 80%, rgba(255,107,53,0.05) 0%, transparent 50%);
+  }
+  .sampul-inner {
+    display:flex; align-items:center; justify-content:center;
+    gap: 40px; z-index:1; width:100%;
+    padding: 0 40px;
+  }
+  .sampul-img {
+    width: 280px; height: 280px;
+    object-fit: contain;
+    filter: drop-shadow(0 0 30px rgba(0,212,255,0.4));
+    animation: float 4s ease-in-out infinite;
+  }
+  @keyframes float{0%,100%{transform:translateY(0)}50%{transform:translateY(-12px)}}
+  .sampul-text { max-width: 480px; }
+  .sampul-label {
+    font-size:11px; font-weight:700; letter-spacing:3px;
+    color:var(--accent); text-transform:uppercase; margin-bottom:8px;
+    display:flex;align-items:center;gap:8px;
+  }
+  .sampul-label::before,.sampul-label::after{content:'';flex:1;height:1px;background:var(--border);}
+  .sampul-title {
+    font-family:'Nunito',sans-serif;
+    font-size: 34px; font-weight: 900; line-height: 1.15;
+    color: var(--text); margin-bottom: 10px;
+  }
+  .sampul-title span { color: var(--accent); }
+  .sampul-subtitle {
+    font-size:14px; color:var(--text2); margin-bottom:20px; line-height:1.7;
+  }
+  .sampul-tags { display:flex; gap:8px; flex-wrap:wrap; margin-bottom:24px; }
+  .sampul-tag {
+    padding:4px 12px; border-radius:20px; font-size:11px; font-weight:600;
+    background:rgba(0,212,255,0.1); border:1px solid rgba(0,212,255,0.3);
+    color:var(--accent);
+  }
+  .sampul-tag.orange{background:rgba(255,107,53,0.1);border-color:rgba(255,107,53,0.3);color:var(--accent2);}
+  .sampul-tag.green{background:rgba(0,255,157,0.1);border-color:rgba(0,255,157,0.3);color:var(--accent3);}
+  .btn-mulai {
+    padding:12px 28px; border-radius:30px;
+    background:linear-gradient(90deg,var(--accent),var(--accent2));
+    border:none; color:#fff; font-family:'Poppins',sans-serif;
+    font-size:14px;font-weight:700; cursor:pointer;
+    box-shadow:0 4px 20px rgba(0,212,255,0.4);
+    transition:all 0.3s; display:inline-flex; align-items:center;gap:8px;
+  }
+  .btn-mulai:hover{transform:translateY(-2px);box-shadow:0 6px 30px rgba(0,212,255,0.6);}
+
+  /* ──────── SCROLLABLE INNER ──────── */
+  .scroll-inner {
+    flex:1; overflow-y:auto; padding-right:4px;
+  }
+  .scroll-inner::-webkit-scrollbar{width:4px;}
+  .scroll-inner::-webkit-scrollbar-track{background:transparent;}
+  .scroll-inner::-webkit-scrollbar-thumb{background:var(--border);border-radius:4px;}
+
+  /* ──────── SECTION TITLE ──────── */
+  .sec-title {
+    font-size:14px;font-weight:700;color:var(--accent);
+    display:flex;align-items:center;gap:8px;margin-bottom:8px;
+  }
+  .sec-title::after{content:'';flex:1;height:1px;background:var(--border);}
+
+  /* ──────── TUJUAN TAB ──────── */
+  .tujuan-fullscreen {
+    display:flex;flex-direction:column;height:100%;overflow:hidden;
+  }
+  .tp-section{margin-bottom:8px;}
+  .tujuan-pembelajaran-card {
+    background:linear-gradient(135deg, rgba(0,212,255,0.08), rgba(255,107,53,0.06));
+    border:1.5px solid var(--accent);
+    border-radius:var(--r);padding:12px 16px;
+    display:flex;gap:14px;align-items:center;
+    box-shadow:var(--glow);margin-bottom:8px;
+  }
+  .tp-icon{font-size:28px;}
+  .tp-content strong{font-size:13px;color:var(--accent);display:block;margin-bottom:2px;}
+  .tp-content p{font-size:12px;color:var(--text);line-height:1.7;margin:0;}
+  .tujuan-grid {
+    display:grid;grid-template-columns:1fr 1fr;gap:8px;
+  }
+  .tujuan-card {
+    background:var(--surface);border:1px solid var(--border);
+    border-radius:var(--r);padding:10px 12px;
+    display:flex;gap:10px;align-items:flex-start;
+    transition:all 0.2s;
+  }
+  .tujuan-card:hover{border-color:var(--accent);box-shadow:var(--glow);}
+  .tujuan-num {
+    width:28px;height:28px;min-width:28px;border-radius:50%;
+    background:linear-gradient(135deg,var(--accent),var(--accent2));
+    display:flex;align-items:center;justify-content:center;
+    font-size:12px;font-weight:800;color:#fff;
+    box-shadow:var(--glow);
+  }
+  .tujuan-text{font-size:11px;line-height:1.6;color:var(--text2);}
+  .tujuan-text strong{color:var(--text);display:block;margin-bottom:2px;font-size:12px;}
+
+  .hasil-tabs { display:flex;gap:8px;margin-bottom:6px; }
+  .hasil-tab {
+    padding:5px 14px;border-radius:20px;border:1px solid var(--border);
+    background:transparent;color:var(--text2);font-size:11px;font-weight:600;
+    cursor:pointer;font-family:'Poppins',sans-serif;transition:all 0.2s;
+  }
+  .hasil-tab.active{background:var(--accent);border-color:var(--accent);color:#fff;}
+  .hasil-content{display:none;}
+  .hasil-content.active{display:block;}
+  .hasil-item {
+    display:flex;gap:8px;align-items:flex-start;padding:5px 0;
+    border-bottom:1px solid rgba(255,255,255,0.05);
+  }
+  .hasil-item:last-child{border-bottom:none;}
+  .hasil-icon{font-size:16px;margin-top:1px;}
+  .hasil-desc{font-size:11px;line-height:1.5;color:var(--text2);}
+  .hasil-desc strong{color:var(--text);}
+
+  /* ──────── TEORI TAB ──────── */
+  .teori-layout {
+    display:grid;grid-template-columns:1fr 280px;gap:10px;height:100%;overflow:hidden;
+  }
+  .teori-left{overflow-y:auto;padding-right:6px;scrollbar-width:thin;}
+  .teori-left::-webkit-scrollbar{width:3px;}
+  .teori-left::-webkit-scrollbar-thumb{background:var(--border);border-radius:4px;}
+  .teori-img-wrap {
+    background:var(--surface);border:1px solid var(--border);
+    border-radius:var(--r);overflow:hidden;
+    display:flex;flex-direction:column;gap:8px;padding:10px;
+    position:sticky;top:0;max-height:100%;overflow-y:auto;scrollbar-width:thin;
+  }
+  .teori-img{width:100%;border-radius:8px;object-fit:contain;max-height:180px;}
+  .theory-card{
+    background:var(--surface);border:1px solid var(--border);
+    border-radius:var(--r);padding:10px;margin-bottom:8px;
+  }
+  .theory-card h3{font-size:12px;font-weight:700;color:var(--accent);margin-bottom:6px;}
+  .theory-card p{font-size:11px;line-height:1.6;color:var(--text2);}
+  .theory-card p strong{color:var(--text);}
+  .struct-compare {
+    display:grid;grid-template-columns:1fr 1fr;gap:10px;margin:10px 0;
+  }
+  .struct-box {
+    background:var(--bg);border-radius:8px;padding:12px;text-align:center;
+    border:1px solid var(--border);
+  }
+  .struct-box h4{font-size:12px;font-weight:700;margin-bottom:6px;}
+  .struct-box.aldehida h4{color:var(--accent3);}
+  .struct-box.keton h4{color:var(--accent2);}
+  .struct-formula {
+    font-size:20px;font-weight:800;letter-spacing:1px;margin:6px 0;
+  }
+  .struct-box.aldehida .struct-formula{color:var(--accent3);}
+  .struct-box.keton .struct-formula{color:var(--accent2);}
+  .struct-desc{font-size:10px;color:var(--text2);line-height:1.5;}
+  .uji-table{width:100%;border-collapse:collapse;font-size:11px;margin-top:6px;}
+  .uji-table th{
+    background:rgba(0,212,255,0.1);color:var(--accent);
+    padding:6px 8px;text-align:left;border:1px solid var(--border);font-size:11px;
+  }
+  .uji-table td{padding:6px 8px;border:1px solid var(--border);color:var(--text2);}
+  .uji-table tr:nth-child(even) td{background:rgba(255,255,255,0.02);}
+  .chip{
+    display:inline-block;padding:2px 8px;border-radius:10px;font-size:10px;font-weight:700;
+  }
+  .chip.merah{background:rgba(192,57,43,0.2);color:#e74c3c;border:1px solid rgba(192,57,43,0.4);}
+  .chip.biru{background:rgba(26,107,171,0.2);color:#74b9ff;border:1px solid rgba(26,107,171,0.4);}
+  .chip.perak{background:rgba(192,192,192,0.2);color:#ddd;border:1px solid rgba(192,192,192,0.4);}
+
+  /* ──────── ALAT BAHAN ──────── */
+  .ab-fullscreen{
+    display:flex;flex-direction:column;height:100%;overflow:hidden;
+  }
+  .ab-grid{
+    display:grid;grid-template-columns:repeat(auto-fill,minmax(120px,1fr));
+    gap:8px;
+  }
+  .ab-card{
+    background:var(--surface);border:1px solid var(--border);
+    border-radius:var(--r);padding:8px 6px;
+    text-align:center;transition:all 0.25s;cursor:default;
+    display:flex;flex-direction:column;align-items:center;gap:5px;
+  }
+  .ab-card:hover{border-color:var(--accent);transform:translateY(-3px);box-shadow:var(--glow);}
+  .ab-card img{width:50px;height:50px;object-fit:contain;}
+  .ab-card .ab-name{font-size:11px;font-weight:700;color:var(--text);line-height:1.3;}
+  .ab-card .ab-desc{font-size:9.5px;color:var(--text2);line-height:1.4;}
+  .ab-card .ab-badge{
+    padding:2px 8px;border-radius:10px;font-size:9px;font-weight:700;
+    background:rgba(0,212,255,0.1);color:var(--accent);border:1px solid rgba(0,212,255,0.3);
+  }
+  .ab-badge.bahan{background:rgba(255,107,53,0.1);color:var(--accent2);border-color:rgba(255,107,53,0.3);}
+  .ab-section-title{
+    font-size:12px;font-weight:700;color:var(--accent4);
+    padding:6px 10px;background:rgba(255,204,0,0.08);
+    border-radius:6px;margin-bottom:8px;display:inline-flex;align-items:center;gap:6px;
+  }
+
+  /* ──────── SIMULASI ──────── */
+  #panel-simulasi {
+    padding: 0;
+    flex-direction: row;
+  }
+  .sim-sidebar {
+    width: 170px; min-width:170px;
+    background: var(--surface);
+    border-right: 1px solid var(--border);
+    display: flex; flex-direction: column;
+    padding: 10px;
+    gap: 5px;
+    overflow-y:auto;
+  }
+  .sim-sidebar-title{
+    font-size:10px;font-weight:700;letter-spacing:1.5px;
+    text-transform:uppercase;color:var(--text2);margin-bottom:4px;
+  }
+  .percob-btn{
+    padding:8px 10px;border-radius:8px;border:1px solid var(--border);
+    background:transparent;color:var(--text2);
+    font-family:'Poppins',sans-serif;font-size:11px;font-weight:600;
+    cursor:pointer;text-align:left;transition:all 0.2s;
+    display:flex;align-items:center;gap:8px;
+  }
+  .percob-btn:hover{border-color:var(--accent);color:var(--text);}
+  .percob-btn.active{
+    background:rgba(0,212,255,0.1);border-color:var(--accent);color:var(--accent);
+    box-shadow:var(--glow);
+  }
+  .percob-icon{font-size:16px;}
+  .percob-label{font-size:10px;color:inherit;opacity:0.8;}
+  .sim-main {
+    flex:1;overflow:hidden;display:flex;flex-direction:column;
+  }
+  .sim-header{
+    padding:4px 14px;border-bottom:1px solid var(--border);
+    display:flex;align-items:center;gap:8px;flex-shrink:0;
+  }
+  .sim-header h2{font-size:12px;font-weight:700;color:var(--accent);}
+  .sim-header p{font-size:10px;color:var(--text2);}
+  .sim-body {
+    flex:1;overflow:hidden;display:flex;flex-direction:column;
+  }
+  .sim-lab-area{
+    flex:1;position:relative;overflow:hidden;
+    background: linear-gradient(180deg, #0a1a2e 0%, #0d2040 60%, #111520 100%);
+    display:flex;align-items:center;justify-content:center;
+  }
+  /* Lab table - lowered to 35% so all equipment is visible above */
+  .lab-table {
+    position:absolute;bottom:0;width:100%;height:35%;
+    background:linear-gradient(180deg,#1a2535 0%,#141e2d 100%);
+    border-top:3px solid #2d4060;
+    border-radius:8px 8px 0 0;
+  }
+  .lab-table::before {
+    content:''; position:absolute;top:0;left:0;right:0;height:3px;
+    background:linear-gradient(90deg,transparent,rgba(0,212,255,0.4),transparent);
+  }
+  /* Bunsen burner - sits on the table surface */
+  .bunsen-wrap{
+    position:absolute;bottom:calc(35% - 65px);left:50%;transform:translateX(-50%);
+    z-index:10;display:flex;flex-direction:column;align-items:center;
+  }
+  .bunsen-img{width:75px;object-fit:contain;}
+  .bunsen-inner{position:relative;display:inline-flex;align-items:flex-end;justify-content:center;}
+  .beaker-wrap{
+    position:absolute;z-index:15;
+    display:flex;flex-direction:column;align-items:center;
+    bottom:calc(35% + 2px);
+  }
+  .beaker-img{width:75px;object-fit:contain;}
+  .test-tubes-wrap{
+    position:absolute;bottom:calc(35% + 8px);
+    display:flex;gap:50px;z-index:20;
+    transition:all 0.5s;
+  }
+  .tube-unit{
+    display:flex;flex-direction:column;align-items:center;gap:4px;
+    position:relative;
+  }
+  .tube-label{
+    font-size:11px;font-weight:700;
+    background:var(--surface);border:1px solid var(--border);
+    padding:3px 10px;border-radius:10px;color:var(--text);
+  }
+
+  /* SVG Test tube */
+  .tube-svg{
+    filter:drop-shadow(0 0 8px rgba(0,212,255,0.2));
+    cursor:pointer;transition:filter 0.3s;
+  }
+  .tube-svg:hover{filter:drop-shadow(0 0 12px rgba(0,212,255,0.5));}
+
+  /* Pipet animation */
+  .pipet-anim{
+    position:absolute;z-index:30;pointer-events:none;
+    width:60px;height:60px;
+    object-fit:contain;
+    transition:all 0.8s cubic-bezier(0.4,0,0.2,1);
+    transform-origin:bottom center;
+  }
+  .drop{
+    position:absolute;width:6px;height:8px;
+    border-radius:50% 50% 50% 50% / 60% 60% 40% 40%;
+    animation:dropFall 0.6s ease-in forwards;
+  }
+  @keyframes dropFall{
+    0%{transform:translateY(0);opacity:1;}
+    80%{opacity:1;}
+    100%{transform:translateY(90px);opacity:0;}
+  }
+
+  /* Step controls - bottom horizontal panel */
+  .sim-steps{
+    height:auto;max-height:110px;min-height:80px;
+    background:var(--surface);border-top:1px solid var(--border);
+    display:flex;flex-direction:row;align-items:center;
+    padding:6px 10px;gap:8px;overflow-x:auto;overflow-y:hidden;
+    scrollbar-width:thin;flex-shrink:0;
+  }
+  .sim-steps::-webkit-scrollbar{height:3px;}
+  .sim-steps::-webkit-scrollbar-thumb{background:var(--border);}
+  .sim-steps-header{
+    display:flex;flex-direction:column;gap:3px;min-width:120px;flex-shrink:0;
+  }
+  .step-item{
+    display:flex;gap:5px;align-items:flex-start;padding:5px 7px;
+    border-radius:6px;border:1px solid var(--border);
+    transition:all 0.3s;font-size:9px;color:var(--text2);
+    background:transparent;min-width:140px;max-width:165px;flex-shrink:0;
+  }
+  .step-item.current{
+    border-color:var(--accent);background:rgba(0,212,255,0.07);color:var(--text);
+  }
+  .step-item.done{
+    border-color:var(--accent3);background:rgba(0,255,157,0.05);opacity:0.7;
+  }
+  .step-num{
+    width:18px;height:18px;min-width:18px;border-radius:50%;
+    background:var(--surface2);border:1px solid var(--border);
+    display:flex;align-items:center;justify-content:center;
+    font-size:8px;font-weight:700;color:var(--text2);flex-shrink:0;
+  }
+  .step-item.current .step-num{
+    background:var(--accent);color:#fff;border-color:var(--accent);
+  }
+  .step-item.done .step-num{
+    background:var(--accent3);color:#fff;border-color:var(--accent3);
+  }
+  .step-text{line-height:1.3;font-size:9px;}
+  .step-text strong{color:var(--accent);display:block;margin-bottom:1px;font-size:9px;}
+  .btn-next-step{
+    padding:6px 12px;border-radius:6px;border:none;
+    background:linear-gradient(90deg,var(--accent),var(--accent2));
+    color:#fff;font-family:'Poppins',sans-serif;font-size:10px;font-weight:700;
+    cursor:pointer;transition:all 0.2s;
+    display:flex;align-items:center;justify-content:center;gap:4px;
+    white-space:nowrap;min-width:130px;flex-shrink:0;height:30px;
+  }
+  .btn-next-step:hover{opacity:0.9;transform:translateY(-1px);}
+  .btn-next-step:disabled{opacity:0.4;cursor:not-allowed;transform:none;}
+  .btn-reset{
+    padding:5px 10px;border-radius:6px;border:1px solid var(--border);
+    background:transparent;color:var(--text2);font-family:'Poppins',sans-serif;
+    font-size:9px;font-weight:600;cursor:pointer;transition:all 0.2s;
+    display:flex;align-items:center;justify-content:center;gap:4px;
+    white-space:nowrap;min-width:80px;flex-shrink:0;height:28px;
+  }
+  .btn-reset:hover{border-color:var(--danger);color:var(--danger);}
+
+  .result-panel{
+    background:var(--bg);border:1px solid var(--border);
+    border-radius:8px;padding:8px 10px;
+    font-size:10px;display:none;min-width:280px;flex-shrink:0;
+  }
+  .result-panel.show{display:block;animation:fadeIn 0.4s ease;}
+  .result-row{
+    display:flex;gap:6px;align-items:center;margin-bottom:4px;
+    padding:4px 6px;background:var(--surface);border-radius:6px;
+  }
+  .result-tube{
+    width:8px;height:22px;border-radius:0 0 5px 5px;
+    border:2px solid rgba(255,255,255,0.2);
+  }
+  .result-tube.red{background:linear-gradient(180deg,#e74c3c,#c0392b);border-color:#e74c3c;}
+  .result-tube.blue{background:linear-gradient(180deg,#1a6bab,#0e4880);border-color:#1a6bab;}
+  .result-tube.silver{background:linear-gradient(180deg,#ddd,#aaa);border-color:#bbb;}
+  .result-label{font-size:10px;color:var(--text);}
+  .result-desc{font-size:9px;color:var(--text2);}
+
+  /* observation visual */
+  .obs-badge{
+    padding:3px 10px;border-radius:10px;font-size:10px;font-weight:700;
+    display:inline-block;margin-top:4px;
+  }
+  .obs-badge.positive{background:rgba(192,57,43,0.2);color:#e74c3c;border:1px solid #c0392b;}
+  .obs-badge.positive-silver{background:rgba(192,192,192,0.15);color:#ddd;border:1px solid #aaa;}
+  .obs-badge.negative{background:rgba(26,107,171,0.2);color:#74b9ff;border:1px solid #1a6bab;}
+
+  /* ──────── DISKUSI ──────── */
+  .diskusi-fullscreen{
+    display:flex;flex-direction:column;height:100%;overflow:hidden;
+  }
+  .diskusi-grid{
+    display:grid;grid-template-columns:1fr 1fr;gap:8px;
+  }
+  .diskusi-card{
+    background:var(--surface);border:1px solid var(--border);
+    border-radius:var(--r);padding:10px;display:flex;flex-direction:column;gap:5px;
+    overflow:hidden;
+  }
+  .diskusi-card h3{font-size:11px;font-weight:700;color:var(--accent);line-height:1.4;}
+  .diskusi-q{font-size:10px;color:var(--text2);line-height:1.5;max-height:50px;overflow-y:auto;}
+  .diskusi-textarea{
+    flex:1;min-height:50px;resize:none;
+    background:var(--bg);border:1px solid var(--border);
+    border-radius:8px;padding:6px;
+    color:var(--text);font-family:'Poppins',sans-serif;font-size:11px;
+    line-height:1.6;outline:none;transition:border-color 0.2s;
+  }
+  .diskusi-textarea:focus{border-color:var(--accent);}
+  .diskusi-textarea::placeholder{color:var(--text2);opacity:0.5;}
+  .btn-save{
+    padding:7px 14px;border-radius:20px;border:none;
+    background:rgba(0,212,255,0.1);color:var(--accent);
+    border:1px solid rgba(0,212,255,0.3);
+    font-family:'Poppins',sans-serif;font-size:11px;font-weight:600;
+    cursor:pointer;transition:all 0.2s;display:flex;align-items:center;gap:6px;
+    align-self:flex-start;
+  }
+  .btn-save:hover{background:rgba(0,212,255,0.2);}
+  .save-status{font-size:10px;color:var(--accent3);display:none;align-items:center;gap:4px;}
+  .save-status.show{display:flex;animation:fadeIn 0.3s ease;}
+
+  /* ──────── TOAST ──────── */
+  #toast{
+    position:fixed;bottom:16px;left:50%;transform:translateX(-50%) translateY(80px);
+    background:var(--surface);border:1px solid var(--accent);
+    border-radius:30px;padding:8px 20px;
+    font-size:12px;color:var(--text);
+    display:flex;align-items:center;gap:8px;
+    transition:transform 0.4s cubic-bezier(0.4,0,0.2,1);
+    z-index:9999;white-space:nowrap;
+    box-shadow:var(--glow);
+  }
+  #toast.show{transform:translateX(-50%) translateY(0);}
+
+  /* ──────── HEATING ANIMATION ──────── */
+  @keyframes flicker{
+    0%,100%{transform:scaleY(1)scaleX(1);opacity:0.9;}
+    33%{transform:scaleY(1.1)scaleX(0.9);opacity:1;}
+    66%{transform:scaleY(0.95)scaleX(1.05);opacity:0.85;}
+  }
+  .flame{
+    position:absolute;
+    bottom:calc(100% - 22px);
+    left:calc(50% - 12px);
+    transform:translateX(-50%);
+    width:18px;height:32px;border-radius:50% 50% 20% 20%;
+    background:linear-gradient(180deg,#fff3cd 0%,#ff8c00 40%,#ff4500 100%);
+    animation:flicker 0.15s ease-in-out infinite;
+    transform-origin:bottom center;
+    filter:blur(1px);
+    display:none;
+    z-index:11;
+  }
+  .flame::after{
+    content:'';position:absolute;
+    bottom:0;left:50%;transform:translateX(-50%);
+    width:9px;height:15px;border-radius:50% 50% 30% 30%;
+    background:linear-gradient(180deg,#4dc9f6 0%,#1e90ff 100%);
+    filter:blur(0.5px);
+  }
+  .flame.on{display:block;}
+
+  /* bubbles */
+  @keyframes bubbleUp{
+    0%{transform:translateX(0)translateY(0);opacity:0.8;}
+    100%{transform:translateX(var(--dx,5px))translateY(-30px);opacity:0;}
+  }
+  .bubble{
+    position:absolute;border-radius:50%;
+    background:rgba(255,255,255,0.3);
+    animation:bubbleUp 0.8s ease-out forwards;
+    pointer-events:none;
+  }
+
+  /* color change anim */
+  @keyframes colorChange{
+    0%{fill:var(--start);}
+    100%{fill:var(--end);}
+  }
+
+  /* silver mirror effect */
+  @keyframes silverShine{
+    0%{opacity:0;}
+    100%{opacity:1;}
+  }
+
+  /* Stamp/endapan effect */
+  .endapan-overlay{
+    position:absolute;pointer-events:none;
+    bottom:0;left:0;right:0;
+    border-radius:0 0 10px 10px;
+    transition:all 1.5s ease;
+  }
+
+  /* percussion */
+  .shake{animation:shake 0.4s ease;}
+  @keyframes shake{0%,100%{transform:translateX(0)}25%{transform:translateX(-3px)}75%{transform:translateX(3px)}}
+
+  /* ─── penangas air (water bath) ─── */
+  .waterbath-wrap{
+    position:absolute;bottom:calc(35% + 8px);
+    left:50%;transform:translateX(-50%);
+    z-index:12;display:flex;flex-direction:column;align-items:center;
+    width:240px;
+  }
+  .waterbath-container{
+    width:260px;height:80px;
+    background:linear-gradient(180deg,rgba(100,180,255,0.3),rgba(60,130,220,0.4));
+    border:2px solid rgba(100,180,255,0.5);
+    border-radius:0 0 12px 12px;border-top:none;
+    position:relative;overflow:hidden;display:none;
+  }
+  .waterbath-container.show{display:block;}
+  .water-surface{
+    position:absolute;top:0;left:0;right:0;height:4px;
+    background:rgba(150,210,255,0.6);
+    animation:wave 1.5s ease-in-out infinite;
+  }
+  @keyframes wave{0%,100%{transform:scaleX(1)}50%{transform:scaleX(0.97)translateX(2px)}}
+  .waterbath-steam{
+    position:absolute;top:-20px;left:50%;transform:translateX(-50%);
+    width:60px;height:20px;display:none;
+  }
+  .steam-puff{
+    position:absolute;background:rgba(200,220,255,0.25);
+    border-radius:50%;animation:steamRise 1.5s ease-out infinite;
+  }
+  @keyframes steamRise{
+    0%{transform:translateY(0)scale(0.5);opacity:0.6;}
+    100%{transform:translateY(-30px)scale(1.5);opacity:0;}
+  }
+
+  /* ─── progress bar ─── */
+  .progress-wrap{
+    height:4px;background:rgba(255,255,255,0.05);
+    border-radius:2px;overflow:hidden;margin:4px 0;
+  }
+  .progress-bar{
+    height:100%;background:linear-gradient(90deg,var(--accent),var(--accent2));
+    border-radius:2px;transition:width 0.4s ease;
+  }
+
+  /* ─── info block ─── */
+  .info-block{
+    background:rgba(0,212,255,0.05);border:1px solid var(--border);
+    border-radius:8px;padding:8px 10px;
+    font-size:10px;color:var(--text2);line-height:1.6;
+  }
+  .info-block strong{color:var(--accent);}
+  .info-block.orange{background:rgba(255,107,53,0.05);border-color:rgba(255,107,53,0.2);}
+  .info-block.orange strong{color:var(--accent2);}
+  .info-block.green{background:rgba(0,255,157,0.05);border-color:rgba(0,255,157,0.2);}
+  .info-block.green strong{color:var(--accent3);}
+
+  /* ─── KESIMPULAN ─── */
+  .kesimpulan-fullscreen{
+    display:flex;flex-direction:column;height:100%;overflow-y:auto;scrollbar-width:thin;
+  }
+  .kesimpulan-fullscreen::-webkit-scrollbar{width:3px;}
+  .kesimpulan-fullscreen::-webkit-scrollbar-thumb{background:var(--border);border-radius:4px;}
+  .kesimpulan-card{
+    background:var(--surface);border:1px solid var(--border);
+    border-radius:var(--r);padding:12px;margin-bottom:8px;
+  }
+  .kesimpulan-card h3{font-size:12px;font-weight:700;color:var(--accent);margin-bottom:6px;}
+  .react-table{width:100%;border-collapse:collapse;font-size:10px;}
+  .react-table th{
+    background:rgba(0,212,255,0.1);color:var(--accent);
+    padding:6px 8px;text-align:left;border:1px solid var(--border);
+  }
+  .react-table td{padding:5px 8px;border:1px solid var(--border);color:var(--text2);vertical-align:middle;}
+  .react-table tr:nth-child(even) td{background:rgba(255,255,255,0.02);}
+
+  /* ─── FOOTER ─── */
+  #footer{
+    height:24px;min-height:24px;
+    background:var(--surface);border-top:1px solid var(--border);
+    display:flex;align-items:center;justify-content:space-between;
+    padding:0 16px;
+    font-size:10px;color:var(--text2);
+  }
+
+  /* ─── PDF Download Button ─── */
+  .btn-download-pdf{
+    padding:10px 24px;border-radius:25px;border:none;
+    background:linear-gradient(90deg, #ff6b35, #ff8c5a);
+    color:#fff;font-family:'Poppins',sans-serif;
+    font-size:13px;font-weight:700;cursor:pointer;
+    box-shadow:0 4px 15px rgba(255,107,53,0.4);
+    transition:all 0.3s;display:inline-flex;align-items:center;gap:8px;
+  }
+  .btn-download-pdf:hover{transform:translateY(-2px);box-shadow:0 6px 25px rgba(255,107,53,0.6);}
+
+  /* ─── TOUCH SUPPORT ─── */
+  @media (pointer: coarse) {
+    .tab-btn{padding:10px 16px 12px;font-size:13px;min-height:44px;}
+    .btn-next-step,.btn-reset,.btn-save,.btn-download-pdf{min-height:44px;font-size:13px;}
+    .percob-btn{padding:12px 14px;min-height:44px;}
+    .diskusi-textarea{min-height:100px;font-size:14px;}
+    .tujuan-card{padding:12px;}
+    .ab-card{padding:10px 6px;min-height:44px;}
+    .hasil-tab{padding:8px 16px;min-height:44px;font-size:12px;}
+    .tube-svg{cursor:pointer;-webkit-tap-highlight-color:transparent;}
+    button{-webkit-tap-highlight-color:transparent;touch-action:manipulation;}
+    textarea{touch-action:pan-y;-webkit-overflow-scrolling:touch;}
+    .sim-steps{-webkit-overflow-scrolling:touch;}
+    .scroll-inner,.ab-scroll,.kesimpulan-fullscreen,.teori-left{-webkit-overflow-scrolling:touch;}
+  }
+
+  /* ─── AB Scroll ─── */
+  .ab-scroll::-webkit-scrollbar{width:3px;}
+  .ab-scroll::-webkit-scrollbar-thumb{background:var(--border);border-radius:4px;}
+</style>
+</head>
+<body>
+<div id="app">
+  <!-- HEADER -->
+  <div id="header">
+    <div class="logo-icon">⚗️</div>
+    <div>
+      <h1>Lab Maya Kimia <span>/ SMA</span></h1>
+    </div>
+    <div class="spacer"></div>
+    <div class="badge"><div class="dot"></div> Senyawa Karbon – Kelas XII</div>
+  </div>
+
+  <!-- NAV -->
+  <div id="nav">
+    <button class="tab-btn active" onclick="switchTab('sampul',this)">
+      <span class="tab-icon">🏠</span> Sampul
+    </button>
+    <button class="tab-btn" onclick="switchTab('tujuan',this)">
+      <span class="tab-icon">🎯</span> Tujuan & Hasil Belajar
+    </button>
+    <button class="tab-btn" onclick="switchTab('teori',this)">
+      <span class="tab-icon">📚</span> Dasar Teori
+    </button>
+    <button class="tab-btn" onclick="switchTab('alatbahan',this)">
+      <span class="tab-icon">🧪</span> Alat & Bahan
+    </button>
+    <button class="tab-btn" onclick="switchTab('simulasi',this)">
+      <span class="tab-icon">🔬</span> Simulasi
+    </button>
+    <button class="tab-btn" onclick="switchTab('diskusi',this)">
+      <span class="tab-icon">💬</span> Diskusi
+    </button>
+    <button class="tab-btn" onclick="switchTab('kesimpulan',this)">
+      <span class="tab-icon">📊</span> Kesimpulan
+    </button>
+  </div>
+
+  <!-- CONTENT -->
+  <div id="content">
+
+    <!-- ══ SAMPUL ══ -->
+    <div class="tab-panel active" id="panel-sampul">
+      <div class="bg-particles"></div>
+      <div class="sampul-inner">
+        <img src="https://yulinestiyarum.github.io/senyawakarbon/sampul.png"
+             alt="Ilustrasi Senyawa Karbon"
+             class="sampul-img"
+             onerror="this.style.fontSize='80px';this.style.lineHeight='280px';this.style.textAlign='center';this.alt='⚗️';this.removeAttribute('src');">
+        <div class="sampul-text">
+          <div class="sampul-label">Lab Maya Kimia</div>
+          <h1 class="sampul-title">Identifikasi <span>Aldehida</span> &<br><span>Keton</span></h1>
+          <p class="sampul-subtitle">
+            Eksplorasi sifat kimia senyawa karbon turunan alkana melalui uji kualitatif
+            Fehling, Tollens, dan Benedict secara interaktif dan visual.
+          </p>
+          <div class="sampul-tags">
+            <span class="sampul-tag">🔬 Uji Fehling</span>
+            <span class="sampul-tag orange">⚗️ Uji Tollens</span>
+            <span class="sampul-tag green">🧪 Uji Benedict</span>
+            <span class="sampul-tag">📚 SMA Kelas XII</span>
+          </div>
+          <button class="btn-mulai" onclick="switchTab('tujuan', document.querySelectorAll('.tab-btn')[1]); playSound('jump')">
+            ▶ Mulai Praktikum
+          </button>
+        </div>
+      </div>
+    </div>
+
+    <!-- ══ TUJUAN ══ -->
+    <div class="tab-panel" id="panel-tujuan">
+      <div class="tujuan-fullscreen">
+        <div class="tp-section">
+          <div class="sec-title">📘 Tujuan Pembelajaran</div>
+          <div class="tujuan-pembelajaran-card">
+            <div class="tp-icon">🎓</div>
+            <div class="tp-content">
+              <strong>Tujuan Pembelajaran (TP)</strong>
+              <p>Menjelaskan senyawa karbon dan makromolekul serta penerapannya dalam kehidupan sehari-hari.</p>
+            </div>
+          </div>
+        </div>
+        <div class="sec-title">🎯 Tujuan Percobaan</div>
+        <div class="tujuan-grid" style="margin-bottom:8px;">
+          <div class="tujuan-card">
+            <div class="tujuan-num">1</div>
+            <div class="tujuan-text">
+              <strong>Identifikasi Struktur Gugus Fungsi</strong>
+              Mengidentifikasi perbedaan struktur gugus fungsi antara senyawa aldehida (−CHO) dan keton (−CO−) dengan tepat.
+            </div>
+          </div>
+          <div class="tujuan-card">
+            <div class="tujuan-num">2</div>
+            <div class="tujuan-text">
+              <strong>Uji Identifikasi Kualitatif</strong>
+              Membedakan sifat kimia aldehida dan keton melalui simulasi uji kualitatif (pereaksi Fehling, Tollens, dan Benedict) secara akurat.
+            </div>
+          </div>
+          <div class="tujuan-card">
+            <div class="tujuan-num">3</div>
+            <div class="tujuan-text">
+              <strong>Evaluasi Hasil Percobaan</strong>
+              Menyimpulkan perbedaan reaktivitas aldehida dan keton terhadap agen pengoksidasi berdasarkan perubahan visual yang terjadi.
+            </div>
+          </div>
+          <div class="tujuan-card">
+            <div class="tujuan-num">4</div>
+            <div class="tujuan-text">
+              <strong>Penerapan dalam Kehidupan</strong>
+              Menjelaskan fungsi senyawa aldehida (formalin) dan keton (aseton) dalam kehidupan sehari-hari berdasarkan sifat spesifiknya.
+            </div>
+          </div>
+        </div>
+
+        <div class="sec-title">🏆 Hasil Belajar</div>
+        <div class="hasil-tabs">
+          <button class="hasil-tab active" onclick="switchHasil(this,'kognitif')">🧠 Kognitif</button>
+          <button class="hasil-tab" onclick="switchHasil(this,'psiko')">🤲 Psikomotorik</button>
+          <button class="hasil-tab" onclick="switchHasil(this,'afektif')">💡 Afektif</button>
+        </div>
+        <div class="theory-card">
+          <div class="hasil-content active" id="hasil-kognitif">
+            <div class="hasil-item">
+              <span class="hasil-icon">✅</span>
+              <div class="hasil-desc"><strong>Membedakan Struktur dan Sifat Kimia:</strong> Mampu membedakan struktur dan sifat kimia aldehida-keton secara mendalam.</div>
+            </div>
+            <div class="hasil-item">
+              <span class="hasil-icon">✅</span>
+              <div class="hasil-desc"><strong>Analisis Uji Kualitatif:</strong> Mampu menganalisis hasil uji kualitatif menggunakan pereaksi Fehling, Tollens, dan Benedict.</div>
+            </div>
+            <div class="hasil-item">
+              <span class="hasil-icon">✅</span>
+              <div class="hasil-desc"><strong>Penerapan Kehidupan:</strong> Mampu menjelaskan penerapan senyawa aldehida dan keton dalam kehidupan sehari-hari.</div>
+            </div>
+          </div>
+          <div class="hasil-content" id="hasil-psiko">
+            <div class="hasil-item">
+              <span class="hasil-icon">🔬</span>
+              <div class="hasil-desc"><strong>Operasikan Simulasi:</strong> Mampu mengoperasikan simulasi laboratorium virtual Senyawa Karbon dengan lancar.</div>
+            </div>
+            <div class="hasil-item">
+              <span class="hasil-icon">📊</span>
+              <div class="hasil-desc"><strong>Sajikan Data:</strong> Mampu menyajikan data hasil pengamatan simulasi secara akurat dan terstruktur.</div>
+            </div>
+          </div>
+          <div class="hasil-content" id="hasil-afektif">
+            <div class="hasil-item">
+              <span class="hasil-icon">🎯</span>
+              <div class="hasil-desc"><strong>Teliti & Objektif:</strong> Menunjukkan sikap teliti, objektif, dan kritis dalam mengamati serta mencatat data hasil percobaan.</div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ══ TEORI ══ -->
+    <div class="tab-panel" id="panel-teori">
+      <div class="teori-layout">
+        <div class="teori-left">
+          <div class="sec-title">📚 Dasar Teori</div>
+          <div class="theory-card">
+            <h3>1. Struktur Gugus Fungsi</h3>
+            <p>Aldehida (alkanal) dan keton (alkanon) adalah senyawa karbon turunan alkana yang berisomer fungsi. Keduanya memiliki <strong>gugus karbonil (−C=O)</strong> dengan rumus umum C<sub>n</sub>H<sub>2n</sub>O.</p>
+            <div class="struct-compare" style="margin-top:10px;">
+              <div class="struct-box aldehida">
+                <h4>ALDEHIDA</h4>
+                <div class="struct-formula">R−CHO</div>
+                <div class="struct-desc">Gugus karbonil terikat pada atom H (−CHO), selalu di <strong>ujung</strong> rantai karbon.</div>
+                <div style="margin-top:6px;">
+                  <span class="chip merah">Contoh: Butanal (C₄H₈O)</span>
+                </div>
+              </div>
+              <div class="struct-box keton">
+                <h4>KETON</h4>
+                <div class="struct-formula">R−CO−R'</div>
+                <div class="struct-desc">Gugus karbonil diapit dua gugus alkil (−CO−), selalu di <strong>tengah</strong> rantai karbon.</div>
+                <div style="margin-top:6px;">
+                  <span class="chip biru">Contoh: 2-Butanon (C₄H₈O)</span>
+                </div>
+              </div>
+            </div>
+          </div>
+          <div class="theory-card">
+            <h3>2. Sifat Kimia & Reaktivitas</h3>
+            <p>Adanya atom hidrogen pada gugus karbonil membuat <strong>aldehida mudah dioksidasi</strong> menjadi asam karboksilat. Keton <strong>sangat sulit dioksidasi</strong> karena tidak memiliki atom H tersebut.</p>
+            <table class="uji-table" style="margin-top:10px;">
+              <tr>
+                <th>Pereaksi</th><th>Aldehida (Butanal)</th><th>Keton (2-Butanon)</th>
+              </tr>
+              <tr>
+                <td><strong>Fehling</strong><br><span style="font-size:10px;color:var(--text2)">Ion Cu²⁺ (biru)</span></td>
+                <td><span class="chip merah">Endapan merah bata (Cu₂O)</span></td>
+                <td><span class="chip biru">Tetap biru (tidak bereaksi)</span></td>
+              </tr>
+              <tr>
+                <td><strong>Tollens</strong><br><span style="font-size:10px;color:var(--text2)">Ion Ag⁺ kompleks</span></td>
+                <td><span class="chip perak">Cermin perak (Ag)</span></td>
+                <td><span class="chip biru">Tidak bereaksi</span></td>
+              </tr>
+              <tr>
+                <td><strong>Benedict</strong><br><span style="font-size:10px;color:var(--text2)">Ion Cu²⁺ (biru)</span></td>
+                <td><span class="chip merah">Endapan merah bata (Cu₂O)</span></td>
+                <td><span class="chip biru">Tetap biru (tidak bereaksi)</span></td>
+              </tr>
+            </table>
+          </div>
+          <div class="theory-card">
+            <h3>3. Penerapan dalam Kehidupan</h3>
+            <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-top:6px;">
+              <div class="info-block green">
+                <strong>Aldehida – Formalin</strong><br>
+                Metanal (formaldehida) dilarutkan dalam air (30–40%) menghasilkan formalin. Sangat reaktif membunuh bakteri → digunakan sebagai disinfektan dan pengawet spesimen biologi.
+              </div>
+              <div class="info-block orange">
+                <strong>Keton – Aseton</strong><br>
+                Propanon (aseton) adalah cairan volatil dan pelarut organik yang sangat baik. Digunakan sebagai pelarut cat kuku (kuteks), pelarut lilin, dan pelarut resin.
+              </div>
+            </div>
+          </div>
+        </div>
+        <div class="teori-img-wrap">
+          <div style="font-size:11px;font-weight:700;color:var(--accent);margin-bottom:4px;">📌 Ilustrasi Materi</div>
+          <img src="https://yulinestiyarum.github.io/senyawakarbon/teori.png"
+               alt="Ilustrasi Teori Senyawa Karbon"
+               class="teori-img"
+               onerror="this.style.padding='20px';this.style.textAlign='center';this.alt='Gambar tidak tersedia';this.style.color='var(--text2)';this.style.fontSize='12px';">
+          <div class="info-block" style="margin-top:6px;">
+            <strong>Isomer Fungsi:</strong><br>
+            Aldehida dan keton memiliki rumus molekul yang sama (C<sub>n</sub>H<sub>2n</sub>O) namun berbeda gugus fungsinya.
+          </div>
+          <div class="info-block green" style="margin-top:6px;">
+            <strong>Kunci Identifikasi:</strong><br>
+            Aldehida dapat <em>mereduksi</em> ion Cu²⁺ dan Ag⁺, menghasilkan perubahan warna yang khas dan terlihat jelas.
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ══ ALAT & BAHAN ══ -->
+    <div class="tab-panel" id="panel-alatbahan">
+      <div class="ab-fullscreen">
+        <div class="sec-title" style="margin-bottom:6px;">🔧 Daftar Alat & Bahan</div>
+        <div style="flex:1;overflow-y:auto;scrollbar-width:thin;" class="ab-scroll">
+        <div class="ab-section-title">🔧 ALAT</div>
+        <div class="ab-grid" style="margin-bottom:10px;">
+          <div class="ab-card">
+            <img src="https://yulinestiyarum.github.io/termokimia/tabungreaksi.png" alt="Tabung Reaksi"
+                 onerror="this.style.fontSize='40px';this.style.lineHeight='64px';this.alt='🧪';this.removeAttribute('src');">
+            <div class="ab-name">Tabung Reaksi</div>
+            <div class="ab-desc">Wadah utama pencampuran sampel dengan reagen</div>
+            <span class="ab-badge">2 buah</span>
+          </div>
+          <div class="ab-card">
+            <img src="https://yulinestiyarum.github.io/termokimia/pipettetes.png" alt="Pipet Tetes"
+                 onerror="this.style.fontSize='40px';this.style.lineHeight='64px';this.alt='💧';this.removeAttribute('src');">
+            <div class="ab-name">Pipet Tetes</div>
+            <div class="ab-desc">Mengambil & meneteskan sampel secara presisi</div>
+            <span class="ab-badge">4 buah</span>
+          </div>
+          <div class="ab-card">
+            <img src="https://yulinestiyarum.github.io/Gelas-Kimia/Gelas-Kimia.png" alt="Gelas Kimia"
+                 onerror="this.style.fontSize='40px';this.style.lineHeight='64px';this.alt='🥛';this.removeAttribute('src');">
+            <div class="ab-name">Gelas Kimia</div>
+            <div class="ab-desc">Wadah air untuk membuat penangas air</div>
+            <span class="ab-badge">1 buah</span>
+          </div>
+          <div class="ab-card">
+            <img src="https://yulinestiyarum.github.io/elektrolisis/bunsen.png" alt="Pembakar Bunsen"
+                 onerror="this.style.fontSize='40px';this.style.lineHeight='64px';this.alt='🔥';this.removeAttribute('src');">
+            <div class="ab-name">Pembakar Bunsen</div>
+            <div class="ab-desc">Alat pemanas untuk uji Fehling & Benedict</div>
+            <span class="ab-badge">1 buah</span>
+          </div>
+          <div class="ab-card">
+            <img src="https://yulinestiyarum.github.io/senyawakarbon/kakitiga.png" alt="Kaki Tiga & Kawat Kasa"
+                 onerror="this.style.fontSize='40px';this.style.lineHeight='64px';this.alt='🔩';this.removeAttribute('src');">
+            <div class="ab-name">Kaki Tiga & Kawat Kasa</div>
+            <div class="ab-desc">Penyangga gelas kimia saat dipanaskan</div>
+            <span class="ab-badge">1 set</span>
+          </div>
+          <div class="ab-card">
+            <img src="https://yulinestiyarum.github.io/senyawakarbon/penjepit.png" alt="Penjepit Tabung"
+                 onerror="this.style.fontSize='40px';this.style.lineHeight='64px';this.alt='🗜️';this.removeAttribute('src');">
+            <div class="ab-name">Penjepit Tabung</div>
+            <div class="ab-desc">Memegang tabung saat dimasukkan ke penangas</div>
+            <span class="ab-badge">1 buah</span>
+          </div>
+        </div>
+
+        <div class="ab-section-title">🧴 BAHAN – Sampel Senyawa Uji</div>
+        <div class="ab-grid" style="margin-bottom:10px;">
+          <div class="ab-card">
+            <img src="https://yulinestiyarum.github.io/senyawakarbon/butanal.png" alt="Butanal"
+                 onerror="this.style.fontSize='40px';this.style.lineHeight='64px';this.alt='⚗️';this.removeAttribute('src');">
+            <div class="ab-name">Butanal / C₄H₈O</div>
+            <div class="ab-desc">Mewakili senyawa <strong>Aldehida</strong></div>
+            <span class="ab-badge bahan">Aldehida</span>
+          </div>
+          <div class="ab-card">
+            <img src="https://yulinestiyarum.github.io/senyawakarbon/2-butanon.png" alt="2-Butanon"
+                 onerror="this.style.fontSize='40px';this.style.lineHeight='64px';this.alt='⚗️';this.removeAttribute('src');">
+            <div class="ab-name">2−Butanon / C₄H₈O</div>
+            <div class="ab-desc">Mewakili senyawa <strong>Keton</strong></div>
+            <span class="ab-badge bahan">Keton</span>
+          </div>
+        </div>
+
+        <div class="ab-section-title">🧪 BAHAN – Reagen Penguji</div>
+        <div class="ab-grid" style="margin-bottom:10px;">
+          <div class="ab-card">
+            <img src="https://yulinestiyarum.github.io/senyawakarbon/fehling.png" alt="Fehling"
+                 onerror="this.style.fontSize='40px';this.style.lineHeight='64px';this.alt='🟦';this.removeAttribute('src');">
+            <div class="ab-name">Pereaksi Fehling</div>
+            <div class="ab-desc">Mengandung ion Cu²⁺ berwarna biru</div>
+            <span class="ab-badge bahan">Percobaan 1</span>
+          </div>
+          <div class="ab-card">
+            <img src="https://yulinestiyarum.github.io/senyawakarbon/tollens.png" alt="Tollens"
+                 onerror="this.style.fontSize='40px';this.style.lineHeight='64px';this.alt='🥛';this.removeAttribute('src');">
+            <div class="ab-name">Pereaksi Tollens</div>
+            <div class="ab-desc">Pereaksi perak amoniakal, mengandung ion Ag⁺</div>
+            <span class="ab-badge bahan">Percobaan 2</span>
+          </div>
+          <div class="ab-card">
+            <img src="https://yulinestiyarum.github.io/senyawakarbon/benedict.png" alt="Benedict"
+                 onerror="this.style.fontSize='40px';this.style.lineHeight='64px';this.alt='🟦';this.removeAttribute('src');">
+            <div class="ab-name">Pereaksi Benedict</div>
+            <div class="ab-desc">Mengandung ion Cu²⁺ berwarna biru</div>
+            <span class="ab-badge bahan">Percobaan 3</span>
+          </div>
+          <div class="ab-card">
+            <img src="https://yulinestiyarum.github.io/termokimia/aquades.png" alt="Aquades"
+                 onerror="this.style.fontSize='40px';this.style.lineHeight='64px';this.alt='💧';this.removeAttribute('src');">
+            <div class="ab-name">Air (Aquades)</div>
+            <div class="ab-desc">Media penangas air saat proses pemanasan</div>
+            <span class="ab-badge bahan">Pendukung</span>
+          </div>
+        </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ══ SIMULASI ══ -->
+    <div class="tab-panel" id="panel-simulasi">
+      <!-- Sidebar -->
+      <div class="sim-sidebar">
+        <div class="sim-sidebar-title">Pilih Percobaan</div>
+        <button class="percob-btn active" onclick="selectPercobaan(1,this)" id="btn-p1">
+          <span class="percob-icon">🔵</span>
+          <div>
+            <div style="font-size:11px;font-weight:700;">Percobaan 1</div>
+            <div class="percob-label">Uji Fehling</div>
+          </div>
+        </button>
+        <button class="percob-btn" onclick="selectPercobaan(2,this)" id="btn-p2">
+          <span class="percob-icon">⚪</span>
+          <div>
+            <div style="font-size:11px;font-weight:700;">Percobaan 2</div>
+            <div class="percob-label">Uji Tollens</div>
+          </div>
+        </button>
+        <button class="percob-btn" onclick="selectPercobaan(3,this)" id="btn-p3">
+          <span class="percob-icon">🔵</span>
+          <div>
+            <div style="font-size:11px;font-weight:700;">Percobaan 3</div>
+            <div class="percob-label">Uji Benedict</div>
+          </div>
+        </button>
+        <div style="margin-top:8px;height:1px;background:var(--border);"></div>
+        <div style="font-size:10px;color:var(--text2);line-height:1.6;margin-top:4px;">
+          💡 Klik tombol <strong style="color:var(--accent)">Langkah Selanjutnya</strong> untuk menjalankan simulasi tahap demi tahap.
+        </div>
+        <div style="margin-top:8px;">
+          <div style="font-size:10px;color:var(--text2);margin-bottom:4px;">Progress Keseluruhan</div>
+          <div class="progress-wrap">
+            <div class="progress-bar" id="overall-progress" style="width:0%"></div>
+          </div>
+          <div style="font-size:10px;color:var(--text2);text-align:right;" id="overall-pct">0 / 3 selesai</div>
+        </div>
+      </div>
+
+      <!-- Main Lab -->
+      <div class="sim-main">
+        <div class="sim-header">
+          <div>
+            <h2 id="sim-title">Percobaan 1: Uji Fehling</h2>
+            <p id="sim-desc">Identifikasi aldehida dan keton menggunakan pereaksi Fehling (Ion Cu²⁺)</p>
+          </div>
+        </div>
+        <div class="sim-body">
+          <!-- Lab visualization -->
+          <div class="sim-lab-area" id="lab-area">
+            <!-- Lab table -->
+            <div class="lab-table"></div>
+
+            <!-- Bunsen + Kaki tiga -->
+            <div class="bunsen-wrap" id="bunsen-wrap" style="display:none;">
+              <div class="bunsen-inner">
+                <div class="flame" id="flame"></div>
+                <img src="https://yulinestiyarum.github.io/elektrolisis/bunsen.png"
+                     class="bunsen-img" alt="Bunsen"
+                     onerror="this.style.fontSize='36px';this.style.lineHeight='60px';this.alt='🔥';this.removeAttribute('src');">
+              </div>
+            </div>
+
+            <!-- Water bath -->
+            <div class="waterbath-wrap" id="waterbath-wrap">
+              <div style="display:flex;gap:10px;position:relative;" id="waterbath-steam-area">
+                <div class="steam-puff" style="width:12px;height:12px;left:10px;animation-delay:0s;animation-duration:1.2s;display:none;" id="steam1"></div>
+                <div class="steam-puff" style="width:8px;height:8px;left:30px;animation-delay:0.4s;animation-duration:1.5s;display:none;" id="steam2"></div>
+                <div class="steam-puff" style="width:10px;height:10px;left:50px;animation-delay:0.8s;animation-duration:1.3s;display:none;" id="steam3"></div>
+              </div>
+              <div class="waterbath-container" id="waterbath">
+                <div class="water-surface"></div>
+                <!-- Gelas kimia icon inside -->
+                <div style="text-align:center;padding:4px 0;opacity:0.6;font-size:10px;color:rgba(150,200,255,0.8);font-weight:600;">Penangas Air 🌡️</div>
+              </div>
+            </div>
+
+            <!-- Test tubes -->
+            <div class="test-tubes-wrap" id="test-tubes-wrap" style="left:50%;transform:translateX(-50%);">
+              <!-- Tube 1: Butanal -->
+              <div class="tube-unit" id="tube1-unit">
+                <div class="tube-label" id="tube1-label">Tabung 1: Butanal</div>
+                <svg class="tube-svg" width="100" height="210" viewBox="0 0 60 130" id="tube1-svg" onclick="playSound('blup')">
+                  <defs>
+                    <linearGradient id="tg1" x1="0" y1="0" x2="1" y2="0">
+                      <stop offset="0%" stop-color="rgba(255,255,255,0.15)"/>
+                      <stop offset="50%" stop-color="rgba(255,255,255,0.05)"/>
+                      <stop offset="100%" stop-color="rgba(255,255,255,0.0)"/>
+                    </linearGradient>
+                    <clipPath id="clip1"><rect x="5" y="10" width="50" height="115" rx="0"/></clipPath>
+                  </defs>
+                  <!-- Tube body -->
+                  <rect x="5" y="10" width="50" height="100" fill="rgba(200,230,255,0.08)" stroke="rgba(150,200,255,0.5)" stroke-width="2" rx="3"/>
+                  <path d="M5,110 Q5,130 30,130 Q55,130 55,110" fill="rgba(200,230,255,0.08)" stroke="rgba(150,200,255,0.5)" stroke-width="2"/>
+                  <!-- Liquid fill -->
+                  <rect id="t1-liquid" x="7" y="60" width="46" height="50" fill="rgba(180,200,255,0.15)" rx="0"/>
+                  <path id="t1-bottom" d="M7,110 Q7,128 30,128 Q53,128 53,110" fill="rgba(180,200,255,0.15)"/>
+                  <!-- Endapan layer -->
+                  <rect id="t1-endapan" x="7" y="115" width="46" height="12" fill="transparent" rx="0" opacity="0"/>
+                  <path id="t1-endapan-bottom" d="M7,115 Q7,128 30,128 Q53,128 53,115" fill="transparent" opacity="0"/>
+                  <!-- Silver mirror -->
+                  <rect id="t1-silver" x="7" y="60" width="46" height="55" fill="transparent" opacity="0"/>
+                  <!-- Glass shine -->
+                  <rect x="10" y="12" width="6" height="96" fill="url(#tg1)" rx="2" opacity="0.6"/>
+                </svg>
+              </div>
+              <!-- Tube 2: 2-Butanon -->
+              <div class="tube-unit" id="tube2-unit">
+                <div class="tube-label" id="tube2-label">Tabung 2: 2-Butanon</div>
+                <svg class="tube-svg" width="100" height="210" viewBox="0 0 60 130" id="tube2-svg" onclick="playSound('blup')">
+                  <defs>
+                    <linearGradient id="tg2" x1="0" y1="0" x2="1" y2="0">
+                      <stop offset="0%" stop-color="rgba(255,255,255,0.15)"/>
+                      <stop offset="50%" stop-color="rgba(255,255,255,0.05)"/>
+                      <stop offset="100%" stop-color="rgba(255,255,255,0.0)"/>
+                    </linearGradient>
+                  </defs>
+                  <rect x="5" y="10" width="50" height="100" fill="rgba(200,230,255,0.08)" stroke="rgba(150,200,255,0.5)" stroke-width="2" rx="3"/>
+                  <path d="M5,110 Q5,130 30,130 Q55,130 55,110" fill="rgba(200,230,255,0.08)" stroke="rgba(150,200,255,0.5)" stroke-width="2"/>
+                  <rect id="t2-liquid" x="7" y="60" width="46" height="50" fill="rgba(180,200,255,0.15)" rx="0"/>
+                  <path id="t2-bottom" d="M7,110 Q7,128 30,128 Q53,128 53,110" fill="rgba(180,200,255,0.15)"/>
+                  <rect id="t2-endapan" x="7" y="115" width="46" height="12" fill="transparent" rx="0" opacity="0"/>
+                  <path id="t2-endapan-bottom" d="M7,115 Q7,128 30,128 Q53,128 53,115" fill="transparent" opacity="0"/>
+                  <rect id="t2-silver" x="7" y="60" width="46" height="55" fill="transparent" opacity="0"/>
+                  <rect x="10" y="12" width="6" height="96" fill="url(#tg2)" rx="2" opacity="0.6"/>
+                </svg>
+              </div>
+            </div>
+
+            <!-- Dropper animation -->
+            <img src="https://yulinestiyarum.github.io/termokimia/pipettetes.png"
+                 id="pipet-img" class="pipet-anim"
+                 alt="💧"
+                 style="top:10%;left:5%;opacity:0;"
+                 onerror="this.style.fontSize='30px';this.style.lineHeight='50px';this.removeAttribute('src');">
+
+            <!-- Drop container -->
+            <div id="drops-container" style="position:absolute;inset:0;pointer-events:none;overflow:visible;"></div>
+
+            <!-- Observation label -->
+            <div id="obs-label" style="
+              position:absolute;top:10px;right:10px;
+              background:var(--surface);border:1px solid var(--border);
+              border-radius:8px;padding:8px 12px;font-size:11px;
+              color:var(--text2);display:none;max-width:200px;
+            "></div>
+          </div>
+
+          <!-- Steps panel - horizontal bottom -->
+          <div class="sim-steps" id="sim-steps">
+            <div class="sim-steps-header">
+              <div style="font-size:10px;font-weight:700;color:var(--text2);">📋 Langkah</div>
+              <div class="progress-wrap">
+                <div class="progress-bar" id="step-progress" style="width:0%"></div>
+              </div>
+              <button class="btn-next-step" id="btn-next" onclick="nextStep()">
+                ▶ Langkah Selanjutnya
+              </button>
+              <button class="btn-reset" onclick="resetPercobaan()">
+                🔄 Ulangi
+              </button>
+            </div>
+            <div id="steps-list" style="display:flex;gap:6px;flex:1;overflow-x:auto;align-items:stretch;"></div>
+            <div class="result-panel" id="result-panel">
+              <div style="font-size:10px;font-weight:700;color:var(--accent);margin-bottom:4px;">📊 Hasil Pengamatan</div>
+              <div id="result-content"></div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ══ DISKUSI ══ -->
+    <div class="tab-panel" id="panel-diskusi">
+      <div class="diskusi-fullscreen">
+        <div class="sec-title" style="flex-shrink:0;">💬 Pertanyaan Diskusi</div>
+        <div class="diskusi-grid" style="flex:1;overflow:hidden;">
+          <div class="diskusi-card">
+            <h3>Soal 1 – Struktur & Reaktivitas</h3>
+            <div class="diskusi-q">
+              Perhatikan kembali struktur molekul butanal dan 2−butanon. Aldehida memiliki atom hidrogen yang terikat langsung pada gugus karbonil (−CHO), sedangkan gugus karbonil pada keton diapit oleh dua gugus alkil (−CO−). Analisislah, bagaimana perbedaan posisi gugus karbonil dan ada tidaknya atom hidrogen ini memengaruhi kemampuan senyawa untuk bereaksi dengan zat lain?
+            </div>
+            <textarea class="diskusi-textarea" id="ans1" placeholder="Tuliskan jawabanmu di sini..."></textarea>
+            <div style="display:flex;align-items:center;gap:8px;">
+              <button class="btn-save" onclick="saveAnswer(1)">💾 Simpan Jawaban</button>
+              <div class="save-status" id="status1">✅ Tersimpan!</div>
+            </div>
+          </div>
+          <div class="diskusi-card">
+            <h3>Soal 2 – Ion yang Tereduksi</h3>
+            <div class="diskusi-q">
+              Pada simulasi pereaksi Fehling dan Benedict, sampel butanal (aldehida) menghasilkan endapan merah bata, sedangkan dengan pereaksi Tollens menghasilkan cermin perak. Berdasarkan literatur, jelaskan ion apa yang mengalami reaksi reduksi pada masing-masing uji tersebut, dan mengapa 2−butanon (keton) gagal mereduksi ion-ion tersebut!
+            </div>
+            <textarea class="diskusi-textarea" id="ans2" placeholder="Tuliskan jawabanmu di sini..."></textarea>
+            <div style="display:flex;align-items:center;gap:8px;">
+              <button class="btn-save" onclick="saveAnswer(2)">💾 Simpan Jawaban</button>
+              <div class="save-status" id="status2">✅ Tersimpan!</div>
+            </div>
+          </div>
+          <div class="diskusi-card">
+            <h3>Soal 3 – Reaktivitas & Oksidasi</h3>
+            <div class="diskusi-q">
+              Berdasarkan perubahan visual dari ketiga uji yang telah kalian simulasikan secara keseluruhan, buatlah kesimpulan mengenai tingkat reaktivitas aldehida dibandingkan keton terhadap agen pengoksidasi lemah! Hubungkan kesimpulanmu dengan kemudahan suatu senyawa untuk dioksidasi menjadi asam karboksilat.
+            </div>
+            <textarea class="diskusi-textarea" id="ans3" placeholder="Tuliskan jawabanmu di sini..."></textarea>
+            <div style="display:flex;align-items:center;gap:8px;">
+              <button class="btn-save" onclick="saveAnswer(3)">💾 Simpan Jawaban</button>
+              <div class="save-status" id="status3">✅ Tersimpan!</div>
+            </div>
+          </div>
+          <div class="diskusi-card">
+            <h3>Soal 4 – Penerapan Kehidupan</h3>
+            <div class="diskusi-q">
+              Sifat kimia yang berbeda membuat aldehida dan keton memiliki fungsi yang berbeda di keseharian. Berdasarkan tingkat reaktivitas yang telah kalian evaluasi sebelumnya, jelaskan mengapa formaldehida (aldehida) sangat reaktif dan efektif digunakan sebagai agen disinfektan/pengawet (formalin), sedangkan aseton (keton) cenderung lebih stabil dan sangat ideal digunakan sebagai pelarut organik seperti pembersih cat kuku!
+            </div>
+            <textarea class="diskusi-textarea" id="ans4" placeholder="Tuliskan jawabanmu di sini..."></textarea>
+            <div style="display:flex;align-items:center;gap:8px;">
+              <button class="btn-save" onclick="saveAnswer(4)">💾 Simpan Jawaban</button>
+              <div class="save-status" id="status4">✅ Tersimpan!</div>
+            </div>
+          </div>
+        </div>
+        <div style="text-align:center;margin-top:6px;flex-shrink:0;">
+          <button class="btn-download-pdf" onclick="downloadDiskusiPDF()">
+            📄 Unduh Hasil Diskusi (PDF)
+          </button>
+        </div>
+      </div>
+    </div>
+
+    <!-- ══ KESIMPULAN ══ -->
+    <div class="tab-panel" id="panel-kesimpulan">
+      <div class="kesimpulan-fullscreen">
+        <div class="sec-title">📊 Kesimpulan & Ringkasan Hasil</div>
+        <div class="kesimpulan-card">
+          <h3>Ringkasan Hasil Uji Identifikasi</h3>
+          <table class="react-table">
+            <tr>
+              <th>Pereaksi</th>
+              <th>Komponen Aktif</th>
+              <th>Butanal (Aldehida)</th>
+              <th>2-Butanon (Keton)</th>
+              <th>Perubahan Visual</th>
+            </tr>
+            <tr>
+              <td><strong>Fehling</strong></td>
+              <td>Ion Cu²⁺ (biru)</td>
+              <td><span class="obs-badge positive">✅ Bereaksi</span></td>
+              <td><span class="obs-badge negative">❌ Tidak Bereaksi</span></td>
+              <td>Endapan <span style="color:#e74c3c;font-weight:700;">merah bata</span> (Cu₂O)</td>
+            </tr>
+            <tr>
+              <td><strong>Tollens</strong></td>
+              <td>Ion Ag⁺ kompleks</td>
+              <td><span class="obs-badge positive">✅ Bereaksi</span></td>
+              <td><span class="obs-badge negative">❌ Tidak Bereaksi</span></td>
+              <td>Cermin <span style="color:#ddd;font-weight:700;">perak</span> (Ag) pada dinding tabung</td>
+            </tr>
+            <tr>
+              <td><strong>Benedict</strong></td>
+              <td>Ion Cu²⁺ (biru)</td>
+              <td><span class="obs-badge positive">✅ Bereaksi</span></td>
+              <td><span class="obs-badge negative">❌ Tidak Bereaksi</span></td>
+              <td>Endapan <span style="color:#e74c3c;font-weight:700;">merah bata</span> (Cu₂O)</td>
+            </tr>
+          </table>
+        </div>
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:8px;">
+          <div class="kesimpulan-card">
+            <h3>🔬 Prinsip Dasar</h3>
+            <div class="info-block green">
+              <strong>Aldehida (−CHO)</strong> memiliki atom H pada gugus karbonil sehingga mudah <em>dioksidasi</em>. Ia bertindak sebagai <strong>reduktor</strong> yang dapat mereduksi Cu²⁺ menjadi Cu₂O (endapan merah bata) dan Ag⁺ menjadi Ag (cermin perak).
+            </div>
+            <div class="info-block orange" style="margin-top:8px;">
+              <strong>Keton (−CO−)</strong> tidak memiliki atom H pada gugus karbonil sehingga <em>sulit dioksidasi</em> dengan oksidator lemah. Ketiga uji menghasilkan <strong>tidak ada perubahan</strong> – larutan tetap berwarna biru.
+            </div>
+          </div>
+          <div class="kesimpulan-card">
+            <h3>⚡ Persamaan Reaksi</h3>
+            <div class="info-block" style="margin-bottom:8px;">
+              <strong>Fehling & Benedict:</strong><br>
+              RCHO + 2Cu²⁺ + 5OH⁻ → RCOO⁻ + Cu₂O↓ + 3H₂O<br>
+              <span style="color:#e74c3c;">Cu₂O = endapan merah bata</span>
+            </div>
+            <div class="info-block" style="margin-bottom:8px;">
+              <strong>Tollens (Cermin Perak):</strong><br>
+              RCHO + 2[Ag(NH₃)₂]⁺ + 2OH⁻ → RCOO⁻ + 2Ag↓ + 4NH₃ + H₂O<br>
+              <span style="color:#ddd;">Ag = cermin perak pada dinding tabung</span>
+            </div>
+          </div>
+        </div>
+        <div class="kesimpulan-card">
+          <h3>🌍 Penerapan dalam Kehidupan Sehari-hari</h3>
+          <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;">
+            <div class="info-block green">
+              <strong>Aldehida → Formalin (Pengawet)</strong><br>
+              Formaldehida yang dilarutkan dalam air (30–40%) menghasilkan formalin. Sifatnya yang <em>sangat reaktif</em> membuatnya efektif membunuh bakteri → digunakan sebagai disinfektan dan pengawet spesimen biologi/anatomi di laboratorium.
+            </div>
+            <div class="info-block orange">
+              <strong>Keton → Aseton (Pelarut)</strong><br>
+              Propanon (aseton) memiliki sifat yang <em>stabil dan volatil</em> (mudah menguap), menjadikannya pelarut organik ideal. Digunakan sebagai pelarut cat kuku (kuteks), pelarut lilin, pelarut resin, dan industri farmasi.
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+  </div>
+
+  <!-- FOOTER -->
+  <div id="footer">
+    <span>⚗️ Lab Maya Kimia – Senyawa Karbon</span>
+    <span>Identifikasi Gugus Fungsi Aldehida dan Keton | SMA Kelas XII</span>
+    <span id="footer-time"></span>
+  </div>
+</div>
+
+<!-- TOAST -->
+<div id="toast">🔔 <span id="toast-msg"></span></div>
+
+<script>
+// ═══════════════════════════════════════════════════════
+// AUDIO ENGINE – Web Audio API (no external files)
+// ═══════════════════════════════════════════════════════
+const AudioCtx = window.AudioContext || window.webkitAudioContext;
+let audioCtx = null;
+
+function getAudioCtx() {
+  if (!audioCtx) audioCtx = new AudioCtx();
+  return audioCtx;
+}
+
+function playSound(type) {
+  try {
+    const ctx = getAudioCtx();
+    switch(type) {
+      case 'blup':   synthBlup(ctx);   break;
+      case 'jump':   synthJump(ctx);   break;
+      case 'benar':  synthBenar(ctx);  break;
+      case 'berhasil': synthBerhasil(ctx); break;
+      case 'drip':   synthDrip(ctx);   break;
+      case 'heat':   synthHeat(ctx);   break;
+      case 'reaction': synthReaction(ctx); break;
+      case 'tab':    synthTab(ctx);    break;
+    }
+  } catch(e) {}
+}
+
+function synthBlup(ctx) {
+  const osc = ctx.createOscillator();
+  const gain = ctx.createGain();
+  osc.connect(gain); gain.connect(ctx.destination);
+  osc.frequency.setValueAtTime(600, ctx.currentTime);
+  osc.frequency.exponentialRampToValueAtTime(200, ctx.currentTime+0.15);
+  gain.gain.setValueAtTime(0.6, ctx.currentTime);
+  gain.gain.exponentialRampToValueAtTime(0.001, ctx.currentTime+0.25);
+  osc.start(); osc.stop(ctx.currentTime+0.25);
+}
+function synthDrip(ctx) {
+  for(let i=0;i<3;i++){
+    const osc = ctx.createOscillator();
+    const gain = ctx.createGain();
+    osc.connect(gain); gain.connect(ctx.destination);
+    const t = ctx.currentTime + i*0.18;
+    osc.frequency.setValueAtTime(800+i*100, t);
+    osc.frequency.exponentialRampToValueAtTime(300, t+0.12);
+    gain.gain.setValueAtTime(0.45, t);
+    gain.gain.exponentialRampToValueAtTime(0.001, t+0.18);
+    osc.start(t); osc.stop(t+0.18);
+  }
+}
+function synthJump(ctx) {
+  const osc = ctx.createOscillator();
+  const gain = ctx.createGain();
+  osc.connect(gain); gain.connect(ctx.destination);
+  osc.type = 'sine';
+  osc.frequency.setValueAtTime(400, ctx.currentTime);
+  osc.frequency.exponentialRampToValueAtTime(800, ctx.currentTime+0.2);
+  gain.gain.setValueAtTime(0.5, ctx.currentTime);
+  gain.gain.exponentialRampToValueAtTime(0.001, ctx.currentTime+0.35);
+  osc.start(); osc.stop(ctx.currentTime+0.35);
+}
+function synthBenar(ctx) {
+  [523, 659, 784].forEach((f,i)=>{
+    const osc = ctx.createOscillator();
+    const gain = ctx.createGain();
+    osc.connect(gain); gain.connect(ctx.destination);
+    const t = ctx.currentTime + i*0.15;
+    osc.frequency.setValueAtTime(f, t);
+    gain.gain.setValueAtTime(0.5, t);
+    gain.gain.exponentialRampToValueAtTime(0.001, t+0.3);
+    osc.start(t); osc.stop(t+0.3);
+  });
+}
+function synthBerhasil(ctx) {
+  [523,659,784,1047].forEach((f,i)=>{
+    const osc = ctx.createOscillator();
+    const gain = ctx.createGain();
+    osc.connect(gain); gain.connect(ctx.destination);
+    const t = ctx.currentTime + i*0.12;
+    osc.frequency.setValueAtTime(f,t);
+    gain.gain.setValueAtTime(0.55,t);
+    gain.gain.exponentialRampToValueAtTime(0.001,t+0.35);
+    osc.start(t); osc.stop(t+0.35);
+  });
+}
+function synthHeat(ctx) {
+  const buf = ctx.createBuffer(1, ctx.sampleRate*0.5, ctx.sampleRate);
+  const d = buf.getChannelData(0);
+  for(let i=0;i<d.length;i++) d[i] = (Math.random()*2-1)*0.12;
+  const src = ctx.createBufferSource();
+  const gain = ctx.createGain();
+  const filter = ctx.createBiquadFilter();
+  filter.type = 'bandpass'; filter.frequency.value = 800;
+  src.buffer = buf;
+  src.connect(filter); filter.connect(gain); gain.connect(ctx.destination);
+  gain.gain.setValueAtTime(0.7,ctx.currentTime);
+  gain.gain.exponentialRampToValueAtTime(0.001,ctx.currentTime+0.5);
+  src.start();
+}
+function synthReaction(ctx) {
+  // Bubbling sound
+  for(let i=0;i<5;i++){
+    const osc = ctx.createOscillator();
+    const gain = ctx.createGain();
+    osc.connect(gain); gain.connect(ctx.destination);
+    const t = ctx.currentTime + i*0.08 + Math.random()*0.05;
+    osc.frequency.setValueAtTime(200+Math.random()*400, t);
+    osc.frequency.exponentialRampToValueAtTime(100, t+0.1);
+    gain.gain.setValueAtTime(0.35, t);
+    gain.gain.exponentialRampToValueAtTime(0.001, t+0.15);
+    osc.start(t); osc.stop(t+0.15);
+  }
+}
+function synthTab(ctx) {
+  const osc = ctx.createOscillator();
+  const gain = ctx.createGain();
+  osc.connect(gain); gain.connect(ctx.destination);
+  osc.frequency.setValueAtTime(700, ctx.currentTime);
+  gain.gain.setValueAtTime(0.25, ctx.currentTime);
+  gain.gain.exponentialRampToValueAtTime(0.001, ctx.currentTime+0.12);
+  osc.start(); osc.stop(ctx.currentTime+0.12);
+}
+
+// ═══════════════════════════════════════════════════════
+// TAB SWITCHING
+// ═══════════════════════════════════════════════════════
+function switchTab(id, btn) {
+  playSound('tab');
+  document.querySelectorAll('.tab-panel').forEach(p => p.classList.remove('active'));
+  document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+  document.getElementById('panel-' + id).classList.add('active');
+  if(btn) btn.classList.add('active');
+}
+
+function switchHasil(btn, id) {
+  document.querySelectorAll('.hasil-tab').forEach(b=>b.classList.remove('active'));
+  document.querySelectorAll('.hasil-content').forEach(c=>c.classList.remove('active'));
+  btn.classList.add('active');
+  document.getElementById('hasil-'+id).classList.add('active');
+  playSound('tab');
+}
+
+// ═══════════════════════════════════════════════════════
+// SIMULATION ENGINE
+// ═══════════════════════════════════════════════════════
+let currentPercobaan = 1;
+let currentStep = 0;
+let isAnimating = false;
+let completedPercobaan = new Set();
+
+const percobaanData = {
+  1: {
+    title: 'Percobaan 1: Uji Fehling',
+    desc: 'Identifikasi aldehida dan keton menggunakan pereaksi Fehling (Ion Cu²⁺)',
+    reagentColor1: 'rgba(30,120,200,0.7)',   // Fehling blue
+    reagentColor2: 'rgba(30,120,200,0.7)',
+    reagentName: 'Pereaksi Fehling',
+    reagentImg: 'https://yulinestiyarum.github.io/senyawakarbon/fehling.png',
+    needsHeating: true,
+    result1Type: 'red',    // Butanal → red brick
+    result2Type: 'blue',   // 2-Butanon → stays blue
+    steps: [
+      { title: 'Persiapan Tabung', text: 'Siapkan dua tabung reaksi pada rak tabung virtual. <strong>Tabung 1</strong> untuk Butanal, <strong>Tabung 2</strong> untuk 2-Butanon.' },
+      { title: 'Isi Butanal', text: 'Gunakan pipet tetes, masukkan <strong>±2 mL Butanal</strong> (±40 tetes) ke dalam <strong>Tabung 1</strong>.' },
+      { title: 'Isi 2-Butanon', text: 'Gunakan pipet tetes, masukkan <strong>±2 mL 2-Butanon</strong> ke dalam <strong>Tabung 2</strong>.' },
+      { title: 'Tambahkan Fehling', text: 'Tambahkan <strong>pereaksi Fehling</strong> (berwarna biru, mengandung ion Cu²⁺) ke dalam <strong>kedua tabung</strong> dengan takaran yang sama.' },
+      { title: 'Masukkan Penangas Air', text: 'Gunakan penjepit tabung, pindahkan <strong>Tabung 1 dan 2</strong> ke dalam penangas air panas. Nyalakan pembakar Bunsen.' },
+      { title: 'Amati Perubahan', text: 'Amati perubahan warna. <strong>Catat</strong> tabung mana yang menghasilkan endapan merah bata (Cu₂O) dan mana yang tidak bereaksi.' },
+    ]
+  },
+  2: {
+    title: 'Percobaan 2: Uji Tollens',
+    desc: 'Identifikasi aldehida dan keton menggunakan pereaksi Tollens (Pereaksi Perak Amoniakal, Ion Ag⁺)',
+    reagentColor1: 'rgba(220,230,240,0.5)',   // Tollens clear
+    reagentColor2: 'rgba(220,230,240,0.5)',
+    reagentName: 'Pereaksi Tollens',
+    reagentImg: 'https://yulinestiyarum.github.io/senyawakarbon/tollens.png',
+    needsHeating: true,
+    result1Type: 'silver',
+    result2Type: 'clear',
+    steps: [
+      { title: 'Persiapan Tabung Baru', text: 'Siapkan dua tabung reaksi baru yang bersih. Beri label <strong>Tabung 1 (Butanal)</strong> dan <strong>Tabung 2 (2-Butanon)</strong>.' },
+      { title: 'Isi Butanal', text: 'Gunakan pipet tetes, masukkan <strong>±2 mL Butanal</strong> ke dalam <strong>Tabung 1</strong>.' },
+      { title: 'Isi 2-Butanon', text: 'Gunakan pipet tetes, masukkan <strong>±2 mL 2-Butanon</strong> ke dalam <strong>Tabung 2</strong>.' },
+      { title: 'Teteskan Tollens', text: 'Teteskan <strong>pereaksi Tollens</strong> (pereaksi perak amoniakal, mengandung ion Ag⁺) ke dalam masing-masing tabung.' },
+      { title: 'Penangas Air Hangat', text: 'Masukkan kedua tabung ke dalam <strong>penangas air hangat</strong> untuk mengoptimalkan reaksi.' },
+      { title: 'Amati Cermin Perak', text: 'Amati dinding bagian dalam tabung reaksi. <strong>Catat</strong> tabung mana yang membentuk endapan/cermin perak (Ag) dan mana yang tidak berubah.' },
+    ]
+  },
+  3: {
+    title: 'Percobaan 3: Uji Benedict',
+    desc: 'Identifikasi aldehida dan keton menggunakan pereaksi Benedict (Ion Cu²⁺)',
+    reagentColor1: 'rgba(20,100,180,0.7)',
+    reagentColor2: 'rgba(20,100,180,0.7)',
+    reagentName: 'Pereaksi Benedict',
+    reagentImg: 'https://yulinestiyarum.github.io/senyawakarbon/benedict.png',
+    needsHeating: true,
+    result1Type: 'red',
+    result2Type: 'blue',
+    steps: [
+      { title: 'Persiapan Tabung Baru', text: 'Siapkan dua tabung reaksi baru pada rak. Beri label <strong>Tabung 1 (Butanal)</strong> dan <strong>Tabung 2 (2-Butanon)</strong>.' },
+      { title: 'Isi Butanal', text: 'Gunakan pipet tetes, masukkan <strong>±2 mL Butanal</strong> ke dalam <strong>Tabung 1</strong>.' },
+      { title: 'Isi 2-Butanon', text: 'Gunakan pipet tetes, masukkan <strong>±2 mL 2-Butanon</strong> ke dalam <strong>Tabung 2</strong>.' },
+      { title: 'Teteskan Benedict', text: 'Teteskan <strong>pereaksi Benedict</strong> (berwarna biru, mengandung ion Cu²⁺) ke dalam masing-masing tabung reaksi.' },
+      { title: 'Masukkan Penangas & Panaskan', text: 'Pindahkan kedua tabung reaksi ke dalam penangas air. <strong>Panaskan</strong> hingga reaksi terjadi.' },
+      { title: 'Amati Perubahan', text: 'Amati secara saksama. <strong>Catat</strong> tabung mana yang bereaksi menghasilkan endapan merah bata (Cu₂O) dan mana yang tidak bereaksi.' },
+    ]
+  }
+};
+
+function selectPercobaan(num, btn) {
+  currentPercobaan = num;
+  currentStep = 0;
+  isAnimating = false;
+
+  document.querySelectorAll('.percob-btn').forEach(b=>b.classList.remove('active'));
+  btn.classList.add('active');
+
+  const data = percobaanData[num];
+  document.getElementById('sim-title').textContent = data.title;
+  document.getElementById('sim-desc').textContent = data.desc;
+
+  resetVisuals();
+  renderSteps();
+  playSound('tab');
+}
+
+function resetVisuals() {
+  // Reset tube colors
+  setLiquidColor('t1', 'rgba(180,200,255,0.15)');
+  setLiquidColor('t2', 'rgba(180,200,255,0.15)');
+  hideEndapan('t1');
+  hideEndapan('t2');
+  hideSilver('t1');
+  hideSilver('t2');
+
+  // Reset waterbath and bunsen
+  document.getElementById('waterbath').classList.remove('show');
+  document.getElementById('bunsen-wrap').style.display = 'none';
+  document.getElementById('flame').classList.remove('on');
+  document.getElementById('steam1').style.display='none';
+  document.getElementById('steam2').style.display='none';
+  document.getElementById('steam3').style.display='none';
+
+  // Reset pipet
+  const pipet = document.getElementById('pipet-img');
+  pipet.style.opacity = '0';
+
+  // Reset obs label
+  document.getElementById('obs-label').style.display = 'none';
+
+  // Reset result panel
+  document.getElementById('result-panel').classList.remove('show');
+
+  // Update btn
+  document.getElementById('btn-next').disabled = false;
+  document.getElementById('btn-next').textContent = '▶ Langkah Selanjutnya';
+}
+
+function setLiquidColor(id, color) {
+  const el1 = document.getElementById(id+'-liquid');
+  const el2 = document.getElementById(id+'-bottom');
+  if(el1) el1.setAttribute('fill', color);
+  if(el2) el2.setAttribute('fill', color);
+}
+
+function showEndapan(id, type) {
+  const color = type==='red' ? 'rgba(192,57,43,0.85)' : 'rgba(30,120,200,0.6)';
+  const end1 = document.getElementById(id+'-endapan');
+  const end2 = document.getElementById(id+'-endapan-bottom');
+  if(end1){
+    end1.setAttribute('fill', color);
+    end1.style.transition = 'opacity 1.5s ease';
+    end1.setAttribute('opacity','1');
+  }
+  if(end2){
+    end2.setAttribute('fill', color);
+    end2.setAttribute('opacity','1');
+  }
+}
+function hideEndapan(id) {
+  [id+'-endapan',id+'-endapan-bottom'].forEach(sid=>{
+    const el = document.getElementById(sid);
+    if(el){el.setAttribute('fill','transparent');el.setAttribute('opacity','0');}
+  });
+}
+function showSilver(id) {
+  const el = document.getElementById(id+'-silver');
+  if(el){
+    // Silver gradient on tube walls
+    el.setAttribute('fill', 'url(#silverGrad)');
+    el.setAttribute('opacity','0');
+    // Animate
+    let op = 0;
+    const int = setInterval(()=>{
+      op += 0.05;
+      el.setAttribute('opacity', Math.min(op,0.8));
+      if(op>=0.8) clearInterval(int);
+    },50);
+  }
+}
+function hideSilver(id) {
+  const el = document.getElementById(id+'-silver');
+  if(el){el.setAttribute('fill','transparent');el.setAttribute('opacity','0');}
+}
+
+function renderSteps() {
+  const data = percobaanData[currentPercobaan];
+  const list = document.getElementById('steps-list');
+  list.innerHTML = '';
+  data.steps.forEach((s,i)=>{
+    const div = document.createElement('div');
+    div.className = 'step-item' + (i<currentStep?' done':i===currentStep?' current':'');
+    div.id = 'step-'+i;
+    div.innerHTML = `
+      <div class="step-num">${i<currentStep?'✓':(i+1)}</div>
+      <div class="step-text"><strong>${s.title}</strong>${s.text}</div>
+    `;
+    list.appendChild(div);
+  });
+
+  const pct = Math.round((currentStep/data.steps.length)*100);
+  document.getElementById('step-progress').style.width = pct+'%';
+
+  if(currentStep >= data.steps.length) {
+    document.getElementById('btn-next').disabled = true;
+    document.getElementById('btn-next').textContent = '✅ Percobaan Selesai';
+    completedPercobaan.add(currentPercobaan);
+    updateOverallProgress();
+  }
+}
+
+function updateOverallProgress() {
+  const n = completedPercobaan.size;
+  document.getElementById('overall-progress').style.width = Math.round(n/3*100)+'%';
+  document.getElementById('overall-pct').textContent = n+' / 3 selesai';
+}
+
+function nextStep() {
+  if(isAnimating) return;
+  const data = percobaanData[currentPercobaan];
+  if(currentStep >= data.steps.length) return;
+
+  isAnimating = true;
+  executeStep(currentStep);
+}
+
+function executeStep(stepIdx) {
+  const data = percobaanData[currentPercobaan];
+
+  switch(stepIdx) {
+    case 0: // Prepare tubes
+      animateTubeAppear();
+      break;
+    case 1: // Fill tube 1 with sample
+      dropIntoTube('tube1', 'rgba(220,180,100,0.4)', 'left', ()=>{
+        setLiquidColor('t1','rgba(220,180,100,0.35)');
+        advanceStep();
+      });
+      break;
+    case 2: // Fill tube 2 with sample
+      dropIntoTube('tube2', 'rgba(200,220,180,0.4)', 'right', ()=>{
+        setLiquidColor('t2','rgba(200,220,180,0.35)');
+        advanceStep();
+      });
+      break;
+    case 3: // Add reagent to both
+      dropIntoTube('both', data.reagentColor1, 'center', ()=>{
+        // Mix colors
+        const m1 = blendColors('rgba(220,180,100,0.4)', data.reagentColor1);
+        const m2 = blendColors('rgba(200,220,180,0.4)', data.reagentColor2);
+        setLiquidColor('t1', data.reagentColor1);
+        setLiquidColor('t2', data.reagentColor2);
+        advanceStep();
+      });
+      break;
+    case 4: // Heat
+      startHeating(()=>{
+        advanceStep();
+      });
+      break;
+    case 5: // Observe results
+      showResults(data, ()=>{
+        advanceStep();
+        playSound('berhasil');
+      });
+      break;
+    default:
+      advanceStep();
+  }
+}
+
+function advanceStep() {
+  currentStep++;
+  renderSteps();
+  isAnimating = false;
+
+  // Scroll to current step
+  const curr = document.getElementById('step-'+currentStep);
+  if(curr) curr.scrollIntoView({behavior:'smooth',block:'nearest'});
+}
+
+function animateTubeAppear() {
+  playSound('benar');
+  const wrap = document.getElementById('test-tubes-wrap');
+  wrap.style.opacity='0';
+  wrap.style.transform='translateX(-50%) translateY(20px)';
+  setTimeout(()=>{
+    wrap.style.transition='all 0.5s ease';
+    wrap.style.opacity='1';
+    wrap.style.transform='translateX(-50%) translateY(0)';
+  }, 100);
+  setTimeout(advanceStep, 700);
+}
+
+function dropIntoTube(target, color, side, callback) {
+  const pipet = document.getElementById('pipet-img');
+  const labArea = document.getElementById('lab-area');
+  const labRect = labArea.getBoundingClientRect();
+
+  const tube1El = document.getElementById('tube1-svg');
+  const tube2El = document.getElementById('tube2-svg');
+  const tube1Rect = tube1El.getBoundingClientRect();
+  const tube2Rect = tube2El.getBoundingClientRect();
+
+  const pipetW = 60; // pipet image width
+  const pipetH = 60; // pipet image height (tip at bottom-left)
+
+  // Calculate tube opening positions relative to lab area
+  // Pipet tip is slightly left of center, so shift pipet right by 8px
+  const tipOffsetX = 15;
+  const t1X = (tube1Rect.left - labRect.left) + tube1Rect.width / 2 - pipetW / 2 + tipOffsetX;
+  const t1Y = (tube1Rect.top - labRect.top) - pipetH + 12;
+
+  const t2X = (tube2Rect.left - labRect.left) + tube2Rect.width / 2 - pipetW / 2 + tipOffsetX;
+  const t2Y = (tube2Rect.top - labRect.top) - pipetH + 12;
+
+  // Start position (off to the side, above)
+  const startX = target === 'tube2' ? labRect.width * 0.75 : labRect.width * 0.15;
+  const startY = labRect.height * 0.08;
+
+  pipet.style.opacity = '1';
+  pipet.style.left = startX + 'px';
+  pipet.style.top = startY + 'px';
+  pipet.style.transition = 'all 0.0s';
+
+  setTimeout(()=>{
+    if(target==='tube1'||target==='both') {
+      pipet.style.transition = 'all 0.5s ease';
+      pipet.style.left = t1X + 'px';
+      pipet.style.top = t1Y + 'px';
+      setTimeout(()=> drip(1, color, ()=>{
+        if(target==='both') {
+          // Move to tube 2
+          pipet.style.transition = 'all 0.5s ease';
+          pipet.style.left = t2X + 'px';
+          pipet.style.top = t2Y + 'px';
+          setTimeout(()=> drip(2, color, ()=>{
+            pipet.style.opacity='0';
+            setTimeout(callback, 300);
+          }), 500);
+        } else {
+          pipet.style.opacity='0';
+          setTimeout(callback, 300);
+        }
+      }), 500);
+    } else {
+      pipet.style.transition = 'all 0.5s ease';
+      pipet.style.left = t2X + 'px';
+      pipet.style.top = t2Y + 'px';
+      setTimeout(()=> drip(2, color, ()=>{
+        pipet.style.opacity='0';
+        setTimeout(callback, 300);
+      }), 500);
+    }
+  }, 100);
+}
+
+function drip(tubeNum, color, callback) {
+  playSound('drip');
+  let count = 0;
+  const interval = setInterval(()=>{
+    createDrop(tubeNum, color);
+    playSound('blup');
+    count++;
+    if(count>=5) {
+      clearInterval(interval);
+      setTimeout(callback, 400);
+    }
+  }, 160);
+}
+
+function createDrop(tubeNum, color) {
+  const container = document.getElementById('drops-container');
+  const drop = document.createElement('div');
+  drop.className = 'drop';
+  drop.style.background = color;
+  drop.style.width = '7px';
+  drop.style.height = '9px';
+  drop.style.borderRadius = '50% 50% 50% 50% / 60% 60% 40% 40%';
+  drop.style.position = 'absolute';
+  drop.style.zIndex = '50';
+  drop.style.boxShadow = '0 0 4px '+color;
+
+  // Position drop at pipet tip
+  const pipet = document.getElementById('pipet-img');
+  const pipetLeft = parseFloat(pipet.style.left) || 0;
+  const pipetTop = parseFloat(pipet.style.top) || 0;
+  const pipetW = pipet.offsetWidth || 60;
+  const pipetH = pipet.offsetHeight || 60;
+
+  const cx = pipetLeft + pipetW / 2 - 15; // shifted left to align with pipet tip
+  const ty = pipetTop + pipetH - 2; // at the very tip of the pipet
+
+  drop.style.left = (cx + Math.random()*4 - 2) + 'px';
+  drop.style.top = ty + 'px';
+
+  container.appendChild(drop);
+  setTimeout(()=>{ if(drop.parentNode) drop.parentNode.removeChild(drop); }, 700);
+}
+
+function blendColors(c1, c2) { return c2; }
+
+function startHeating(callback) {
+  // Show bunsen + waterbath
+  const bunsen = document.getElementById('bunsen-wrap');
+  bunsen.style.display = 'flex';
+  setTimeout(()=>{
+    document.getElementById('flame').classList.add('on');
+    playSound('heat');
+  }, 300);
+
+  setTimeout(()=>{
+    document.getElementById('waterbath').classList.add('show');
+    ['steam1','steam2','steam3'].forEach(id=>{
+      document.getElementById(id).style.display='block';
+    });
+    playSound('heat');
+  }, 800);
+
+  // Bubbles in tubes
+  setTimeout(()=>{
+    createBubbles('tube1-svg');
+    createBubbles('tube2-svg');
+    playSound('reaction');
+  }, 1500);
+
+  setTimeout(callback, 2500);
+}
+
+function createBubbles(svgId) {
+  const svg = document.getElementById(svgId);
+  if(!svg) return;
+  for(let i=0;i<6;i++){
+    setTimeout(()=>{
+      const circle = document.createElementNS('http://www.w3.org/2000/svg','circle');
+      const x = 15+Math.random()*30;
+      const y = 100+Math.random()*20;
+      circle.setAttribute('cx',x); circle.setAttribute('cy',y);
+      circle.setAttribute('r', 2+Math.random()*3);
+      circle.setAttribute('fill','rgba(255,255,255,0.3)');
+      circle.setAttribute('opacity','0.8');
+      svg.appendChild(circle);
+      let py = parseFloat(y);
+      const anim = setInterval(()=>{
+        py -= 2;
+        circle.setAttribute('cy',py);
+        circle.setAttribute('opacity', Math.max(0, parseFloat(circle.getAttribute('opacity'))-0.05));
+        if(py < 30) { clearInterval(anim); svg.removeChild(circle); }
+      }, 50);
+    }, i*120);
+  }
+}
+
+function showResults(data, callback) {
+  // Show color changes
+  setTimeout(()=>{
+    // Tube 1 (Butanal = Aldehida → always reacts)
+    if(data.result1Type === 'red') {
+      // Fehling/Benedict → red brick
+      setLiquidColor('t1','rgba(192,57,43,0.6)');
+      setTimeout(()=>{
+        showEndapan('t1','red');
+        playSound('reaction');
+      }, 500);
+    } else if(data.result1Type === 'silver') {
+      // Tollens → silver mirror
+      addSilverGradient();
+      setLiquidColor('t1','rgba(180,180,180,0.2)');
+      setTimeout(()=>{
+        showSilver('t1');
+        playSound('reaction');
+      }, 500);
+    }
+
+    // Tube 2 (2-Butanon = Keton → never reacts with weak oxidizers)
+    if(data.result2Type === 'blue') {
+      setLiquidColor('t2', data.reagentColor2);
+    } else if(data.result2Type === 'clear') {
+      setLiquidColor('t2','rgba(200,210,220,0.3)');
+    }
+
+    setTimeout(()=>{
+      showObsLabel(data);
+      showResultPanel(data);
+      callback();
+    }, 1200);
+  }, 300);
+}
+
+function addSilverGradient() {
+  const svgs = ['tube1-svg','tube2-svg'];
+  svgs.forEach(sid=>{
+    const svg = document.getElementById(sid);
+    if(!svg) return;
+    let defs = svg.querySelector('defs');
+    if(!defs){defs=document.createElementNS('http://www.w3.org/2000/svg','defs');svg.prepend(defs);}
+    if(!defs.querySelector('#silverGrad')){
+      const grad = document.createElementNS('http://www.w3.org/2000/svg','linearGradient');
+      grad.setAttribute('id','silverGrad');
+      grad.setAttribute('x1','0');grad.setAttribute('y1','0');grad.setAttribute('x2','1');grad.setAttribute('y2','0');
+      [[0,'#e8e8e8'],[30,'#ffffff'],[50,'#c8c8c8'],[70,'#ffffff'],[100,'#d0d0d0']].forEach(([o,c])=>{
+        const stop=document.createElementNS('http://www.w3.org/2000/svg','stop');
+        stop.setAttribute('offset',o+'%');stop.setAttribute('stop-color',c);
+        grad.appendChild(stop);
+      });
+      defs.appendChild(grad);
+    }
+  });
+}
+
+function showObsLabel(data) {
+  const obs = document.getElementById('obs-label');
+  const p = currentPercobaan;
+  let html = '';
+  if(data.result1Type==='red') {
+    html = `<strong style="color:var(--accent)">🔬 Hasil Pengamatan:</strong><br>
+    <span style="color:#e74c3c;">● Tabung 1 (Butanal): Endapan MERAH BATA</span><br>
+    <span style="color:#74b9ff;">● Tabung 2 (2-Butanon): Tetap BIRU</span>`;
+  } else if(data.result1Type==='silver') {
+    html = `<strong style="color:var(--accent)">🔬 Hasil Pengamatan:</strong><br>
+    <span style="color:#ddd;">● Tabung 1 (Butanal): CERMIN PERAK (Ag)</span><br>
+    <span style="color:#74b9ff;">● Tabung 2 (2-Butanon): Tidak ada perubahan</span>`;
+  }
+  obs.innerHTML = html;
+  obs.style.display = 'block';
+}
+
+function showResultPanel(data) {
+  const panel = document.getElementById('result-panel');
+  const content = document.getElementById('result-content');
+
+  if(data.result1Type==='red') {
+    content.innerHTML = `
+      <div class="result-row">
+        <div class="result-tube red"></div>
+        <div>
+          <div class="result-label">Tabung 1 – Butanal (Aldehida)</div>
+          <div class="result-desc">Cu²⁺ tereduksi → Cu₂O (endapan merah bata) ✅</div>
+          <span class="obs-badge positive">Bereaksi Positif</span>
+        </div>
+      </div>
+      <div class="result-row">
+        <div class="result-tube blue"></div>
+        <div>
+          <div class="result-label">Tabung 2 – 2-Butanon (Keton)</div>
+          <div class="result-desc">Tidak ada reaksi, larutan tetap biru ❌</div>
+          <span class="obs-badge negative">Tidak Bereaksi</span>
+        </div>
+      </div>`;
+  } else {
+    content.innerHTML = `
+      <div class="result-row">
+        <div class="result-tube silver"></div>
+        <div>
+          <div class="result-label">Tabung 1 – Butanal (Aldehida)</div>
+          <div class="result-desc">Ag⁺ tereduksi → Ag (cermin perak pada dinding) ✅</div>
+          <span class="obs-badge positive-silver">Cermin Perak Terbentuk</span>
+        </div>
+      </div>
+      <div class="result-row">
+        <div class="result-tube" style="background:rgba(200,210,220,0.3);border-color:rgba(150,180,200,0.5);"></div>
+        <div>
+          <div class="result-label">Tabung 2 – 2-Butanon (Keton)</div>
+          <div class="result-desc">Tidak ada reaksi, tidak terbentuk cermin perak ❌</div>
+          <span class="obs-badge negative">Tidak Bereaksi</span>
+        </div>
+      </div>`;
+  }
+
+  panel.classList.add('show');
+  playSound('benar');
+}
+
+function resetPercobaan() {
+  currentStep = 0;
+  isAnimating = false;
+  resetVisuals();
+  renderSteps();
+  playSound('tab');
+  showToast('🔄 Percobaan diulang dari awal');
+}
+
+// ═══════════════════════════════════════════════════════
+// DISKUSI
+// ═══════════════════════════════════════════════════════
+function saveAnswer(num) {
+  const ta = document.getElementById('ans'+num);
+  const val = ta.value.trim();
+  if(!val) { showToast('⚠️ Isi jawaban terlebih dahulu!'); return; }
+  localStorage.setItem('diskusi_ans'+num, val);
+  const status = document.getElementById('status'+num);
+  status.classList.add('show');
+  playSound('benar');
+  showToast('💾 Jawaban no. '+num+' berhasil disimpan!');
+  setTimeout(()=>status.classList.remove('show'), 2500);
+}
+
+function loadAnswers() {
+  for(let i=1;i<=4;i++){
+    const saved = localStorage.getItem('diskusi_ans'+i);
+    if(saved) {
+      const ta = document.getElementById('ans'+i);
+      if(ta) ta.value = saved;
+    }
+  }
+}
+
+// ═══════════════════════════════════════════════════════
+// TOAST
+// ═══════════════════════════════════════════════════════
+let toastTimer = null;
+function showToast(msg) {
+  const toast = document.getElementById('toast');
+  document.getElementById('toast-msg').textContent = msg;
+  toast.classList.add('show');
+  if(toastTimer) clearTimeout(toastTimer);
+  toastTimer = setTimeout(()=>toast.classList.remove('show'), 2500);
+}
+
+// ═══════════════════════════════════════════════════════
+// DISKUSI PDF DOWNLOAD
+// ═══════════════════════════════════════════════════════
+function downloadDiskusiPDF() {
+  const questions = [
+    'Soal 1 – Struktur & Reaktivitas: Perhatikan kembali struktur molekul butanal dan 2−butanon. Aldehida memiliki atom hidrogen yang terikat langsung pada gugus karbonil (−CHO), sedangkan gugus karbonil pada keton diapit oleh dua gugus alkil (−CO−). Analisislah, bagaimana perbedaan posisi gugus karbonil dan ada tidaknya atom hidrogen ini memengaruhi kemampuan senyawa untuk bereaksi dengan zat lain?',
+    'Soal 2 – Ion yang Tereduksi: Pada simulasi pereaksi Fehling dan Benedict, sampel butanal (aldehida) menghasilkan endapan merah bata, sedangkan dengan pereaksi Tollens menghasilkan cermin perak. Berdasarkan literatur, jelaskan ion apa yang mengalami reaksi reduksi pada masing-masing uji tersebut, dan mengapa 2−butanon (keton) gagal mereduksi ion-ion tersebut!',
+    'Soal 3 – Reaktivitas & Oksidasi: Berdasarkan perubahan visual dari ketiga uji yang telah kalian simulasikan secara keseluruhan, buatlah kesimpulan mengenai tingkat reaktivitas aldehida dibandingkan keton terhadap agen pengoksidasi lemah! Hubungkan kesimpulanmu dengan kemudahan suatu senyawa untuk dioksidasi menjadi asam karboksilat.',
+    'Soal 4 – Penerapan Kehidupan: Sifat kimia yang berbeda membuat aldehida dan keton memiliki fungsi yang berbeda di keseharian. Berdasarkan tingkat reaktivitas yang telah kalian evaluasi sebelumnya, jelaskan mengapa formaldehida (aldehida) sangat reaktif dan efektif digunakan sebagai agen disinfektan/pengawet (formalin), sedangkan aseton (keton) cenderung lebih stabil dan sangat ideal digunakan sebagai pelarut organik seperti pembersih cat kuku!'
+  ];
+
+  let answers = [];
+  for(let i=1;i<=4;i++){
+    const ta = document.getElementById('ans'+i);
+    answers.push(ta ? ta.value.trim() : '');
+  }
+
+  const hasAnswers = answers.some(a => a.length > 0);
+  if(!hasAnswers){
+    showToast('⚠️ Silakan isi minimal satu jawaban terlebih dahulu!');
+    return;
+  }
+
+  // Generate printable HTML for PDF
+  const now = new Date();
+  const dateStr = now.toLocaleDateString('id-ID', {day:'numeric',month:'long',year:'numeric'});
+  const timeStr = now.toLocaleTimeString('id-ID', {hour:'2-digit',minute:'2-digit'});
+
+  let html = `<!DOCTYPE html><html><head><meta charset="UTF-8">
+<title>Hasil Diskusi - Lab Maya Kimia</title>
+<style>
+*{box-sizing:border-box;margin:0;padding:0;}
+body{font-family:'Segoe UI',Tahoma,sans-serif;padding:30px 40px;color:#1a1a2e;line-height:1.8;font-size:12pt;}
+.header{text-align:center;border-bottom:3px solid #0d1b2a;padding-bottom:15px;margin-bottom:20px;}
+.header h1{font-size:16pt;color:#0d1b2a;margin-bottom:4px;}
+.header h2{font-size:12pt;color:#1a6bab;margin-bottom:4px;font-weight:600;}
+.header p{font-size:10pt;color:#666;}
+.qa-block{margin-bottom:18px;page-break-inside:avoid;}
+.question{background:#f0f7ff;border-left:4px solid #1a6bab;padding:10px 14px;border-radius:0 8px 8px 0;margin-bottom:8px;font-size:11pt;color:#333;}
+.question strong{color:#0d1b2a;display:block;margin-bottom:4px;font-size:12pt;}
+.answer{border:1px solid #ddd;border-radius:8px;padding:12px 14px;min-height:60px;font-size:11pt;color:#222;background:#fafafa;}
+.answer.empty{color:#999;font-style:italic;}
+.footer{margin-top:30px;text-align:center;font-size:9pt;color:#999;border-top:1px solid #eee;padding-top:10px;}
+@media print{body{padding:20px;}}
+</style></head><body>
+<div class="header">
+<h1>📋 HASIL DISKUSI</h1>
+<h2>Lab Maya Kimia – Identifikasi Aldehida & Keton</h2>
+<p>Dicetak pada: ${dateStr}, pukul ${timeStr} WIB</p>
+</div>`;
+
+  for(let i=0;i<4;i++){
+    const ans = answers[i] || '(Belum dijawab)';
+    const isEmpty = !answers[i];
+    html += `<div class="qa-block">
+<div class="question"><strong>${questions[i].split(':')[0]}</strong>${questions[i].split(':').slice(1).join(':')}</div>
+<div class="answer${isEmpty?' empty':''}">${ans.replace(/\n/g,'<br>')}</div>
+</div>`;
+  }
+
+  html += `<div class="footer">Lab Maya Kimia – Senyawa Karbon | Identifikasi Gugus Fungsi Aldehida dan Keton | SMA Kelas XII</div>
+</body></html>`;
+
+  // Open in new window for printing/saving as PDF
+  const printWin = window.open('', '_blank', 'width=800,height=900');
+  if(printWin){
+    printWin.document.write(html);
+    printWin.document.close();
+    setTimeout(()=>{
+      printWin.print();
+    }, 500);
+    playSound('benar');
+    showToast('📄 Halaman cetak dibuka! Pilih "Save as PDF" untuk mengunduh.');
+  } else {
+    showToast('⚠️ Pop-up diblokir! Izinkan pop-up untuk mencetak PDF.');
+  }
+}
+
+// ═══════════════════════════════════════════════════════
+// FOOTER CLOCK
+// ═══════════════════════════════════════════════════════
+function updateClock(){
+  const now = new Date();
+  document.getElementById('footer-time').textContent =
+    now.toLocaleTimeString('id-ID',{hour:'2-digit',minute:'2-digit',second:'2-digit'});
+}
+setInterval(updateClock, 1000); updateClock();
+
+// ═══════════════════════════════════════════════════════
+// INIT
+// ═══════════════════════════════════════════════════════
+window.addEventListener('load', ()=>{
+  loadAnswers();
+  renderSteps();
+
+  // Init overall progress
+  updateOverallProgress();
+
+  // Welcome toast
+  setTimeout(()=>showToast('👋 Selamat datang di Lab Maya Kimia!'), 800);
+
+  // Unlock audio on first interaction (supports both click and touch)
+  const unlockAudio = ()=>{ try{ getAudioCtx().resume(); }catch(e){} };
+  document.addEventListener('click', unlockAudio, {once:true});
+  document.addEventListener('touchstart', unlockAudio, {once:true});
+
+  // Touch support for interactive whiteboards (PID)
+  document.querySelectorAll('button, .tab-btn, .percob-btn, .hasil-tab, .btn-save, .btn-next-step, .btn-reset, .btn-download-pdf, .btn-mulai').forEach(el => {
+    el.addEventListener('touchend', function(e) {
+      e.preventDefault();
+      this.click();
+    }, {passive:false});
+  });
+});
+</script>
+</body>
+</html>
