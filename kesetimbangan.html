@@ -1,0 +1,845 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+<title>Lab Maya Kimia – Kesetimbangan</title>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+<style>
+:root{
+  --bg:#f0f4f8;--surf:#ffffff;--surf2:#f8fafc;
+  --border:#dde3ec;--border2:#c5cfe0;
+  --acc:#7c3aed;--acc2:#8b5cf6;--acc3:#6d28d9;
+  --text:#1e293b;--text2:#475569;--text3:#94a3b8;
+  --yellow:#d97706;--red:#dc2626;--green:#059669;
+  --h:52px;
+}
+*{margin:0;padding:0;box-sizing:border-box;}
+html,body{height:100%;overflow:hidden;font-family:'Segoe UI',system-ui,sans-serif;background:var(--bg);color:var(--text);}
+body{display:flex;flex-direction:column;}
+body::before{content:'';position:fixed;inset:0;pointer-events:none;z-index:0;
+  background:radial-gradient(ellipse 60% 40% at 10% 0%,rgba(124,58,237,.06) 0%,transparent 60%),
+  radial-gradient(ellipse 40% 50% at 90% 100%,rgba(124,58,237,.05) 0%,transparent 60%),
+  repeating-linear-gradient(0deg,transparent,transparent 39px,rgba(148,163,184,.07) 40px),
+  repeating-linear-gradient(90deg,transparent,transparent 39px,rgba(148,163,184,.07) 40px);}
+
+/* ── LOADING ── */
+#loadScreen{position:fixed;inset:0;z-index:99999;
+  background:linear-gradient(135deg,#1e1b4b 0%,#4c1d95 50%,#7c3aed 100%);
+  display:flex;flex-direction:column;align-items:center;justify-content:center;transition:opacity .6s ease;}
+#loadScreen.hide{opacity:0;pointer-events:none;}
+.load-img{width:clamp(120px,18vw,220px);margin-bottom:12px;border-radius:16px;filter:drop-shadow(0 8px 30px rgba(0,0,0,.4));}
+.load-title{font-size:clamp(20px,3vw,34px);font-weight:800;color:#fff;text-align:center;margin-bottom:4px;text-shadow:0 2px 12px rgba(0,0,0,.3);}
+.load-sub{font-size:clamp(10px,1.2vw,13px);color:#c4b5fd;letter-spacing:.18em;text-transform:uppercase;text-align:center;margin-bottom:28px;}
+.load-bar-wrap{width:clamp(220px,30vw,360px);height:6px;background:rgba(255,255,255,.15);border-radius:6px;overflow:hidden;margin-bottom:8px;}
+.load-bar-fill{height:100%;width:0%;background:linear-gradient(90deg,#a78bfa,#c4b5fd,#7c3aed);border-radius:6px;transition:width .1s linear;}
+.load-pct{font-size:clamp(13px,1.5vw,16px);color:#fff;font-weight:700;margin-bottom:14px;text-align:center;font-variant-numeric:tabular-nums;}
+.load-st{font-size:clamp(11px,1.1vw,12px);color:#c4b5fd;margin-bottom:32px;min-height:16px;text-align:center;}
+#btnMulai{display:none;background:linear-gradient(135deg,#7c3aed,#a78bfa);color:#fff;border:none;border-radius:12px;
+  padding:12px 32px;font-size:clamp(13px,1.4vw,15px);font-weight:700;cursor:pointer;
+  box-shadow:0 4px 20px rgba(124,58,237,.5);animation:pop .4s cubic-bezier(.34,1.56,.64,1) forwards;transition:transform .18s,box-shadow .18s;}
+#btnMulai:hover{transform:translateY(-2px) scale(1.04);box-shadow:0 8px 30px rgba(124,58,237,.6);}
+@keyframes pop{from{opacity:0;transform:scale(.7)}to{opacity:1;transform:scale(1)}}
+
+/* ── HEADER ── */
+header{position:relative;z-index:10;height:var(--h);flex-shrink:0;
+  background:linear-gradient(135deg,#1e1b4b,#4c1d95);border-bottom:1px solid rgba(255,255,255,.12);
+  display:flex;align-items:center;padding:0 14px;gap:10px;box-shadow:0 2px 12px rgba(30,27,75,.45);}
+.logo{display:flex;align-items:center;gap:8px;flex-shrink:0;}
+.logo-icon{width:32px;height:32px;border-radius:6px;background:#fff;display:flex;align-items:center;justify-content:center;font-size:16px;box-shadow:0 2px 8px rgba(0,0,0,.15);}
+.logo-text{font-size:clamp(14px,1.8vw,20px);font-weight:800;color:#fff;line-height:1.1;}
+.logo-sub{font-size:9px;color:rgba(255,255,255,.65);}
+nav{display:flex;gap:1px;flex:1;overflow-x:auto;scrollbar-width:none;}
+nav::-webkit-scrollbar{display:none;}
+.nb{position:relative;background:none;border:none;color:rgba(255,255,255,.65);cursor:pointer;font-size:clamp(11px,1.15vw,13px);font-weight:600;padding:0 10px;height:var(--h);white-space:nowrap;transition:color .2s;display:flex;align-items:center;gap:5px;}
+.nb::after{content:'';position:absolute;bottom:0;left:8px;right:8px;height:2.5px;background:#a78bfa;transform:scaleX(0);transition:transform .2s;border-radius:2px 2px 0 0;}
+.nb:hover{color:rgba(255,255,255,.9);}
+.nb.active{color:#fff;}
+.nb.active::after{transform:scaleX(1);}
+
+/* ── PAGES ── */
+#app{position:relative;z-index:1;flex:1;overflow:hidden;display:flex;flex-direction:column;}
+.page{display:none;flex:1;overflow:hidden;}
+.page.active{display:flex;flex-direction:column;animation:fu .22s ease;}
+@keyframes fu{from{opacity:0;transform:translateY(6px)}to{opacity:1;transform:translateY(0)}}
+.scroll{flex:1;overflow-y:auto;padding:10px 14px 14px;}
+.scroll::-webkit-scrollbar{width:4px;}
+.scroll::-webkit-scrollbar-thumb{background:var(--border2);border-radius:2px;}
+
+/* ── CARDS ── */
+.card{background:var(--surf);border:1px solid var(--border);border-radius:10px;padding:12px 14px;margin-bottom:7px;box-shadow:0 1px 3px rgba(30,41,59,.06);}
+.ch{display:flex;align-items:center;gap:7px;margin-bottom:8px;}
+.ci{width:24px;height:24px;border-radius:6px;display:flex;align-items:center;justify-content:center;font-size:12px;flex-shrink:0;}
+.ci.p{background:rgba(124,58,237,.1);} .ci.b{background:rgba(37,99,235,.1);}
+.ci.g{background:rgba(5,150,105,.1);} .ci.r{background:rgba(220,38,38,.1);}
+.ci.y{background:rgba(217,119,6,.1);}
+.ct{font-size:clamp(12px,1.4vw,15px);font-weight:700;color:var(--acc3);}
+.card p{font-size:clamp(11px,1.15vw,13px);line-height:1.65;color:var(--text2);margin-bottom:5px;}
+.card p:last-child{margin-bottom:0;}
+.card h4{font-size:clamp(9px,1vw,11px);font-weight:700;color:var(--acc);letter-spacing:.08em;text-transform:uppercase;margin:8px 0 4px;}
+.olist{list-style:none;}
+.olist li{display:flex;align-items:flex-start;gap:6px;font-size:clamp(11px,1.15vw,13px);color:var(--text2);line-height:1.6;padding:3px 0;border-bottom:1px solid var(--border);}
+.olist li:last-child{border-bottom:none;}
+.olist li::before{content:'›';color:var(--acc);font-weight:700;font-size:14px;}
+.two-col{display:grid;grid-template-columns:1fr 1fr;gap:7px;}
+.eq-box{font-size:11.5px;background:#f5f3ff;border-left:3px solid var(--acc);padding:6px 10px;border-radius:0 7px 7px 0;color:var(--acc3);margin:6px 0;font-weight:600;}
+
+/* ── ALAT BAHAN (fullscreen grid) ── */
+#page-alatbahan .scroll{overflow:hidden;display:flex;flex-direction:column;padding:8px 12px;}
+.ab-section{flex:1;display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px;min-height:0;}
+.ab-card{background:var(--surf);border:1px solid var(--border);border-radius:10px;padding:10px;display:flex;flex-direction:column;overflow:hidden;}
+.ab-card .ch{margin-bottom:4px;}
+.ab-inner{flex:1;display:grid;grid-template-columns:1fr 1fr;gap:4px;min-height:0;overflow:hidden;align-content:start;}
+.ab-item{background:var(--surf2);border:1px solid var(--border);border-radius:7px;padding:6px 4px;text-align:center;transition:border-color .2s,transform .2s;}
+.ab-item:hover{border-color:var(--acc2);transform:translateY(-1px);box-shadow:0 3px 8px rgba(124,58,237,.08);}
+.ab-item img{height:clamp(28px,4vh,44px);width:auto;max-width:60px;object-fit:contain;display:block;margin:0 auto 3px;}
+.ab-item .ab-name{font-size:clamp(8px,0.9vw,11px);font-weight:700;color:var(--text);line-height:1.2;}
+.ab-item .ab-desc{font-size:clamp(7px,0.8vw,9px);color:var(--text3);margin-top:1px;}
+
+/* ── PROSEDUR (tabbed fullscreen) ── */
+#page-prosedur .scroll{overflow:hidden;display:flex;flex-direction:column;padding:8px 12px;}
+.proc-tabs{display:flex;gap:4px;margin-bottom:6px;flex-shrink:0;}
+.proc-tab{padding:6px 14px;border-radius:7px;border:1px solid var(--border);background:var(--surf);font-size:clamp(10px,1.1vw,12px);font-weight:600;color:var(--text2);cursor:pointer;transition:all .17s;}
+.proc-tab:hover{border-color:var(--acc2);color:var(--acc);}
+.proc-tab.active{background:var(--acc);color:#fff;border-color:var(--acc);}
+.proc-panel{display:none;flex:1;overflow:hidden;}
+.proc-panel.active{display:flex;flex-direction:column;}
+.steps{display:flex;flex-direction:column;gap:4px;flex:1;overflow-y:auto;}
+.step{display:flex;gap:8px;align-items:flex-start;background:var(--surf2);border:1px solid var(--border);border-radius:7px;padding:6px 10px;transition:border-color .15s;}
+.step:hover{border-color:var(--acc2);background:#f5f3ff;}
+.snum{min-width:20px;height:20px;border-radius:50%;background:rgba(124,58,237,.1);border:1px solid rgba(124,58,237,.25);display:flex;align-items:center;justify-content:center;font-size:9px;font-weight:700;color:var(--acc);flex-shrink:0;}
+.step p{font-size:clamp(10.5px,1.1vw,12.5px);color:var(--text2);line-height:1.55;margin:0;}
+.step .chem-icon{height:18px;width:auto;vertical-align:middle;margin:0 2px;}
+.read-box{background:#f5f3ff;border:1px solid #c4b5fd;border-radius:8px;padding:8px 10px;margin-top:6px;flex-shrink:0;}
+.read-box h4{font-size:10px;font-weight:700;color:var(--acc3);margin:0 0 4px;letter-spacing:.06em;text-transform:uppercase;}
+.read-box p{font-size:clamp(10px,1vw,12px);color:var(--text2);line-height:1.55;margin:0;}
+
+/* ── SIMULASI ── */
+.sim-tabs{display:flex;gap:4px;margin-bottom:6px;flex-shrink:0;flex-wrap:wrap;}
+.sim-tab{padding:5px 12px;border-radius:7px;border:1px solid var(--border);background:var(--surf);font-size:clamp(10px,1.1vw,12px);font-weight:600;color:var(--text2);cursor:pointer;transition:all .17s;}
+.sim-tab:hover{border-color:var(--acc2);color:var(--acc);}
+.sim-tab.active{background:var(--acc);color:#fff;border-color:var(--acc);}
+.sim-panel{display:none;flex:1;min-height:0;flex-direction:column;}
+.sim-panel.active{display:flex;}
+.sim-area{flex:1;background:var(--surf);border:1px solid var(--border);border-radius:10px;position:relative;overflow:hidden;min-height:0;}
+.sim-canvas{width:100%;height:100%;display:block;}
+.sim-controls{display:flex;gap:5px;margin-top:5px;flex-wrap:wrap;align-items:center;flex-shrink:0;}
+.btn{border:none;border-radius:7px;padding:6px 14px;font-size:11px;font-weight:600;cursor:pointer;transition:all .17s;}
+.btn-primary{background:linear-gradient(135deg,var(--acc3),var(--acc2));color:#fff;box-shadow:0 2px 8px rgba(124,58,237,.3);}
+.btn-primary:hover{transform:translateY(-1px);box-shadow:0 4px 14px rgba(124,58,237,.4);}
+.btn-primary:disabled{opacity:.4;cursor:not-allowed;transform:none;box-shadow:none;}
+.btn-secondary{background:var(--surf2);border:1px solid var(--border);color:var(--text2);}
+.btn-secondary:hover{border-color:var(--acc);color:var(--acc);}
+.btn-danger{background:#fff1f2;border:1px solid #fecdd3;color:var(--red);}
+.sim-info{position:absolute;top:6px;left:6px;background:rgba(30,27,75,.85);backdrop-filter:blur(6px);border:1px solid rgba(255,255,255,.15);border-radius:7px;padding:5px 9px;color:#fff;font-size:10px;z-index:5;pointer-events:none;max-width:280px;line-height:1.45;}
+.sim-info .val{font-weight:700;color:#a78bfa;}
+
+/* ── OBS TABLE ── */
+.obs-table{width:100%;border-collapse:collapse;font-size:10.5px;margin-top:5px;flex-shrink:0;}
+.obs-table th{background:#f5f3ff;color:var(--acc3);padding:4px 6px;text-align:left;border:1px solid var(--border);font-size:9px;text-transform:uppercase;letter-spacing:.04em;}
+.obs-table td{padding:4px 6px;border:1px solid var(--border);color:var(--text2);}
+.obs-table tr:nth-child(even) td{background:#faf9ff;}
+
+/* ── DISKUSI ── */
+.disc-area{width:100%;border:1px solid var(--border);border-radius:7px;padding:8px 10px;font-size:12px;color:var(--text);background:var(--surf2);resize:vertical;outline:none;transition:border-color .17s;line-height:1.6;margin-top:5px;min-height:50px;}
+.disc-area:focus{border-color:var(--acc);box-shadow:0 0 0 2px rgba(124,58,237,.1);}
+.disc-actions{display:flex;gap:8px;margin-top:12px;justify-content:center;flex-wrap:wrap;}
+.btn-lg{padding:10px 28px;border-radius:10px;font-size:13px;font-weight:700;cursor:pointer;border:none;transition:all .17s;}
+.btn-submit{background:linear-gradient(135deg,#059669,#34d399);color:#fff;box-shadow:0 3px 12px rgba(5,150,105,.35);}
+.btn-submit:hover{transform:translateY(-2px);box-shadow:0 6px 20px rgba(5,150,105,.45);}
+.btn-pdf{background:linear-gradient(135deg,#dc2626,#f87171);color:#fff;box-shadow:0 3px 12px rgba(220,38,38,.3);}
+.btn-pdf:hover{transform:translateY(-2px);box-shadow:0 6px 20px rgba(220,38,38,.4);}
+.submit-ok{display:none;text-align:center;padding:14px;background:#ecfdf5;border:1px solid #86efac;border-radius:10px;margin-top:10px;}
+.submit-ok.show{display:block;animation:pop .4s cubic-bezier(.34,1.56,.64,1);}
+</style>
+</head>
+<body>
+
+<!-- ═══════ LOADING SCREEN ═══════ -->
+<div id="loadScreen">
+  <img class="load-img" src="https://yulinestiyarum.github.io/kesetimbangan/sampul.png" alt="Sampul" onerror="this.style.display='none'">
+  <div class="load-title">Lab Maya Kimia</div>
+  <div class="load-sub">Faktor-Faktor yang Memengaruhi Pergeseran Kesetimbangan</div>
+  <div class="load-bar-wrap"><div class="load-bar-fill" id="loadBar"></div></div>
+  <div class="load-pct" id="loadPct">0%</div>
+  <div class="load-st" id="loadSt">Memuat laboratorium virtual…</div>
+  <button id="btnMulai" onclick="startLab()">Mulai Praktikum</button>
+</div>
+
+<!-- ═══════ HEADER ═══════ -->
+<header id="mainHeader" style="display:none;">
+  <div class="logo">
+    <div class="logo-icon">⚗️</div>
+    <div><div class="logo-text">Lab Maya Kimia</div><div class="logo-sub">Kesetimbangan Kimia</div></div>
+  </div>
+  <nav>
+    <button class="nb active" onclick="showPage('tujuan',this)">🎯 Tujuan</button>
+    <button class="nb" onclick="showPage('teori',this)">📚 Teori</button>
+    <button class="nb" onclick="showPage('alatbahan',this)">🔬 Alat & Bahan</button>
+    <button class="nb" onclick="showPage('prosedur',this)">📋 Prosedur</button>
+    <button class="nb" onclick="showPage('simulasi',this)">🧪 Simulasi</button>
+    <button class="nb" onclick="showPage('diskusi',this)">💬 Diskusi</button>
+  </nav>
+</header>
+
+<div id="app" style="display:none;">
+
+<!-- ═══════ TUJUAN ═══════ -->
+<div id="page-tujuan" class="page active">
+<div class="scroll">
+  <div class="two-col">
+    <div class="card">
+      <div class="ch"><div class="ci p">🎯</div><div class="ct">Tujuan Pembelajaran</div></div>
+      <ul class="olist"><li>Menganalisis kesetimbangan kimia dan penerapannya.</li></ul>
+    </div>
+    <div class="card">
+      <div class="ch"><div class="ci g">🧪</div><div class="ct">Tujuan Percobaan</div></div>
+      <ul class="olist">
+        <li>Menganalisis pengaruh perubahan konsentrasi, suhu, volume, dan tekanan terhadap arah pergeseran kesetimbangan.</li>
+        <li>Menyelidiki faktor-faktor penggeser kesetimbangan untuk menentukan kondisi reaksi yang paling optimal.</li>
+      </ul>
+    </div>
+  </div>
+  <div class="card">
+    <div class="ch"><div class="ci b">🏆</div><div class="ct">Hasil Belajar</div></div>
+    <div class="two-col">
+      <div>
+        <h4>Pengetahuan (Kognitif)</h4>
+        <ul class="olist">
+          <li>Murid mampu memprediksi arah pergeseran kesetimbangan kimia berdasarkan Asas Le Chatelier saat terjadi perubahan suhu, volume, tekanan, dan konsentrasi.</li>
+          <li>Murid mampu mengevaluasi kombinasi faktor-faktor pergeseran kesetimbangan untuk menyimpulkan kondisi reaksi yang paling optimal dalam menghasilkan produk.</li>
+        </ul>
+      </div>
+      <div>
+        <h4>Keterampilan (Psikomotorik)</h4>
+        <ul class="olist"><li>Murid mampu menyajikan dan mengorganisasikan data hasil observasi visual secara akurat untuk mendukung penarikan kesimpulan pada laporan praktikum.</li></ul>
+        <h4>Sikap (Afektif)</h4>
+        <ul class="olist"><li>Murid teliti dalam melakukan pengamatan, kritis dalam menganalisis data, dan mandiri dalam menyelesaikan praktikum.</li></ul>
+      </div>
+    </div>
+  </div>
+</div>
+</div>
+
+<!-- ═══════ TEORI ═══════ -->
+<div id="page-teori" class="page">
+<div class="scroll">
+  <div class="card">
+    <div class="ch"><div class="ci p">📚</div><div class="ct">Dasar Teori — Pergeseran Kesetimbangan Kimia</div></div>
+    <img src="https://yulinestiyarum.github.io/kesetimbangan/teori.png" alt="Ilustrasi Teori" style="float:left;width:clamp(110px,16%,170px);margin:2px 14px 8px 0;border-radius:8px;">
+    <p><strong style="color:var(--acc3)">Kesetimbangan Dinamis</strong> adalah keadaan di mana laju reaksi ke kanan (membentuk produk) sama dengan laju reaksi ke kiri (membentuk reaktan kembali). Secara makroskopis tidak ada perubahan, namun secara mikroskopis reaksi tetap terus berlangsung.</p>
+    <p><strong style="color:var(--acc3)">Asas Le Chatelier:</strong> Sistem selalu berusaha meminimalisasi gangguan. Jika sistem kesetimbangan diberikan suatu Aksi (perubahan), maka sistem akan merespons dengan memberikan Reaksi untuk melawan aksi tersebut (Aksi = −Reaksi).</p>
+    <div style="clear:both"></div>
+  </div>
+  <div class="two-col">
+    <div class="card">
+      <div class="ch"><div class="ci b">🧫</div><div class="ct">Konsentrasi</div></div>
+      <ul class="olist">
+        <li><strong>Zat ditambah:</strong> Kesetimbangan bergeser <em>menjauhi</em> zat tersebut.</li>
+        <li><strong>Zat dikurangi:</strong> Kesetimbangan bergeser <em>mendekati</em> zat tersebut.</li>
+      </ul>
+    </div>
+    <div class="card">
+      <div class="ch"><div class="ci r">🌡️</div><div class="ct">Suhu</div></div>
+      <ul class="olist">
+        <li><strong>Suhu dinaikkan:</strong> Bergeser ke arah reaksi endoterm (ΔH &gt; 0).</li>
+        <li><strong>Suhu diturunkan:</strong> Bergeser ke arah reaksi eksoterm (ΔH &lt; 0).</li>
+      </ul>
+    </div>
+    <div class="card">
+      <div class="ch"><div class="ci g">📦</div><div class="ct">Volume</div></div>
+      <ul class="olist">
+        <li><strong>Volume diperbesar:</strong> Bergeser ke ruas dengan koefisien gas lebih besar.</li>
+        <li><strong>Volume diperkecil:</strong> Bergeser ke ruas dengan koefisien gas lebih kecil.</li>
+      </ul>
+    </div>
+    <div class="card">
+      <div class="ch"><div class="ci y">⚡</div><div class="ct">Tekanan</div></div>
+      <ul class="olist">
+        <li><strong>Tekanan diperbesar:</strong> Bergeser ke ruas dengan koefisien gas lebih kecil.</li>
+        <li><strong>Tekanan diperkecil:</strong> Bergeser ke ruas dengan koefisien gas lebih besar.</li>
+      </ul>
+    </div>
+  </div>
+  <div class="card" style="background:#fffbeb;border-color:#fde68a;margin-bottom:0;">
+    <p style="color:#92400e;font-size:11.5px;margin:0;"><strong>⚠️ Catatan Penting:</strong> Zat berwujud padat murni (s) dan cair murni (<em>l</em>) tidak memengaruhi pergeseran kesetimbangan.</p>
+  </div>
+</div>
+</div>
+
+<!-- ═══════ ALAT & BAHAN (FULLSCREEN NO SCROLL) ═══════ -->
+<div id="page-alatbahan" class="page">
+<div class="scroll">
+  <div class="ab-section">
+    <!-- Percobaan 1 -->
+    <div class="ab-card">
+      <div class="ch"><div class="ci p">🧪</div><div class="ct" style="font-size:clamp(10px,1.2vw,13px);">Perc. 1: Konsentrasi</div></div>
+      <div class="eq-box" style="font-size:10px;padding:4px 8px;margin:0 0 5px;">Fe³⁺ + SCN⁻ ⇌ FeSCN²⁺</div>
+      <div class="ab-inner">
+        <div class="ab-item"><img src="https://yulinestiyarum.github.io/hidrokarbon/tabung.png"><div class="ab-name">Tabung Reaksi</div><div class="ab-desc">Wadah reaksi</div></div>
+        <div class="ab-item"><img src="https://yulinestiyarum.github.io/kesetimbangan/FeCl3.png"><div class="ab-name">FeCl₃ 0,1 M</div><div class="ab-desc">Besi(III) klorida</div></div>
+        <div class="ab-item"><img src="https://yulinestiyarum.github.io/asambasa/pipet.png"><div class="ab-name">Pipet Tetes</div><div class="ab-desc">Meneteskan larutan</div></div>
+        <div class="ab-item"><img src="https://yulinestiyarum.github.io/kesetimbangan/KSCN.png"><div class="ab-name">KSCN 0,1 M</div><div class="ab-desc">Kalium tiosianat</div></div>
+        <div class="ab-item"><img src="https://yulinestiyarum.github.io/asambasa/beakerglass.png"><div class="ab-name">Gelas Kimia</div><div class="ab-desc">Wadah pencampuran</div></div>
+        <div class="ab-item"><img src="https://yulinestiyarum.github.io/kesetimbangan/Na2HPO4.png"><div class="ab-name">Na₂HPO₄ 0,1 M</div><div class="ab-desc">Natrium hidrogen fosfat</div></div>
+        <div class="ab-item" style="grid-column:1/-1;"><img src="https://yulinestiyarum.github.io/kesetimbangan/akuades.png"><div class="ab-name">Akuades</div><div class="ab-desc">Pengencer larutan</div></div>
+      </div>
+    </div>
+    <!-- Percobaan 2 -->
+    <div class="ab-card">
+      <div class="ch"><div class="ci r">🌡️</div><div class="ct" style="font-size:clamp(10px,1.2vw,13px);">Perc. 2: Suhu</div></div>
+      <div class="eq-box" style="font-size:10px;padding:4px 8px;margin:0 0 5px;">[Co(H₂O)₆]²⁺ + 4Cl⁻ ⇌ [CoCl₄]²⁻ + 6H₂O</div>
+      <div class="ab-inner">
+        <div class="ab-item"><img src="https://yulinestiyarum.github.io/hidrokarbon/tabung.png"><div class="ab-name">Tabung Reaksi</div><div class="ab-desc">Wadah reaksi</div></div>
+        <div class="ab-item"><img src="https://yulinestiyarum.github.io/kesetimbangan/CoCl2.png"><div class="ab-name">CoCl₂ 0,1 M</div><div class="ab-desc">Kobalt(II) klorida</div></div>
+        <div class="ab-item"><img src="https://yulinestiyarum.github.io/asambasa/beakerglass.png"><div class="ab-name">Gelas Kimia</div><div class="ab-desc">Wadah perendam</div></div>
+        <div class="ab-item"><img src="https://yulinestiyarum.github.io/kesetimbangan/HClpekat.png"><div class="ab-name">HCl Pekat</div><div class="ab-desc">Asam klorida pekat</div></div>
+        <div class="ab-item"><img src="https://yulinestiyarum.github.io/kesetimbangan/termometer.png"><div class="ab-name">Termometer</div><div class="ab-desc">Pengukur suhu</div></div>
+        <div class="ab-item"><img src="https://yulinestiyarum.github.io/kesetimbangan/airpanasnew.png"><div class="ab-name">Air Panas</div><div class="ab-desc">Media pemanasan</div></div>
+        <div class="ab-item"><img src="https://yulinestiyarum.github.io/kesetimbangan/pemanas.png"><div class="ab-name">Pemanas</div><div class="ab-desc">Hot plate</div></div>
+        <div class="ab-item"><img src="https://yulinestiyarum.github.io/kesetimbangan/esbatu.png"><div class="ab-name">Es Batu</div><div class="ab-desc">Media pendinginan</div></div>
+      </div>
+    </div>
+    <!-- Percobaan 3 & 4 -->
+    <div class="ab-card">
+      <div class="ch"><div class="ci g">📦</div><div class="ct" style="font-size:clamp(10px,1.2vw,13px);">Perc. 3 & 4: Volume & Tekanan</div></div>
+      <div class="eq-box" style="font-size:10px;padding:4px 8px;margin:0 0 5px;">2NO₂(g) ⇌ N₂O₄(g)</div>
+      <div class="ab-inner">
+        <div class="ab-item"><img src="https://yulinestiyarum.github.io/kesetimbangan/suntik.png"><div class="ab-name">Syringe Tertutup</div><div class="ab-desc">Alat suntik gas berskala</div></div>
+        <div class="ab-item"><img src="https://yulinestiyarum.github.io/kesetimbangan/NO2.png"><div class="ab-name">Gas NO₂</div><div class="ab-desc">Cokelat kemerahan</div></div>
+        <div class="ab-item"><img src="https://yulinestiyarum.github.io/kesetimbangan/manometer.png"><div class="ab-name">Manometer</div><div class="ab-desc">Pengukur tekanan</div></div>
+        <div class="ab-item"><img src="https://yulinestiyarum.github.io/kesetimbangan/N2O4.png"><div class="ab-name">Gas N₂O₄</div><div class="ab-desc">Tidak berwarna</div></div>
+      </div>
+    </div>
+  </div>
+</div>
+</div>
+
+<!-- ═══════ PROSEDUR (TABBED FULLSCREEN) ═══════ -->
+<div id="page-prosedur" class="page">
+<div class="scroll">
+  <div class="proc-tabs">
+    <button class="proc-tab active" onclick="showProc(1,this)">🧫 Percobaan 1: Konsentrasi</button>
+    <button class="proc-tab" onclick="showProc(2,this)">🌡️ Percobaan 2: Suhu</button>
+    <button class="proc-tab" onclick="showProc(3,this)">📦 Percobaan 3 & 4: Volume & Tekanan</button>
+  </div>
+  <!-- Proc 1 -->
+  <div id="proc1" class="proc-panel active">
+    <div class="eq-box">Fe³⁺ + SCN⁻ ⇌ FeSCN²⁺</div>
+    <div class="steps">
+      <div class="step"><div class="snum">1</div><p>Siapkan <img class="chem-icon" src="https://yulinestiyarum.github.io/hidrokarbon/tabung.png"> tabung reaksi.</p></div>
+      <div class="step"><div class="snum">2</div><p>Campurkan 5 mL <img class="chem-icon" src="https://yulinestiyarum.github.io/kesetimbangan/FeCl3.png"> FeCl₃ 0,1 M dan 5 mL <img class="chem-icon" src="https://yulinestiyarum.github.io/kesetimbangan/KSCN.png"> KSCN 0,1 M ke dalam <img class="chem-icon" src="https://yulinestiyarum.github.io/asambasa/beakerglass.png"> gelas kimia, lalu aduk hingga warna merata (merah kecokelatan).</p></div>
+      <div class="step"><div class="snum">3</div><p>Tuangkan campuran ke dalam keempat tabung reaksi dengan volume sama. <strong>Tabung 1</strong> = kontrol (pembanding).</p></div>
+      <div class="step"><div class="snum">4</div><p>Pada <strong>Tabung 2</strong>, tambahkan 20 tetes <img class="chem-icon" src="https://yulinestiyarum.github.io/kesetimbangan/FeCl3.png"> FeCl₃ 0,1 M. Amati perubahan intensitas warna.</p></div>
+      <div class="step"><div class="snum">5</div><p>Pada <strong>Tabung 3</strong>, tambahkan 20 tetes <img class="chem-icon" src="https://yulinestiyarum.github.io/kesetimbangan/KSCN.png"> KSCN 0,1 M. Amati perubahan intensitas warna.</p></div>
+      <div class="step"><div class="snum">6</div><p>Pada <strong>Tabung 4</strong>, tambahkan 20 tetes <img class="chem-icon" src="https://yulinestiyarum.github.io/kesetimbangan/Na2HPO4.png"> Na₂HPO₄ 0,1 M. Amati perubahan intensitas warna.</p></div>
+      <div class="step"><div class="snum">7</div><p>Tarik kesimpulan ke arah mana kesetimbangan bergeser berdasarkan perubahan warna.</p></div>
+    </div>
+    <div class="read-box">
+      <h4>📖 Membaca Hasil</h4>
+      <p>• Makin <strong>merah pekat</strong> → Kesetimbangan geser ke <strong>kanan</strong> &nbsp;|&nbsp; • Makin <strong>pudar/kuning</strong> → Kesetimbangan geser ke <strong>kiri</strong></p>
+    </div>
+  </div>
+  <!-- Proc 2 -->
+  <div id="proc2" class="proc-panel">
+    <div class="eq-box">[Co(H₂O)₆]²⁺ + 4Cl⁻ ⇌ [CoCl₄]²⁻ + 6H₂O</div>
+    <div class="steps">
+      <div class="step"><div class="snum">1</div><p>Masukkan 10 mL <img class="chem-icon" src="https://yulinestiyarum.github.io/kesetimbangan/CoCl2.png"> CoCl₂ 0,1 M ke dalam <img class="chem-icon" src="https://yulinestiyarum.github.io/asambasa/beakerglass.png"> gelas kimia.</p></div>
+      <div class="step"><div class="snum">2</div><p>Tambahkan <img class="chem-icon" src="https://yulinestiyarum.github.io/kesetimbangan/HClpekat.png"> HCl pekat tetes demi tetes hingga warna campuran menjadi <strong>ungu</strong>.</p></div>
+      <div class="step"><div class="snum">3</div><p>Bagi campuran ke dalam 3 <img class="chem-icon" src="https://yulinestiyarum.github.io/hidrokarbon/tabung.png"> tabung reaksi. <strong>Tabung 1</strong> = pembanding (suhu ruang).</p></div>
+      <div class="step"><div class="snum">4</div><p>Siapkan dua wadah: satu <img class="chem-icon" src="https://yulinestiyarum.github.io/kesetimbangan/airpanasnew.png"> air panas dan satu <img class="chem-icon" src="https://yulinestiyarum.github.io/kesetimbangan/esbatu.png"> es batu.</p></div>
+      <div class="step"><div class="snum">5</div><p>Rendam <strong>Tabung 2</strong> ke air panas, amati perubahan warna.</p></div>
+      <div class="step"><div class="snum">6</div><p>Rendam <strong>Tabung 3</strong> ke es batu, amati perubahan warna.</p></div>
+      <div class="step"><div class="snum">7</div><p>Analisis pengaruh suhu terhadap pergeseran reaksi endoterm dan eksoterm.</p></div>
+    </div>
+    <div class="read-box">
+      <h4>📖 Membaca Hasil</h4>
+      <p>• Warna <strong>biru</strong> → Geser ke <strong>kanan</strong> (dipanaskan) &nbsp;|&nbsp; • Warna <strong>merah muda</strong> → Geser ke <strong>kiri</strong> (didinginkan)</p>
+    </div>
+  </div>
+  <!-- Proc 3 -->
+  <div id="proc3" class="proc-panel">
+    <div class="eq-box">2NO₂(g) ⇌ N₂O₄(g)</div>
+    <div class="steps">
+      <div class="step"><div class="snum">1</div><p>Aktifkan <img class="chem-icon" src="https://yulinestiyarum.github.io/kesetimbangan/suntik.png"> syringe tertutup berisi gas NO₂ dan N₂O₄.</p></div>
+      <div class="step"><div class="snum">2</div><p>Amati intensitas warna awal gas cokelat kemerahan.</p></div>
+      <div class="step"><div class="snum">3</div><p><strong>Tarik</strong> tuas ke atas → memperbesar volume (menurunkan tekanan).</p></div>
+      <div class="step"><div class="snum">4</div><p>Amati perubahan warna sesaat setelah ditarik dan setelah kesetimbangan baru.</p></div>
+      <div class="step"><div class="snum">5</div><p><strong>Tekan</strong> tuas ke bawah → memperkecil volume (menaikkan tekanan).</p></div>
+      <div class="step"><div class="snum">6</div><p>Amati kembali perubahan warna setelah ditekan.</p></div>
+      <div class="step"><div class="snum">7</div><p>Bandingkan kerapatan partikel untuk menarik kesimpulan.</p></div>
+    </div>
+    <div class="read-box">
+      <h4>📖 Membaca Hasil</h4>
+      <p>• Makin <strong>coklat pekat</strong> → Geser ke <strong>kiri</strong> (↑NO₂) &nbsp;|&nbsp; • Makin <strong>pudar/bening</strong> → Geser ke <strong>kanan</strong> (↑N₂O₄)</p>
+    </div>
+  </div>
+</div>
+</div>
+
+<!-- ═══════ SIMULASI ═══════ -->
+<div id="page-simulasi" class="page">
+<div style="flex:1;overflow:hidden;padding:6px 10px;display:flex;flex-direction:column;">
+  <div class="sim-tabs">
+    <button class="sim-tab active" onclick="showSim(1,this)">🧫 Perc. 1: Konsentrasi</button>
+    <button class="sim-tab" onclick="showSim(2,this)">🌡️ Perc. 2: Suhu</button>
+    <button class="sim-tab" onclick="showSim(3,this)">📦 Perc. 3&4: Volume & Tekanan</button>
+  </div>
+
+  <!-- SIM 1 -->
+  <div id="sim1" class="sim-panel active">
+    <div class="sim-area" id="sim1Area"><canvas id="c1" class="sim-canvas"></canvas>
+      <div class="sim-info" id="info1">Fe³⁺ + SCN⁻ ⇌ FeSCN²⁺ — Klik tombol untuk memulai</div></div>
+    <div class="sim-controls">
+      <button class="btn btn-primary" id="btn1Mix" onclick="sim1Start()">🧫 Campurkan Larutan</button>
+      <button class="btn btn-primary" id="btn1Fe" onclick="sim1Add('fe')" disabled>➕ Teteskan FeCl₃</button>
+      <button class="btn btn-primary" id="btn1SCN" onclick="sim1Add('scn')" disabled>➕ Teteskan KSCN</button>
+      <button class="btn btn-primary" id="btn1Na" onclick="sim1Add('na')" disabled>➕ Teteskan Na₂HPO₄</button>
+      <button class="btn btn-secondary" onclick="sim1Reset()">↺ Reset</button>
+    </div>
+    <table class="obs-table" id="obs1">
+      <tr><th>Tabung</th><th>Perlakuan</th><th>Warna</th><th>Pergeseran</th></tr>
+      <tr><td>1 (Kontrol)</td><td>—</td><td id="t1c">—</td><td id="t1s">—</td></tr>
+      <tr><td>2</td><td>+ FeCl₃</td><td id="t2c">—</td><td id="t2s">—</td></tr>
+      <tr><td>3</td><td>+ KSCN</td><td id="t3c">—</td><td id="t3s">—</td></tr>
+      <tr><td>4</td><td>+ Na₂HPO₄</td><td id="t4c">—</td><td id="t4s">—</td></tr>
+    </table>
+  </div>
+
+  <!-- SIM 2 -->
+  <div id="sim2" class="sim-panel">
+    <div class="sim-area" id="sim2Area"><canvas id="c2" class="sim-canvas"></canvas>
+      <div class="sim-info" id="info2">[Co(H₂O)₆]²⁺ + 4Cl⁻ ⇌ [CoCl₄]²⁻ + 6H₂O — Klik tombol untuk memulai</div></div>
+    <div class="sim-controls">
+      <button class="btn btn-primary" id="btn2Mix" onclick="sim2Start()">🧫 Campurkan CoCl₂ + HCl</button>
+      <button class="btn btn-danger" id="btn2Hot" onclick="sim2Temp('hot')" disabled>🔥 Rendam Air Panas</button>
+      <button class="btn btn-primary" id="btn2Cold" onclick="sim2Temp('cold')" disabled style="background:linear-gradient(135deg,#1e40af,#3b82f6);">❄️ Rendam Es Batu</button>
+      <button class="btn btn-secondary" onclick="sim2Reset()">↺ Reset</button>
+    </div>
+    <table class="obs-table" id="obs2">
+      <tr><th>Tabung</th><th>Perlakuan</th><th>Warna</th><th>Pergeseran</th></tr>
+      <tr><td>1 (Kontrol)</td><td>Suhu ruang</td><td id="s1c">—</td><td id="s1s">—</td></tr>
+      <tr><td>2</td><td>Air panas</td><td id="s2c">—</td><td id="s2s">—</td></tr>
+      <tr><td>3</td><td>Es batu</td><td id="s3c">—</td><td id="s3s">—</td></tr>
+    </table>
+  </div>
+
+  <!-- SIM 3 -->
+  <div id="sim3" class="sim-panel">
+    <div class="sim-area" id="sim3Area"><canvas id="c3" class="sim-canvas"></canvas>
+      <div class="sim-info" id="info3">2NO₂(g) ⇌ N₂O₄(g) — Klik Aktifkan Syringe</div></div>
+    <div class="sim-controls">
+      <button class="btn btn-primary" id="btn3Act" onclick="sim3Activate()">🔧 Aktifkan Syringe</button>
+      <button class="btn btn-primary" id="btn3Pull" onclick="sim3Action('pull')" disabled>⬆️ Tarik (Vol↑ Tek↓)</button>
+      <button class="btn btn-primary" id="btn3Push" onclick="sim3Action('push')" disabled>⬇️ Tekan (Vol↓ Tek↑)</button>
+      <button class="btn btn-secondary" onclick="sim3Reset()">↺ Reset</button>
+    </div>
+    <table class="obs-table" id="obs3">
+      <tr><th>Aksi</th><th>Volume</th><th>Tekanan</th><th>Warna Gas</th><th>Pergeseran</th></tr>
+      <tr><td>Awal</td><td id="v0">—</td><td id="p0">—</td><td id="g0">—</td><td id="d0">—</td></tr>
+      <tr><td>Tarik (↑V ↓P)</td><td id="v1">—</td><td id="p1">—</td><td id="g1">—</td><td id="d1">—</td></tr>
+      <tr><td>Tekan (↓V ↑P)</td><td id="v2">—</td><td id="p2">—</td><td id="g2">—</td><td id="d2">—</td></tr>
+    </table>
+  </div>
+</div>
+</div>
+
+<!-- ═══════ DISKUSI ═══════ -->
+<div id="page-diskusi" class="page">
+<div class="scroll">
+  <div class="card" style="margin-bottom:0;">
+    <div class="ch"><div class="ci p">💬</div><div class="ct">Diskusi</div></div>
+    <p style="font-size:11px;color:var(--text3);margin-bottom:8px;">Jawablah pertanyaan-pertanyaan berikut berdasarkan hasil pengamatan simulasi.</p>
+    <div style="margin-bottom:10px;">
+      <p style="font-size:12px;"><strong>1.</strong> Pada simulasi pengaruh konsentrasi, penambahan larutan Na₂HPO₄ menyebabkan warna merah darah memudar. Analisis bagaimana zat tersebut mengganggu keseimbangan reaktan dan jelaskan mengapa kesetimbangan merespons dengan bergeser ke arah tertentu!</p>
+      <textarea class="disc-area" id="ans1" rows="2" placeholder="Tuliskan analisismu di sini..."></textarea>
+    </div>
+    <div style="margin-bottom:10px;">
+      <p style="font-size:12px;"><strong>2.</strong> Air panas dan es batu memberikan hasil warna yang berlawanan pada campuran CoCl₂. Tentukan apakah reaksi pembentukan produk bersifat endoterm atau eksoterm! Buktikan menggunakan Asas Le Chatelier.</p>
+      <textarea class="disc-area" id="ans2" rows="2" placeholder="Tuliskan analisismu di sini..."></textarea>
+    </div>
+    <div style="margin-bottom:10px;">
+      <p style="font-size:12px;"><strong>3.</strong> Mengapa manipulasi volume dan tekanan hanya memberikan efek signifikan pada zat berwujud gas? Hubungkan dengan koefisien reaksi 2NO₂(g) ⇌ N₂O₄(g)!</p>
+      <textarea class="disc-area" id="ans3" rows="2" placeholder="Tuliskan analisismu di sini..."></textarea>
+    </div>
+    <div style="margin-bottom:10px;">
+      <p style="font-size:12px;"><strong>4.</strong> Kamu ditugaskan memproduksi N₂O₄ sebanyak-banyaknya dari 2NO₂(g) ⇌ N₂O₄(g) yang membebaskan kalor (ΔH &lt; 0). Rumuskan kombinasi suhu dan tekanan yang paling optimal!</p>
+      <textarea class="disc-area" id="ans4" rows="2" placeholder="Tuliskan analisismu di sini..."></textarea>
+    </div>
+    <div class="disc-actions">
+      <button class="btn-lg btn-submit" onclick="submitJawaban()">✅ Kumpulkan Jawaban</button>
+      <button class="btn-lg btn-pdf" onclick="downloadPDF()">📄 Unduh Jawaban (PDF)</button>
+    </div>
+    <div class="submit-ok" id="submitOk">
+      <div style="font-size:42px;margin-bottom:6px;">🎉</div>
+      <div style="font-size:16px;font-weight:700;color:#059669;margin-bottom:4px;">Jawaban Berhasil Dikumpulkan!</div>
+      <div style="font-size:12px;color:var(--text2);">Terima kasih telah mengerjakan diskusi praktikum.</div>
+    </div>
+  </div>
+</div>
+</div>
+
+</div><!-- #app -->
+
+<!-- ═══════ PRELOAD PIPET IMAGE ═══════ -->
+<img id="pipetImg" src="https://yulinestiyarum.github.io/asambasa/pipet.png" style="display:none;" crossorigin="anonymous">
+
+<script>
+// ════════════════════════════════════
+//  WEB AUDIO API SOUND ENGINE
+// ════════════════════════════════════
+const AC=window.AudioContext||window.webkitAudioContext;
+let ax=null;
+function ea(){if(!ax)ax=new AC();if(ax.state==='suspended')ax.resume();}
+function playDrip(){
+  ea();const o=ax.createOscillator(),g=ax.createGain();
+  o.type='sine';o.frequency.setValueAtTime(1200,ax.currentTime);
+  o.frequency.exponentialRampToValueAtTime(400,ax.currentTime+.15);
+  g.gain.setValueAtTime(.3,ax.currentTime);g.gain.exponentialRampToValueAtTime(.001,ax.currentTime+.2);
+  o.connect(g);g.connect(ax.destination);o.start();o.stop(ax.currentTime+.2);
+}
+function dripN(n,iv){for(let i=0;i<n;i++)setTimeout(playDrip,i*iv);}
+function playBubble(){ea();for(let i=0;i<3;i++){setTimeout(()=>{const o=ax.createOscillator(),g=ax.createGain();o.type='sine';o.frequency.setValueAtTime(600+Math.random()*400,ax.currentTime);o.frequency.exponentialRampToValueAtTime(200+Math.random()*200,ax.currentTime+.08);g.gain.setValueAtTime(.15,ax.currentTime);g.gain.exponentialRampToValueAtTime(.001,ax.currentTime+.1);o.connect(g);g.connect(ax.destination);o.start();o.stop(ax.currentTime+.1);},i*60);}}
+function playClick(){ea();const o=ax.createOscillator(),g=ax.createGain();o.type='square';o.frequency.value=800;g.gain.setValueAtTime(.12,ax.currentTime);g.gain.exponentialRampToValueAtTime(.001,ax.currentTime+.05);o.connect(g);g.connect(ax.destination);o.start();o.stop(ax.currentTime+.05);}
+function playSuccess(){ea();[523,659,784].forEach((f,i)=>{setTimeout(()=>{const o=ax.createOscillator(),g=ax.createGain();o.type='sine';o.frequency.value=f;g.gain.setValueAtTime(.2,ax.currentTime);g.gain.exponentialRampToValueAtTime(.001,ax.currentTime+.3);o.connect(g);g.connect(ax.destination);o.start();o.stop(ax.currentTime+.3);},i*120);});}
+function playWhoosh(){ea();const b=ax.createBufferSource(),buf=ax.createBuffer(1,ax.sampleRate*.3,ax.sampleRate);const d=buf.getChannelData(0);for(let i=0;i<d.length;i++)d[i]=(Math.random()*2-1)*Math.pow(1-i/d.length,2)*.2;b.buffer=buf;const f=ax.createBiquadFilter();f.type='bandpass';f.frequency.value=1000;f.Q.value=.5;b.connect(f);f.connect(ax.destination);b.start();}
+function playHiss(){ea();const b=ax.createBufferSource(),buf=ax.createBuffer(1,ax.sampleRate*.5,ax.sampleRate);const d=buf.getChannelData(0);for(let i=0;i<d.length;i++)d[i]=(Math.random()*2-1)*.08*(1-i/d.length);b.buffer=buf;b.connect(ax.destination);b.start();}
+function playTring(){ea();[880,1109,1320,880].forEach((f,i)=>{setTimeout(()=>{const o=ax.createOscillator(),g=ax.createGain();o.type='triangle';o.frequency.value=f;g.gain.setValueAtTime(.18,ax.currentTime);g.gain.exponentialRampToValueAtTime(.001,ax.currentTime+.25);o.connect(g);g.connect(ax.destination);o.start();o.stop(ax.currentTime+.25);},i*150);});}
+function playPour(){ea();const b=ax.createBufferSource(),buf=ax.createBuffer(1,ax.sampleRate*.6,ax.sampleRate);const d=buf.getChannelData(0);for(let i=0;i<d.length;i++){const t=i/d.length;d[i]=(Math.random()*2-1)*.15*(1-t*.5)*Math.sin(t*200);}b.buffer=buf;const f=ax.createBiquadFilter();f.type='lowpass';f.frequency.value=2000;b.connect(f);f.connect(ax.destination);b.start();}
+
+// ════════════════════════════════════
+//  LOADING
+// ════════════════════════════════════
+(function(){const bar=document.getElementById('loadBar'),pct=document.getElementById('loadPct'),st=document.getElementById('loadSt');let c=0;const msgs=['Menyiapkan alat laboratorium…','Mengkalibrasi instrumen…','Memuat reagen kimia…','Menginisialisasi simulasi…'];let mi=0;const iv=setInterval(()=>{c=Math.min(100,c+100/(3000/25));const v=Math.floor(c);bar.style.width=v+'%';pct.textContent=v+'%';if(v>mi*25&&mi<msgs.length){st.textContent=msgs[mi];mi++;}if(c>=100){clearInterval(iv);pct.textContent='100%';st.textContent='✅ Laboratorium siap digunakan!';document.getElementById('btnMulai').style.display='block';}},25);})();
+function startLab(){ea();playTring();const ls=document.getElementById('loadScreen');ls.classList.add('hide');setTimeout(()=>{ls.style.display='none';document.getElementById('mainHeader').style.display='flex';document.getElementById('app').style.display='flex';resizeAll();},600);}
+
+// ════════════════════════════════════
+//  NAVIGATION
+// ════════════════════════════════════
+function showPage(id,btn){playClick();document.querySelectorAll('.page').forEach(p=>p.classList.remove('active'));document.querySelectorAll('.nb').forEach(b=>b.classList.remove('active'));document.getElementById('page-'+id).classList.add('active');btn.classList.add('active');if(id==='simulasi')setTimeout(resizeAll,50);}
+function showSim(n,btn){playClick();document.querySelectorAll('.sim-panel').forEach(p=>p.classList.remove('active'));document.querySelectorAll('.sim-tab').forEach(b=>b.classList.remove('active'));document.getElementById('sim'+n).classList.add('active');btn.classList.add('active');setTimeout(resizeAll,50);}
+function showProc(n,btn){playClick();document.querySelectorAll('.proc-panel').forEach(p=>p.classList.remove('active'));document.querySelectorAll('.proc-tab').forEach(b=>b.classList.remove('active'));document.getElementById('proc'+n).classList.add('active');btn.classList.add('active');}
+
+// ════════════════════════════════════
+//  CANVAS HELPERS
+// ════════════════════════════════════
+function rc(cv,area){const r=window.devicePixelRatio||1;cv.width=area.clientWidth*r;cv.height=area.clientHeight*r;cv.style.width=area.clientWidth+'px';cv.style.height=area.clientHeight+'px';const c=cv.getContext('2d');c.setTransform(r,0,0,r,0,0);return c;}
+function resizeAll(){['sim1Area','sim2Area','sim3Area'].forEach(id=>{const a=document.getElementById(id),cv=a&&a.querySelector('canvas');if(a&&cv)rc(cv,a);});drawS1();drawS2();drawS3();}
+window.addEventListener('resize',resizeAll);
+
+// ════════════════════════════════════
+//  SIM 1 — KONSENTRASI
+// ════════════════════════════════════
+let S1={ph:'idle',tb:[],anim:false,pipetIdx:-1,drops:[],dropTimer:0};
+const pipetImg=document.getElementById('pipetImg');
+
+function sim1Reset(){S1={ph:'idle',tb:[],anim:false,pipetIdx:-1,drops:[],dropTimer:0};document.getElementById('btn1Mix').disabled=false;['btn1Fe','btn1SCN','btn1Na'].forEach(b=>document.getElementById(b).disabled=true);['t1c','t1s','t2c','t2s','t3c','t3s','t4c','t4s'].forEach(id=>document.getElementById(id).textContent='—');document.getElementById('info1').textContent='Fe³⁺ + SCN⁻ ⇌ FeSCN²⁺ — Klik tombol untuk memulai';drawS1();}
+
+function sim1Start(){playPour();S1.ph='mixed';S1.tb=[{r:180,g:80,b:50,l:'Kontrol'},{r:180,g:80,b:50,l:'+FeCl₃'},{r:180,g:80,b:50,l:'+KSCN'},{r:180,g:80,b:50,l:'+Na₂HPO₄'}];document.getElementById('btn1Mix').disabled=true;['btn1Fe','btn1SCN','btn1Na'].forEach(b=>document.getElementById(b).disabled=false);document.getElementById('t1c').textContent='Merah kecokelatan';document.getElementById('t1s').textContent='(Pembanding)';document.getElementById('info1').innerHTML='Campuran awal <span class="val">merah kecokelatan</span>. Teteskan reagen ke tabung 2–4.';drawS1();}
+
+function sim1Add(type){
+  if(S1.anim)return;S1.anim=true;
+  let idx,tR,tG,tB,cn,sh;
+  if(type==='fe'){idx=1;tR=200;tG=30;tB=20;cn='Merah pekat';sh='Ke kanan →';document.getElementById('btn1Fe').disabled=true;}
+  else if(type==='scn'){idx=2;tR=210;tG=20;tB=15;cn='Merah sangat pekat';sh='Ke kanan →';document.getElementById('btn1SCN').disabled=true;}
+  else{idx=3;tR=200;tG=180;tB=100;cn='Kuning pucat';sh='← Ke kiri';document.getElementById('btn1Na').disabled=true;}
+  S1.pipetIdx=idx;S1.drops=[];S1.dropTimer=0;
+  dripN(6,180);
+  // Create drops
+  for(let i=0;i<6;i++){setTimeout(()=>{S1.drops.push({y:0,speed:3+Math.random()*2,alive:true});},i*180);}
+  setTimeout(()=>{const t=S1.tb[idx];t.r=tR;t.g=tG;t.b=tB;document.getElementById('t'+(idx+1)+'c').textContent=cn;document.getElementById('t'+(idx+1)+'s').textContent=sh;S1.anim=false;S1.pipetIdx=-1;S1.drops=[];playSuccess();drawS1();},1500);
+}
+
+function drawS1(){
+  const cv=document.getElementById('c1');if(!cv)return;
+  const area=document.getElementById('sim1Area'),ctx=rc(cv,area),W=area.clientWidth,H=area.clientHeight;
+  ctx.fillStyle='#0f172a';ctx.fillRect(0,0,W,H);
+  ctx.fillStyle='#1e293b';ctx.fillRect(0,H*.72,W,H*.28);
+  ctx.fillStyle='#334155';ctx.fillRect(0,H*.72,W,3);
+  if(S1.ph==='idle'){ctx.fillStyle='#94a3b8';ctx.font='bold 15px system-ui';ctx.textAlign='center';ctx.fillText('Klik "Campurkan Larutan" untuk memulai percobaan',W/2,H/2);return;}
+  const tw=Math.min(65,W*.09),th=Math.min(200,H*.52),sp=W/(S1.tb.length+1);
+  S1.tb.forEach((t,i)=>{
+    const cx=sp*(i+1),cy=H*.7-th;
+    // Tube outline
+    ctx.strokeStyle='#94a3b8';ctx.lineWidth=2.5;ctx.beginPath();
+    ctx.moveTo(cx-tw/2,cy);ctx.lineTo(cx-tw/2,cy+th-12);
+    ctx.quadraticCurveTo(cx-tw/2,cy+th+6,cx,cy+th+6);
+    ctx.quadraticCurveTo(cx+tw/2,cy+th+6,cx+tw/2,cy+th-12);
+    ctx.lineTo(cx+tw/2,cy);ctx.stroke();
+    // Liquid
+    const fH=th*.7,fY=cy+th-12-fH;
+    ctx.fillStyle=`rgb(${t.r},${t.g},${t.b})`;
+    ctx.beginPath();ctx.moveTo(cx-tw/2+2,fY);ctx.lineTo(cx-tw/2+2,cy+th-12);
+    ctx.quadraticCurveTo(cx-tw/2+2,cy+th+4,cx,cy+th+4);
+    ctx.quadraticCurveTo(cx+tw/2-2,cy+th+4,cx+tw/2-2,cy+th-12);
+    ctx.lineTo(cx+tw/2-2,fY);ctx.closePath();ctx.fill();
+    // Surface highlight
+    ctx.fillStyle='rgba(255,255,255,.15)';ctx.fillRect(cx-tw/2+4,fY,tw-8,4);
+    // Rim
+    ctx.fillStyle='#64748b';ctx.fillRect(cx-tw/2-4,cy-5,tw+8,9);
+    // Labels
+    ctx.fillStyle='#e2e8f0';ctx.font='bold 12px system-ui';ctx.textAlign='center';
+    ctx.fillText('Tabung '+(i+1),cx,cy+th+24);
+    ctx.fillStyle='#94a3b8';ctx.font='10px system-ui';ctx.fillText(t.l,cx,cy+th+38);
+    // Pipet with image + dripping animation
+    if(S1.pipetIdx===i&&S1.anim){
+      const px=cx,py=cy-30;
+      // Draw pipet image
+      if(pipetImg.complete&&pipetImg.naturalWidth>0){
+        const imgH=70,imgW=imgH*(pipetImg.naturalWidth/pipetImg.naturalHeight);
+        ctx.drawImage(pipetImg,px-imgW/2,py-imgH,imgW,imgH);
+      }else{
+        ctx.strokeStyle='#a78bfa';ctx.lineWidth=3;ctx.beginPath();ctx.moveTo(px,py);ctx.lineTo(px,py-50);ctx.stroke();
+        ctx.fillStyle='#a78bfa';ctx.beginPath();ctx.arc(px,py-50,7,0,Math.PI*2);ctx.fill();
+      }
+      // Drops
+      S1.drops.forEach(d=>{
+        if(!d.alive)return;
+        d.y+=d.speed;
+        const dy=py+d.y;
+        if(dy>fY+10){d.alive=false;return;}
+        // Teardrop shape
+        ctx.fillStyle='rgba(167,139,250,0.85)';
+        ctx.beginPath();ctx.arc(px,dy,4,0,Math.PI*2);ctx.fill();
+        ctx.beginPath();ctx.moveTo(px-3,dy);ctx.quadraticCurveTo(px,dy-8,px+3,dy);ctx.fill();
+      });
+    }
+  });
+}
+
+// ════════════════════════════════════
+//  SIM 2 — SUHU
+// ════════════════════════════════════
+let S2={ph:'idle',tb:[],anim:false,dripPhase:false,dripDrops:[]};
+
+function sim2Reset(){S2={ph:'idle',tb:[],anim:false,dripPhase:false,dripDrops:[]};document.getElementById('btn2Mix').disabled=false;document.getElementById('btn2Hot').disabled=true;document.getElementById('btn2Cold').disabled=true;['s1c','s1s','s2c','s2s','s3c','s3s'].forEach(id=>document.getElementById(id).textContent='—');document.getElementById('info2').textContent='[Co(H₂O)₆]²⁺ + 4Cl⁻ ⇌ [CoCl₄]²⁻ + 6H₂O — Klik tombol untuk memulai';drawS2();}
+
+function sim2Start(){
+  playPour();
+  S2.ph='mixing';S2.dripPhase=true;S2.dripDrops=[];
+  // Create HCl drip animation
+  dripN(8,130);
+  for(let i=0;i<8;i++){setTimeout(()=>{S2.dripDrops.push({y:0,speed:3+Math.random()*2,alive:true});},i*130);}
+  setTimeout(()=>{
+    S2.ph='mixed';S2.dripPhase=false;S2.dripDrops=[];
+    S2.tb=[{r:128,g:60,b:128,l:'Suhu Ruang',env:'none'},{r:128,g:60,b:128,l:'Air Panas',env:'none'},{r:128,g:60,b:128,l:'Es Batu',env:'none'}];
+    document.getElementById('btn2Mix').disabled=true;document.getElementById('btn2Hot').disabled=false;document.getElementById('btn2Cold').disabled=false;
+    document.getElementById('s1c').textContent='Ungu';document.getElementById('s1s').textContent='(Pembanding)';
+    document.getElementById('info2').innerHTML='Campuran <span class="val">ungu</span>. Rendam tabung ke air panas atau es batu.';
+    playSuccess();drawS2();
+  },1500);
+}
+
+function sim2Temp(type){
+  if(S2.anim)return;S2.anim=true;
+  const idx=type==='hot'?1:2;
+  if(type==='hot'){playHiss();document.getElementById('btn2Hot').disabled=true;S2.tb[1].env='hot';}
+  else{playBubble();document.getElementById('btn2Cold').disabled=true;S2.tb[2].env='cold';}
+  let st=0;
+  const iv=setInterval(()=>{st++;
+    if(type==='hot'){S2.tb[1].r=Math.max(40,128-st*6);S2.tb[1].b=Math.min(180,128+st*3.5);}
+    else{S2.tb[2].r=Math.min(220,128+st*6);S2.tb[2].g=Math.min(120,60+st*4);S2.tb[2].b=Math.min(150,128+st*1.5);}
+    drawS2();if(st>=15){clearInterval(iv);S2.anim=false;
+      if(type==='hot'){document.getElementById('s2c').textContent='Biru';document.getElementById('s2s').textContent='Ke kanan → (endoterm)';}
+      else{document.getElementById('s3c').textContent='Merah muda';document.getElementById('s3s').textContent='← Ke kiri (eksoterm)';}
+      document.getElementById('info2').innerHTML=type==='hot'?'Tabung 2 → <span class="val">Biru</span> (geser kanan)':'Tabung 3 → <span class="val">Merah muda</span> (geser kiri)';
+      playSuccess();}
+  },90);
+}
+
+function drawS2(){
+  const cv=document.getElementById('c2');if(!cv)return;
+  const area=document.getElementById('sim2Area'),ctx=rc(cv,area),W=area.clientWidth,H=area.clientHeight;
+  ctx.fillStyle='#0f172a';ctx.fillRect(0,0,W,H);
+  ctx.fillStyle='#1e293b';ctx.fillRect(0,H*.74,W,H*.26);
+  ctx.fillStyle='#334155';ctx.fillRect(0,H*.74,W,3);
+
+  // Mixing phase: show beaker + pipet dripping HCl
+  if(S2.ph==='mixing'){
+    const bx=W/2,by=H*.35,bw=100,bh=120;
+    ctx.strokeStyle='#94a3b8';ctx.lineWidth=2;ctx.beginPath();
+    ctx.moveTo(bx-bw/2,by);ctx.lineTo(bx-bw/2,by+bh);ctx.lineTo(bx+bw/2,by+bh);ctx.lineTo(bx+bw/2,by);ctx.stroke();
+    // CoCl2 liquid (pink)
+    ctx.fillStyle='rgba(220,120,160,0.7)';ctx.fillRect(bx-bw/2+2,by+bh*.3,bw-4,bh*.7-2);
+    ctx.fillStyle='#e2e8f0';ctx.font='bold 11px system-ui';ctx.textAlign='center';ctx.fillText('CoCl₂ 0,1 M',bx,by+bh+18);
+    // Pipet above
+    if(pipetImg.complete&&pipetImg.naturalWidth>0){
+      const imgH=60,imgW=imgH*(pipetImg.naturalWidth/pipetImg.naturalHeight);
+      ctx.drawImage(pipetImg,bx-imgW/2,by-imgH-10,imgW,imgH);
+    }
+    ctx.fillStyle='#c4b5fd';ctx.font='10px system-ui';ctx.fillText('HCl pekat',bx,by-70);
+    // Drops
+    S2.dripDrops.forEach(d=>{if(!d.alive)return;d.y+=d.speed;const dy=(by-10)+d.y;if(dy>by+bh*.3){d.alive=false;return;}
+      ctx.fillStyle='rgba(167,139,250,.85)';ctx.beginPath();ctx.arc(bx,dy,3.5,0,Math.PI*2);ctx.fill();
+      ctx.beginPath();ctx.moveTo(bx-2.5,dy);ctx.quadraticCurveTo(bx,dy-7,bx+2.5,dy);ctx.fill();
+    });
+    return;
+  }
+
+  if(S2.ph==='idle'){ctx.fillStyle='#94a3b8';ctx.font='bold 15px system-ui';ctx.textAlign='center';ctx.fillText('Klik "Campurkan CoCl₂ + HCl" untuk memulai',W/2,H/2);return;}
+
+  const tw=Math.min(55,W*.07),th=Math.min(170,H*.46),sp=W/(S2.tb.length+1);
+  S2.tb.forEach((t,i)=>{
+    const cx=sp*(i+1),baseY=H*.72,cy=baseY-th;
+    // Environment containers
+    if(t.env==='hot'||t.env==='cold'){
+      const bw=tw*2.5,bh=th*.72,by=baseY-bh+8;
+      ctx.strokeStyle=t.env==='hot'?'#ef4444':'#60a5fa';ctx.lineWidth=2;
+      ctx.beginPath();ctx.moveTo(cx-bw/2,by);ctx.lineTo(cx-bw/2,by+bh);ctx.lineTo(cx+bw/2,by+bh);ctx.lineTo(cx+bw/2,by);ctx.stroke();
+      ctx.fillStyle=t.env==='hot'?'rgba(239,68,68,.12)':'rgba(96,165,250,.12)';
+      ctx.fillRect(cx-bw/2+2,by+bh*.25,bw-4,bh*.75-2);
+      // Label ABOVE the container (raised higher)
+      ctx.fillStyle=t.env==='hot'?'#fca5a5':'#93c5fd';ctx.font='bold 11px system-ui';ctx.textAlign='center';
+      ctx.fillText(t.env==='hot'?'🔥 Air Panas':'❄️ Es Batu',cx,by-14);
+      // Steam/frost
+      if(t.env==='hot'){for(let s=0;s<3;s++){ctx.fillStyle='rgba(255,255,255,.25)';ctx.font='14px system-ui';ctx.fillText('~',cx-12+s*12,by-26-Math.sin(Date.now()/300+s)*4);}}
+    }
+    // Tube
+    ctx.strokeStyle='#94a3b8';ctx.lineWidth=2.5;ctx.beginPath();
+    ctx.moveTo(cx-tw/2,cy);ctx.lineTo(cx-tw/2,cy+th-10);
+    ctx.quadraticCurveTo(cx-tw/2,cy+th+5,cx,cy+th+5);
+    ctx.quadraticCurveTo(cx+tw/2,cy+th+5,cx+tw/2,cy+th-10);
+    ctx.lineTo(cx+tw/2,cy);ctx.stroke();
+    // Liquid
+    const fH=th*.65,fY=cy+th-10-fH;
+    ctx.fillStyle=`rgb(${Math.round(t.r)},${Math.round(t.g)},${Math.round(t.b)})`;
+    ctx.beginPath();ctx.moveTo(cx-tw/2+2,fY);ctx.lineTo(cx-tw/2+2,cy+th-10);
+    ctx.quadraticCurveTo(cx-tw/2+2,cy+th+3,cx,cy+th+3);
+    ctx.quadraticCurveTo(cx+tw/2-2,cy+th+3,cx+tw/2-2,cy+th-10);
+    ctx.lineTo(cx+tw/2-2,fY);ctx.closePath();ctx.fill();
+    ctx.fillStyle='rgba(255,255,255,.12)';ctx.fillRect(cx-tw/2+4,fY,tw-8,3);
+    // Rim
+    ctx.fillStyle='#64748b';ctx.fillRect(cx-tw/2-3,cy-4,tw+6,8);
+    // Labels below
+    ctx.fillStyle='#e2e8f0';ctx.font='bold 12px system-ui';ctx.textAlign='center';
+    ctx.fillText('Tabung '+(i+1),cx,baseY+18);
+    ctx.fillStyle='#94a3b8';ctx.font='10px system-ui';ctx.fillText(t.l,cx,baseY+32);
+  });
+}
+
+// ════════════════════════════════════
+//  SIM 3 — VOLUME & TEKANAN
+// ════════════════════════════════════
+let S3={ph:'idle',vol:50,pres:1,cI:.5,anim:false,pts:[]};
+
+function sim3Reset(){S3={ph:'idle',vol:50,pres:1,cI:.5,anim:false,pts:[]};document.getElementById('btn3Act').disabled=false;document.getElementById('btn3Pull').disabled=true;document.getElementById('btn3Push').disabled=true;['v0','p0','g0','d0','v1','p1','g1','d1','v2','p2','g2','d2'].forEach(id=>document.getElementById(id).textContent='—');document.getElementById('info3').textContent='2NO₂(g) ⇌ N₂O₄(g) — Klik Aktifkan Syringe';drawS3();}
+
+function sim3Activate(){playClick();playHiss();S3.ph='active';S3.vol=50;S3.pres=1;S3.cI=.5;S3.pts=[];for(let i=0;i<35;i++){S3.pts.push({x:Math.random(),y:Math.random(),vx:(Math.random()-.5)*.004,vy:(Math.random()-.5)*.004,type:Math.random()>.4?'NO2':'N2O4'});}document.getElementById('btn3Act').disabled=true;document.getElementById('btn3Pull').disabled=false;document.getElementById('btn3Push').disabled=false;document.getElementById('v0').textContent='50 mL';document.getElementById('p0').textContent='1.0 atm';document.getElementById('g0').textContent='Cokelat sedang';document.getElementById('d0').textContent='Kesetimbangan awal';document.getElementById('info3').innerHTML='Syringe aktif. <span class="val">Vol: 50 mL, Tek: 1.0 atm</span>';drawS3();}
+
+function sim3Action(type){
+  if(S3.anim)return;S3.anim=true;playWhoosh();
+  const isPull=type==='pull';
+  if(isPull)document.getElementById('btn3Pull').disabled=true;else document.getElementById('btn3Push').disabled=true;
+  let st=0;const iv=setInterval(()=>{st++;
+    if(isPull){S3.vol=Math.min(80,50+st*2);S3.pres=Math.max(.6,1-st*.027);S3.cI=Math.min(.8,.5+st*.02);S3.pts.forEach(p=>{if(p.type==='N2O4'&&Math.random()<.05)p.type='NO2';});}
+    else{S3.vol=Math.max(25,50-st*1.7);S3.pres=Math.min(1.8,1+st*.053);S3.cI=Math.max(.2,.5-st*.02);S3.pts.forEach(p=>{if(p.type==='NO2'&&Math.random()<.05)p.type='N2O4';});}
+    drawS3();if(st>=15){clearInterval(iv);S3.anim=false;
+      if(isPull){document.getElementById('v1').textContent=Math.round(S3.vol)+' mL';document.getElementById('p1').textContent=S3.pres.toFixed(1)+' atm';document.getElementById('g1').textContent='Cokelat lebih pekat';document.getElementById('d1').textContent='← Ke kiri (↑NO₂)';document.getElementById('info3').innerHTML='Vol↑ Tek↓ → <span class="val">lebih cokelat</span> (geser kiri)';}
+      else{document.getElementById('v2').textContent=Math.round(S3.vol)+' mL';document.getElementById('p2').textContent=S3.pres.toFixed(1)+' atm';document.getElementById('g2').textContent='Cokelat lebih pudar';document.getElementById('d2').textContent='Ke kanan → (↑N₂O₄)';document.getElementById('info3').innerHTML='Vol↓ Tek↑ → <span class="val">lebih pudar</span> (geser kanan)';}
+      playSuccess();}
+  },80);
+}
+
+function drawS3(){
+  const cv=document.getElementById('c3');if(!cv)return;
+  const area=document.getElementById('sim3Area'),ctx=rc(cv,area),W=area.clientWidth,H=area.clientHeight;
+  ctx.fillStyle='#0f172a';ctx.fillRect(0,0,W,H);
+  if(S3.ph==='idle'){ctx.fillStyle='#94a3b8';ctx.font='bold 15px system-ui';ctx.textAlign='center';ctx.fillText('Klik "Aktifkan Syringe" untuk memulai',W/2,H/2);return;}
+  // Syringe
+  const syW=Math.min(130,W*.16),syMaxH=H*.72,syH=syMaxH*(S3.vol/100);
+  const syCx=W*.32,syTop=H*.08,syBot=syTop+syMaxH,plY=syBot-syH;
+  ctx.strokeStyle='#64748b';ctx.lineWidth=3;ctx.strokeRect(syCx-syW/2,syTop,syW,syMaxH);
+  // Plunger
+  ctx.fillStyle='#475569';ctx.fillRect(syCx-syW/2-12,plY-8,syW+24,13);
+  ctx.fillRect(syCx-5,plY-42,10,36);ctx.fillStyle='#334155';ctx.fillRect(syCx-16,plY-48,32,10);
+  // Gas
+  const a=S3.cI,gR=Math.round(160*a+210*(1-a)),gG=Math.round(80*a+210*(1-a)),gB=Math.round(40*a+210*(1-a));
+  ctx.fillStyle=`rgba(${gR},${gG},${gB},.65)`;ctx.fillRect(syCx-syW/2+2,plY+5,syW-4,syBot-plY-7);
+  // Particles
+  S3.pts.forEach(p=>{p.x+=p.vx;p.y+=p.vy;if(p.x<0||p.x>1){p.vx*=-1;p.x=Math.max(0,Math.min(1,p.x));}if(p.y<0||p.y>1){p.vy*=-1;p.y=Math.max(0,Math.min(1,p.y));}
+    const px=syCx-syW/2+8+p.x*(syW-16),py=plY+10+p.y*(syBot-plY-20);
+    if(py>plY&&py<syBot){ctx.beginPath();if(p.type==='NO2'){ctx.fillStyle='rgba(190,85,30,.9)';ctx.arc(px,py,4.5,0,Math.PI*2);}else{ctx.fillStyle='rgba(210,210,230,.55)';ctx.arc(px,py,4,0,Math.PI*2);}ctx.fill();}
+  });
+  // Scale
+  ctx.fillStyle='#94a3b8';ctx.font='10px system-ui';ctx.textAlign='right';
+  for(let v=0;v<=100;v+=20){const my=syBot-syMaxH*(v/100);ctx.fillRect(syCx+syW/2+3,my,6,1);ctx.fillText(v+' mL',syCx+syW/2+42,my+4);}
+  // Manometer
+  const mX=W*.58,mY=H*.1,mW=W*.3,mH=H*.38;
+  ctx.strokeStyle='#475569';ctx.lineWidth=2;ctx.strokeRect(mX,mY,mW,mH);ctx.fillStyle='#1e293b';ctx.fillRect(mX+1,mY+1,mW-2,mH-2);
+  ctx.fillStyle='#94a3b8';ctx.font='bold 12px system-ui';ctx.textAlign='center';ctx.fillText('MANOMETER',mX+mW/2,mY-8);
+  const gR2=Math.min(mW,mH)*.35,gCx=mX+mW/2,gCy=mY+mH*.55;
+  ctx.beginPath();ctx.arc(gCx,gCy,gR2,Math.PI,0);ctx.strokeStyle='#64748b';ctx.lineWidth=3;ctx.stroke();
+  const ang=Math.PI+((S3.pres-.3)/2)*Math.PI;
+  ctx.strokeStyle='#ef4444';ctx.lineWidth=2;ctx.beginPath();ctx.moveTo(gCx,gCy);ctx.lineTo(gCx+Math.cos(ang)*gR2*.85,gCy+Math.sin(ang)*gR2*.85);ctx.stroke();
+  ctx.fillStyle='#ef4444';ctx.beginPath();ctx.arc(gCx,gCy,4,0,Math.PI*2);ctx.fill();
+  ctx.fillStyle='#a78bfa';ctx.font='bold 20px system-ui';ctx.fillText(S3.pres.toFixed(1)+' atm',mX+mW/2,mY+mH-14);
+  ctx.fillStyle='#60a5fa';ctx.font='bold 16px system-ui';ctx.fillText('Volume: '+Math.round(S3.vol)+' mL',mX+mW/2,mY+mH+30);
+  // Legend
+  const lgX=W*.58,lgY=H*.62;
+  ctx.fillStyle='rgba(190,85,30,.9)';ctx.beginPath();ctx.arc(lgX+6,lgY,5,0,Math.PI*2);ctx.fill();
+  ctx.fillStyle='#e2e8f0';ctx.font='12px system-ui';ctx.textAlign='left';ctx.fillText('NO₂ (cokelat)',lgX+18,lgY+4);
+  ctx.fillStyle='rgba(210,210,230,.55)';ctx.beginPath();ctx.arc(lgX+6,lgY+22,5,0,Math.PI*2);ctx.fill();
+  ctx.fillStyle='#e2e8f0';ctx.fillText('N₂O₄ (tak berwarna)',lgX+18,lgY+26);
+  const n1=S3.pts.filter(p=>p.type==='NO2').length,n2=S3.pts.length-n1;
+  ctx.fillStyle='#94a3b8';ctx.font='12px system-ui';ctx.fillText('NO₂: '+n1+' partikel',lgX,lgY+50);ctx.fillText('N₂O₄: '+n2+' partikel',lgX,lgY+66);
+}
+
+// Animation loops
+(function loop(){if(S1.anim)drawS1();if(S3.ph==='active')drawS3();if(S2.dripPhase)drawS2();requestAnimationFrame(loop);})();
+setTimeout(()=>{drawS1();drawS2();drawS3();},100);
+
+// ════════════════════════════════════
+//  DISKUSI — SUBMIT & PDF
+// ════════════════════════════════════
+function submitJawaban(){
+  const a1=document.getElementById('ans1').value.trim();
+  const a2=document.getElementById('ans2').value.trim();
+  const a3=document.getElementById('ans3').value.trim();
+  const a4=document.getElementById('ans4').value.trim();
+  if(!a1&&!a2&&!a3&&!a4){alert('Harap isi minimal satu jawaban sebelum mengumpulkan.');return;}
+  playSuccess();document.getElementById('submitOk').classList.add('show');
+}
+
+function downloadPDF(){
+  const a1=document.getElementById('ans1').value.trim();
+  const a2=document.getElementById('ans2').value.trim();
+  const a3=document.getElementById('ans3').value.trim();
+  const a4=document.getElementById('ans4').value.trim();
+  if(!a1&&!a2&&!a3&&!a4){alert('Harap isi minimal satu jawaban sebelum mengunduh PDF.');return;}
+  try{
+    const{jsPDF}=window.jspdf;
+    const doc=new jsPDF();
+    const pw=doc.internal.pageSize.getWidth();
+    let y=20;
+    doc.setFontSize(16);doc.setFont(undefined,'bold');
+    doc.text('Jawaban Diskusi — Kesetimbangan Kimia',pw/2,y,{align:'center'});y+=10;
+    doc.setFontSize(10);doc.setFont(undefined,'normal');
+    doc.text('Faktor-Faktor yang Memengaruhi Pergeseran Kesetimbangan',pw/2,y,{align:'center'});y+=12;
+    doc.setDrawColor(124,58,237);doc.line(15,y,pw-15,y);y+=10;
+    const qs=[
+      {n:'1',q:'Analisis pengaruh Na2HPO4 terhadap kesetimbangan Fe3+ + SCN- <=> FeSCN2+',a:a1},
+      {n:'2',q:'Tentukan sifat endoterm/eksoterm reaksi CoCl2 berdasarkan pengaruh suhu',a:a2},
+      {n:'3',q:'Jelaskan pengaruh volume dan tekanan pada zat gas (2NO2 <=> N2O4)',a:a3},
+      {n:'4',q:'Rumuskan kondisi optimal produksi N2O4 (suhu & tekanan)',a:a4}
+    ];
+    qs.forEach(q=>{
+      if(y>260){doc.addPage();y=20;}
+      doc.setFontSize(11);doc.setFont(undefined,'bold');
+      doc.text('Pertanyaan '+q.n+':',15,y);y+=6;
+      doc.setFontSize(9);doc.setFont(undefined,'italic');
+      const ql=doc.splitTextToSize(q.q,pw-30);doc.text(ql,15,y);y+=ql.length*5+4;
+      doc.setFont(undefined,'bold');doc.setFontSize(10);doc.text('Jawaban:',15,y);y+=6;
+      doc.setFont(undefined,'normal');doc.setFontSize(10);
+      if(q.a){const al=doc.splitTextToSize(q.a,pw-30);doc.text(al,15,y);y+=al.length*5+8;}
+      else{doc.setTextColor(150);doc.text('(Belum dijawab)',15,y);doc.setTextColor(0);y+=10;}
+    });
+    doc.save('Jawaban_Diskusi_Kesetimbangan.pdf');
+    playSuccess();
+  }catch(e){
+    alert('Gagal membuat PDF. Pastikan koneksi internet tersedia untuk memuat library jsPDF.');
+    console.error(e);
+  }
+}
+</script>
+</body>
+</html>
