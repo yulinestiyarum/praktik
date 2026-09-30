@@ -1,0 +1,1914 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+<title>Lab Maya Kimia – Termokimia: Sistem dan Lingkungan</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Nunito:wght@400;600;700;800;900&family=Rajdhani:wght@600;700&family=Fira+Code:wght@400;500&display=swap" rel="stylesheet">
+<style>
+:root{
+  --bg:#0f1c2e;--surf:#15253d;--surf2:#1c3050;
+  --border:#2a4060;--border2:#3a5580;
+  --acc:#00c9b1;--acc2:#00e5cc;--acc3:#009d8c;
+  --amber:#f59e0b;--red:#ef4444;--green:#10b981;
+  --text:#e8f0fc;--text2:#94aac8;--text3:#5a7898;
+  --h:52px;--fbase:14px;
+  --blue:#3b82f6;--purple:#8b5cf6;
+}
+*{margin:0;padding:0;box-sizing:border-box;}
+html,body{height:100%;width:100%;overflow:hidden;touch-action:manipulation;}
+body{font-family:'Nunito',sans-serif;background:var(--bg);color:var(--text);display:flex;flex-direction:column;}
+
+/* ═══ LOADING SCREEN ═══ */
+#loadScreen{
+  position:fixed;inset:0;z-index:9999;
+  background:linear-gradient(135deg,#060e1a 0%,#0d1f38 40%,#081422 100%);
+  display:flex;flex-direction:column;align-items:center;justify-content:center;
+  gap:0;transition:opacity .6s ease;
+}
+#loadScreen.hide{opacity:0;pointer-events:none;}
+.load-logo{width:clamp(80px,8vw,110px);margin-bottom:14px;filter:drop-shadow(0 0 20px rgba(0,201,177,.4));}
+.load-title{font-family:'Rajdhani',sans-serif;font-size:clamp(22px,3vw,36px);font-weight:700;color:#fff;text-align:center;margin-bottom:3px;letter-spacing:.05em;}
+.load-sub{font-family:'Fira Code',monospace;font-size:clamp(10px,1.1vw,13px);color:var(--acc);letter-spacing:.15em;text-align:center;margin-bottom:30px;text-transform:uppercase;}
+.load-bar-wrap{width:clamp(220px,28vw,360px);height:5px;background:rgba(255,255,255,.1);border-radius:5px;overflow:hidden;margin-bottom:8px;}
+.load-bar{height:100%;width:0%;background:linear-gradient(90deg,#00c9b1,#3b82f6,#00e5cc);border-radius:5px;transition:width .08s linear;}
+.load-pct{font-family:'Fira Code',monospace;font-size:clamp(14px,1.5vw,18px);color:#fff;font-weight:500;margin-bottom:8px;text-align:center;}
+.load-status{font-size:12px;color:#6a9abc;margin-bottom:30px;min-height:16px;text-align:center;}
+#btnStart{
+  display:none;background:linear-gradient(135deg,#00c9b1,#3b82f6);
+  color:#fff;border:none;border-radius:12px;padding:11px 32px;
+  font-family:'Rajdhani',sans-serif;font-size:clamp(14px,1.5vw,18px);font-weight:700;
+  cursor:pointer;letter-spacing:.05em;
+  box-shadow:0 0 30px rgba(0,201,177,.4);
+  animation:btnPop .4s cubic-bezier(.34,1.56,.64,1);
+  transition:transform .18s,box-shadow .18s;
+}
+#btnStart:hover{transform:translateY(-2px) scale(1.03);box-shadow:0 0 40px rgba(0,201,177,.6);}
+@keyframes btnPop{from{opacity:0;transform:scale(0.7);}to{opacity:1;transform:scale(1);}}
+
+/* ═══ COVER PAGE ═══ */
+#coverPage{
+  position:fixed;inset:0;z-index:500;
+  display:flex;flex-direction:column;align-items:center;justify-content:center;
+  background:linear-gradient(135deg,#060e1a 0%,#0d1f38 50%,#081c30 100%);
+  overflow:hidden;
+}
+#coverPage::before{
+  content:'';position:absolute;inset:0;
+  background:radial-gradient(ellipse 80% 60% at 50% 50%,rgba(0,201,177,.08) 0%,transparent 70%);
+}
+.cover-img-wrap{width:clamp(220px,30vw,360px);margin-bottom:20px;position:relative;z-index:1;}
+.cover-img-wrap img{width:100%;border-radius:16px;box-shadow:0 0 60px rgba(0,201,177,.25);filter:drop-shadow(0 0 20px rgba(0,201,177,.2));}
+.cover-badge{
+  display:inline-block;font-family:'Fira Code',monospace;font-size:clamp(9px,1vw,11px);
+  letter-spacing:.2em;color:var(--acc);text-transform:uppercase;
+  border:1px solid rgba(0,201,177,.3);border-radius:20px;padding:4px 14px;
+  margin-bottom:10px;position:relative;z-index:1;
+}
+.cover-title{
+  font-family:'Rajdhani',sans-serif;font-size:clamp(20px,2.5vw,32px);font-weight:700;
+  color:#fff;text-align:center;line-height:1.15;position:relative;z-index:1;margin-bottom:6px;
+}
+.cover-title span{color:var(--acc);}
+.cover-subtitle{
+  font-family:'Rajdhani',sans-serif;font-size:clamp(14px,1.8vw,20px);font-weight:600;
+  color:#94aac8;text-align:center;margin-bottom:24px;position:relative;z-index:1;
+  letter-spacing:.05em;
+}
+.cover-btn{
+  background:linear-gradient(135deg,#00c9b1,#3b82f6);
+  color:#fff;border:none;border-radius:10px;padding:10px 28px;
+  font-family:'Rajdhani',sans-serif;font-size:clamp(14px,1.5vw,18px);font-weight:700;
+  cursor:pointer;letter-spacing:.05em;position:relative;z-index:1;
+  box-shadow:0 0 30px rgba(0,201,177,.4);transition:all .2s;
+}
+.cover-btn:hover{transform:translateY(-2px);box-shadow:0 0 45px rgba(0,201,177,.6);}
+.cover-dots{position:absolute;inset:0;pointer-events:none;overflow:hidden;}
+.cover-dots::before,.cover-dots::after{
+  content:'';position:absolute;
+  background:radial-gradient(circle,rgba(0,201,177,.15) 1px,transparent 1px);
+  background-size:40px 40px;
+}
+.cover-dots::before{inset:0;}
+.cover-dots::after{inset:0;background-size:80px 80px;opacity:.5;}
+
+/* ═══ HEADER ═══ */
+header{
+  position:relative;z-index:10;height:var(--h);flex-shrink:0;
+  background:linear-gradient(135deg,#060e1a,#0d1f38);
+  border-bottom:1px solid rgba(0,201,177,.2);
+  display:flex;align-items:center;padding:0 12px;gap:10px;
+  box-shadow:0 2px 20px rgba(0,0,0,.5);
+}
+.logo{display:flex;align-items:center;gap:8px;flex-shrink:0;}
+.logo-icon{width:34px;height:34px;border-radius:8px;background:linear-gradient(135deg,#00c9b1,#3b82f6);display:flex;align-items:center;justify-content:center;font-size:16px;box-shadow:0 0 15px rgba(0,201,177,.4);}
+.logo-text{font-family:'Rajdhani',sans-serif;font-size:22px;font-weight:700;color:#fff;line-height:1;}
+.logo-sub{font-size:9px;color:var(--acc);letter-spacing:.1em;text-transform:uppercase;}
+nav{display:flex;gap:1px;flex:1;overflow-x:auto;}
+nav::-webkit-scrollbar{display:none;}
+.nb{
+  position:relative;background:none;border:none;color:var(--text2);
+  cursor:pointer;font-family:'Nunito',sans-serif;font-size:clamp(11px,1.2vw,13px);font-weight:700;
+  padding:0 12px;height:var(--h);white-space:nowrap;transition:color .2s;
+}
+.nb::after{content:'';position:absolute;bottom:0;left:8px;right:8px;height:2px;background:var(--acc);transform:scaleX(0);transition:transform .2s;border-radius:2px 2px 0 0;}
+.nb:hover{color:var(--text);}
+.nb.active{color:var(--acc);}
+.nb.active::after{transform:scaleX(1);}
+.nb .nb-icon{margin-right:5px;font-size:14px;}
+
+/* ═══ APP CONTAINER ═══ */
+#app{position:relative;z-index:1;flex:1;overflow:hidden;display:flex;flex-direction:column;}
+.page{display:none;flex:1;overflow:hidden;flex-direction:column;}
+.page.active{display:flex;animation:fadeUp .2s ease;}
+@keyframes fadeUp{from{opacity:0;transform:translateY(5px);}to{opacity:1;transform:translateY(0);}}
+.scroll{flex:1;overflow-y:auto;padding:10px 14px 12px;scrollbar-width:thin;scrollbar-color:var(--border2) transparent;}
+.scroll::-webkit-scrollbar{width:4px;}
+.scroll::-webkit-scrollbar-thumb{background:var(--border2);border-radius:2px;}
+
+/* ═══ HERO BANNER ═══ */
+.hero{
+  background:linear-gradient(135deg,#060e1a,#0d2540);
+  border:1px solid rgba(0,201,177,.2);border-radius:10px;
+  padding:10px 16px;margin-bottom:8px;display:flex;align-items:center;gap:16px;
+  position:relative;overflow:hidden;flex-shrink:0;
+  box-shadow:0 4px 20px rgba(0,0,0,.3);
+}
+.hero::after{content:'⚗';position:absolute;right:12px;top:-6px;font-size:55px;opacity:.06;pointer-events:none;}
+.h-badge{font-family:'Fira Code',monospace;font-size:9px;letter-spacing:.15em;color:var(--acc);text-transform:uppercase;margin-bottom:2px;}
+.h-title{font-family:'Rajdhani',sans-serif;font-size:clamp(14px,2vw,20px);font-weight:700;color:#fff;line-height:1.2;}
+.h-title span{color:var(--acc);}
+.h-desc{font-size:11px;color:var(--text2);line-height:1.5;max-width:480px;}
+
+/* ═══ CARDS ═══ */
+.card{background:var(--surf);border:1px solid var(--border);border-radius:10px;padding:12px 14px;margin-bottom:7px;transition:border-color .2s;box-shadow:0 2px 8px rgba(0,0,0,.2);}
+.card:hover{border-color:var(--border2);}
+.ch{display:flex;align-items:center;gap:8px;margin-bottom:8px;}
+.ci{width:26px;height:26px;border-radius:7px;display:flex;align-items:center;justify-content:center;font-size:13px;flex-shrink:0;}
+.ci.t{background:rgba(0,201,177,.15);}
+.ci.b{background:rgba(59,130,246,.15);}
+.ci.g{background:rgba(16,185,129,.15);}
+.ci.a{background:rgba(245,158,11,.15);}
+.ci.r{background:rgba(239,68,68,.15);}
+.ci.p{background:rgba(139,92,246,.15);}
+.ct{font-family:'Rajdhani',sans-serif;font-size:clamp(13px,1.5vw,16px);font-weight:700;color:var(--acc);}
+.card p{font-size:clamp(11px,1.2vw,13.5px);line-height:1.7;color:var(--text2);margin-bottom:5px;}
+.card p:last-child{margin-bottom:0;}
+.card h4{font-size:clamp(10px,1vw,12px);font-weight:700;color:var(--acc2);letter-spacing:.08em;text-transform:uppercase;margin:8px 0 4px;}
+.two-col{display:grid;grid-template-columns:1fr 1fr;gap:7px;}
+.three-col{display:grid;grid-template-columns:1fr 1fr 1fr;gap:6px;}
+
+/* ═══ TUJUAN PAGE ═══ */
+.goal-badge{display:inline-flex;align-items:center;gap:6px;background:rgba(0,201,177,.1);border:1px solid rgba(0,201,177,.3);border-radius:20px;padding:3px 12px;font-size:11px;color:var(--acc);font-weight:700;margin-bottom:10px;}
+.goal-item{display:flex;gap:10px;align-items:flex-start;padding:8px 10px;background:var(--surf2);border:1px solid var(--border);border-radius:8px;margin-bottom:5px;}
+.goal-num{min-width:22px;height:22px;border-radius:50%;background:linear-gradient(135deg,var(--acc),var(--blue));color:#fff;font-size:11px;font-weight:800;display:flex;align-items:center;justify-content:center;flex-shrink:0;}
+.goal-text{font-size:clamp(11px,1.2vw,13px);color:var(--text2);line-height:1.6;}
+
+/* ═══ TEORI PAGE ═══ */
+.teori-img{width:50%;max-width:320px;border-radius:10px;border:1px solid var(--border);margin:6px auto;display:block;box-shadow:0 4px 20px rgba(0,0,0,.3);}
+.system-grid{display:grid;grid-template-columns:1fr 1fr 1fr;gap:6px;margin-top:8px;}
+.sys-card{background:var(--surf2);border:1px solid var(--border);border-radius:9px;padding:10px 12px;text-align:center;}
+.sys-icon{font-size:28px;margin-bottom:6px;}
+.sys-title{font-family:'Rajdhani',sans-serif;font-size:clamp(12px,1.4vw,15px);font-weight:700;color:var(--acc);margin-bottom:4px;}
+.sys-desc{font-size:clamp(10px,1vw,11.5px);color:var(--text2);line-height:1.5;}
+.sys-tag{display:inline-block;margin-top:5px;font-size:9.5px;font-weight:700;padding:2px 8px;border-radius:12px;}
+.tag-t{background:rgba(239,68,68,.15);border:1px solid rgba(239,68,68,.3);color:#f87171;}
+.tag-c{background:rgba(59,130,246,.15);border:1px solid rgba(59,130,246,.3);color:#60a5fa;}
+.tag-i{background:rgba(0,201,177,.15);border:1px solid rgba(0,201,177,.3);color:var(--acc);}
+
+/* ═══ ALAT & BAHAN ═══ */
+.ab-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(130px,1fr));gap:6px;margin-top:6px;}
+.ab-item{background:var(--surf2);border:1px solid var(--border);border-radius:9px;padding:8px;text-align:center;transition:border-color .2s,transform .2s;}
+.ab-item:hover{border-color:var(--acc);transform:translateY(-2px);}
+.ab-img{width:70px;height:70px;object-fit:contain;margin-bottom:6px;filter:drop-shadow(0 2px 6px rgba(0,0,0,.3));}
+.ab-name{font-size:clamp(10px,1.1vw,12px);font-weight:700;color:var(--text);margin-bottom:2px;}
+.ab-desc{font-size:clamp(9px,.9vw,10.5px);color:var(--text2);line-height:1.4;}
+
+/* ═══ PROSEDUR PAGE ═══ */
+.proc-tabs{display:flex;gap:4px;margin-bottom:8px;flex-shrink:0;}
+.ptab{background:var(--surf2);border:1px solid var(--border);border-radius:7px;padding:6px 14px;font-size:12px;font-weight:700;color:var(--text2);cursor:pointer;transition:all .2s;font-family:'Rajdhani',sans-serif;letter-spacing:.05em;}
+.ptab.active{background:linear-gradient(135deg,#00c9b1,#3b82f6);border-color:transparent;color:#fff;}
+.ptab:hover:not(.active){border-color:var(--acc);color:var(--acc);}
+.proc-content{display:none;}
+.proc-content.active{display:block;}
+.steps{display:flex;flex-direction:column;gap:5px;}
+.step{display:flex;gap:10px;align-items:flex-start;background:var(--surf2);border:1px solid var(--border);border-radius:8px;padding:8px 10px;transition:all .17s;}
+.step:hover{border-color:var(--acc);background:rgba(0,201,177,.05);}
+.snum{min-width:22px;height:22px;border-radius:50%;background:linear-gradient(135deg,var(--acc3),var(--acc));display:flex;align-items:center;justify-content:center;font-family:'Fira Code',monospace;font-size:10px;color:#fff;flex-shrink:0;font-weight:600;}
+.step p{font-size:clamp(11.5px,1.2vw,13px);color:var(--text2);line-height:1.6;margin:0;}
+.step p strong{color:var(--text);}
+.chem-symbol{display:inline-block;font-family:'Fira Code',monospace;font-size:11px;background:rgba(0,201,177,.1);border:1px solid rgba(0,201,177,.25);border-radius:5px;padding:1px 6px;color:var(--acc);margin:0 2px;}
+.proc-sep{display:flex;align-items:center;gap:8px;margin:6px 0;}
+.proc-sep::before,.proc-sep::after{content:'';flex:1;height:1px;background:var(--border);}
+.proc-sep span{font-family:'Fira Code',monospace;font-size:9px;color:var(--acc);letter-spacing:.12em;text-transform:uppercase;white-space:nowrap;}
+
+/* ═══ SIMULASI PAGE ═══ */
+#page-simulasi{overflow:hidden;}
+.sim-tabs{display:flex;gap:4px;padding:4px 14px 0;flex-shrink:0;border-bottom:1px solid var(--border);}
+.stab{background:var(--surf2);border:1px solid var(--border);border-bottom:none;border-radius:8px 8px 0 0;padding:5px 16px;font-size:clamp(11px,1.2vw,13px);font-weight:700;color:var(--text2);cursor:pointer;transition:all .2s;font-family:'Rajdhani',sans-serif;letter-spacing:.04em;}
+.stab.active{background:var(--surf);border-color:var(--border);border-bottom-color:var(--surf);color:var(--acc);}
+.stab:hover:not(.active){color:var(--text);}
+
+.sim-area{flex:1;display:none;padding:4px 10px;gap:8px;min-height:0;overflow:hidden;}
+.sim-area.active{display:flex;}
+
+/* Left: scene — 16:9 aspect */
+.sim-scene{flex:1;background:var(--surf);border:1px solid var(--border);border-radius:10px;position:relative;overflow:hidden;min-width:0;aspect-ratio:16/9;}
+.sim-scene canvas,.sim-scene svg{width:100%;height:100%;display:block;}
+
+/* Right: controls — compact, no scroll */
+.sim-ctrl{width:220px;flex-shrink:0;display:flex;flex-direction:column;gap:4px;overflow:hidden;}
+.ctrl-box{background:var(--surf);border:1px solid var(--border);border-radius:8px;padding:6px 8px;}
+.ctrl-title{font-family:'Rajdhani',sans-serif;font-size:12px;font-weight:700;color:var(--acc);margin-bottom:4px;display:flex;align-items:center;gap:5px;}
+.ctrl-title::before{content:'';width:3px;height:11px;background:var(--acc);border-radius:2px;flex-shrink:0;}
+
+/* Step list */
+.sim-steps-list{display:flex;flex-direction:column;gap:2px;}
+.sim-step-btn{
+  display:flex;align-items:center;gap:5px;width:100%;
+  background:var(--surf2);border:1px solid var(--border);border-radius:5px;
+  padding:3px 6px;cursor:pointer;transition:all .2s;text-align:left;
+  font-family:'Nunito',sans-serif;font-size:10px;color:var(--text2);font-weight:600;
+  line-height:1.3;
+}
+.sim-step-btn:hover:not(:disabled){border-color:var(--acc);color:var(--text);background:rgba(0,201,177,.05);}
+.sim-step-btn:disabled{opacity:.4;cursor:not-allowed;}
+.sim-step-btn.done{border-color:rgba(16,185,129,.4);color:#34d399;background:rgba(16,185,129,.05);}
+.sim-step-btn.active{border-color:var(--acc);color:var(--acc);background:rgba(0,201,177,.08);animation:pulse-btn .6s ease-in-out;}
+@keyframes pulse-btn{0%,100%{box-shadow:0 0 0 0 rgba(0,201,177,.3);}50%{box-shadow:0 0 0 4px rgba(0,201,177,.1);}}
+.step-icon{font-size:12px;flex-shrink:0;}
+.step-check{margin-left:auto;font-size:10px;flex-shrink:0;}
+.step-check.done::before{content:'✓';color:#34d399;}
+.step-check.active::before{content:'▶';color:var(--acc);}
+
+/* Readings */
+.reading-grid{display:grid;grid-template-columns:1fr 1fr;gap:4px;}
+.reading-box{background:var(--surf2);border:1px solid var(--border);border-radius:6px;padding:4px;text-align:center;}
+.reading-val{font-family:'Fira Code',monospace;font-size:clamp(13px,1.4vw,16px);font-weight:500;color:var(--acc);display:block;margin-bottom:1px;}
+.reading-lbl{font-size:8px;color:var(--text3);text-transform:uppercase;letter-spacing:.06em;}
+
+/* Reset btn */
+.btn-reset{width:100%;background:var(--surf2);border:1px solid var(--border);border-radius:6px;padding:4px;font-family:'Rajdhani',sans-serif;font-size:11px;font-weight:700;cursor:pointer;color:var(--text2);transition:all .2s;letter-spacing:.04em;}
+.btn-reset:hover{border-color:var(--acc);color:var(--acc);}
+
+/* Status message */
+.sim-msg{font-size:10px;color:var(--text2);line-height:1.4;background:rgba(0,201,177,.05);border:1px solid rgba(0,201,177,.15);border-radius:6px;padding:4px 7px;min-height:28px;}
+.sim-msg.info{color:var(--acc);border-color:rgba(0,201,177,.25);}
+.sim-msg.react{color:#f59e0b;border-color:rgba(245,158,11,.3);background:rgba(245,158,11,.05);}
+.sim-msg.done{color:#34d399;border-color:rgba(52,211,153,.3);background:rgba(52,211,153,.05);}
+
+/* System type badge */
+.sys-type-badge{text-align:center;padding:2px 0;}
+.stb-inner{display:inline-flex;align-items:center;gap:5px;border-radius:20px;padding:3px 10px;font-size:10px;font-weight:700;letter-spacing:.05em;}
+.stb-t{background:rgba(239,68,68,.15);border:1px solid rgba(239,68,68,.3);color:#f87171;}
+.stb-c{background:rgba(59,130,246,.15);border:1px solid rgba(59,130,246,.3);color:#60a5fa;}
+.stb-i{background:rgba(0,201,177,.15);border:1px solid rgba(0,201,177,.3);color:var(--acc);}
+
+/* ═══ DATA & DISKUSI ═══ */
+.data-table-wrap{overflow-x:auto;margin-bottom:8px;}
+table.data-tbl{width:100%;border-collapse:collapse;font-size:clamp(10.5px,1.1vw,12.5px);}
+table.data-tbl th{background:rgba(0,201,177,.1);border:1px solid var(--border);padding:7px 10px;text-align:center;color:var(--acc);font-family:'Rajdhani',sans-serif;font-size:clamp(10px,1.1vw,13px);font-weight:700;letter-spacing:.04em;}
+table.data-tbl td{border:1px solid var(--border);padding:6px 10px;color:var(--text2);text-align:center;}
+table.data-tbl tr:nth-child(even) td{background:rgba(255,255,255,.02);}
+input.data-input{background:var(--surf2);border:1px solid var(--border);border-radius:5px;padding:4px 7px;color:var(--text);font-family:'Fira Code',monospace;font-size:11.5px;width:100%;outline:none;transition:border-color .17s;text-align:center;}
+input.data-input:focus{border-color:var(--acc);}
+.disc-q{background:var(--surf2);border:1px solid var(--border);border-radius:8px;padding:6px 10px;margin-bottom:0;}
+.disc-qnum{font-family:'Fira Code',monospace;font-size:8px;color:var(--acc);letter-spacing:.1em;margin-bottom:2px;}
+.disc-qtext{font-size:clamp(10px,1.1vw,12px);color:var(--text2);line-height:1.45;margin-bottom:4px;}
+textarea.disc-area{width:100%;background:var(--surf);border:1px solid var(--border);border-radius:6px;padding:5px 8px;font-family:'Nunito',sans-serif;font-size:11px;color:var(--text);resize:none;outline:none;line-height:1.5;transition:border-color .17s;min-height:0;height:48px;}
+textarea.disc-area:focus{border-color:var(--acc);}
+#page-diskusi .scroll{overflow:hidden;display:flex;flex-direction:column;padding:6px 10px 6px;}
+#page-diskusi .hero{padding:5px 14px;margin-bottom:5px;}
+#page-diskusi .card{padding:8px 10px;margin-bottom:0;flex:1;display:flex;flex-direction:column;}
+.disc-grid{display:grid;grid-template-columns:1fr 1fr;gap:5px;flex:1;min-height:0;}
+.disc-actions{display:flex;justify-content:center;gap:10px;margin-top:6px;flex-shrink:0;}
+.btn-download-pdf{
+  background:linear-gradient(135deg,#8b5cf6,#3b82f6);
+  color:#fff;border:none;border-radius:10px;padding:9px 24px;
+  font-family:'Rajdhani',sans-serif;font-size:14px;font-weight:700;
+  cursor:pointer;letter-spacing:.05em;
+  box-shadow:0 0 20px rgba(139,92,246,.3);transition:all .2s;
+}
+.btn-download-pdf:hover{transform:translateY(-2px);box-shadow:0 0 30px rgba(139,92,246,.5);}
+
+/* ═══ NOTIF ═══ */
+.notif{position:fixed;bottom:14px;left:50%;transform:translateX(-50%) translateY(70px);background:#0d1f38;border:1px solid var(--acc);color:#fff;padding:7px 20px;border-radius:20px;font-size:12px;font-weight:600;z-index:2000;transition:transform .3s ease;pointer-events:none;white-space:nowrap;}
+.notif.show{transform:translateX(-50%) translateY(0);}
+
+/* ═══ SCENE SVG STYLES ═══ */
+.lab-scene-svg{width:100%;height:100%;display:block;}
+
+/* Animation keyframes */
+@keyframes pourAnim{0%{opacity:0;transform:translateY(-10px) scaleY(0);}20%{opacity:1;transform:translateY(0) scaleY(1);}80%{opacity:1;}100%{opacity:0;transform:translateY(10px);}}
+@keyframes dustFall{0%{opacity:1;transform:translateY(0) rotate(0deg);}100%{opacity:0;transform:translateY(40px) rotate(30deg);}}
+@keyframes bubbleRise{0%{opacity:.7;transform:translateY(0) scale(1);}100%{opacity:0;transform:translateY(-50px) scale(1.5);}}
+@keyframes gasEscape{0%{opacity:.8;transform:translateY(0);}100%{opacity:0;transform:translateY(-60px) scale(1.5);}}
+@keyframes tempRise{from{height:var(--th0);}to{height:var(--th1);}}
+@keyframes scaleUpdate{0%,100%{transform:scale(1);}50%{transform:scale(1.08);}}
+@keyframes shimmer{0%,100%{opacity:.4;}50%{opacity:.8;}}
+
+/* Particle animations for simulation */
+.bubble-anim{animation:bubbleRise 1.5s ease-out infinite;}
+.pour-stream{animation:pourAnim .1s ease-out forwards;}
+.gas-particle{animation:gasEscape 2s ease-out infinite;}
+
+/* ═══ TEORI COMPACT ═══ */
+#page-teori .card{margin-bottom:4px;padding:8px 12px;}
+#page-teori .hero{padding:7px 14px;margin-bottom:5px;}
+#page-teori .system-grid{gap:4px;margin-top:5px;}
+#page-teori .sys-card{padding:7px 9px;}
+#page-teori .sys-icon{font-size:22px;margin-bottom:3px;}
+#page-teori .sys-desc{font-size:10px;}
+#page-teori p{font-size:11.5px;line-height:1.5;margin-bottom:3px;}
+
+/* ═══ SCROLLBAR ═══ */
+::-webkit-scrollbar{width:4px;height:4px;}
+::-webkit-scrollbar-track{background:transparent;}
+::-webkit-scrollbar-thumb{background:var(--border2);border-radius:2px;}
+
+/* ═══ MOBILE ═══ */
+@media(max-width:640px){
+  :root{--h:46px;--fbase:12px;}
+  .two-col,.three-col,.system-grid{grid-template-columns:1fr;}
+  .ab-grid{grid-template-columns:repeat(auto-fill,minmax(110px,1fr));}
+  .sim-area{flex-direction:column;}
+  .sim-scene{aspect-ratio:auto;}
+  .sim-ctrl{width:100%;flex-direction:row;flex-wrap:wrap;overflow:visible;}
+  .ctrl-box{flex:1;min-width:140px;}
+  .disc-grid{grid-template-columns:1fr;}
+  #page-diskusi .scroll{overflow-y:auto;}
+  textarea.disc-area{height:40px;}
+}
+</style>
+</head>
+<body>
+
+<!-- ═══ LOADING SCREEN ═══ -->
+<div id="loadScreen">
+  <img class="load-logo" src="https://yulinestiyarum.github.io/sistemlingkungan/sampul.png" alt="Lab Maya Kimia" style="border-radius:12px;">
+  <div class="load-title">Lab Maya Kimia</div>
+  <div class="load-sub">Termokimia: Sistem dan Lingkungan</div>
+  <div class="load-bar-wrap"><div class="load-bar" id="loadBar"></div></div>
+  <div class="load-pct" id="loadPct">0%</div>
+  <div class="load-status" id="loadStatus">Memuat laboratorium virtual…</div>
+  <button id="btnStart" onclick="startLab()">🔬 Mulai Praktikum</button>
+</div>
+
+<!-- ═══ COVER PAGE ═══ -->
+<div id="coverPage" style="display:none;">
+  <div class="cover-dots"></div>
+  <div class="cover-img-wrap">
+    <img src="https://yulinestiyarum.github.io/sistemlingkungan/sampul.png" alt="Termokimia: Sistem dan Lingkungan" onerror="this.style.display='none'">
+  </div>
+  <div class="cover-badge">⚗ Lab Maya Kimia</div>
+  <div class="cover-title">TERMOKIMIA:<br><span>Sistem dan Lingkungan</span></div>
+  <div class="cover-subtitle">Praktikum Interaktif Virtual</div>
+  <button class="cover-btn" onclick="enterLab()">🚀 Masuk ke Laboratorium</button>
+</div>
+
+<!-- ═══ MAIN APP ═══ -->
+<div id="mainApp" style="display:none;flex:1;flex-direction:column;overflow:hidden;">
+
+<header>
+  <div class="logo">
+    <div class="logo-icon">⚗</div>
+    <div>
+      <div class="logo-text">Lab Maya Kimia</div>
+      <div class="logo-sub">Termokimia</div>
+    </div>
+  </div>
+  <nav id="mainNav">
+    <button class="nb active" onclick="showPage('tujuan')"><span class="nb-icon">🎯</span>Tujuan</button>
+    <button class="nb" onclick="showPage('teori')"><span class="nb-icon">📖</span>Teori</button>
+    <button class="nb" onclick="showPage('alatbahan')"><span class="nb-icon">🔬</span>Alat &amp; Bahan</button>
+    <button class="nb" onclick="showPage('prosedur')"><span class="nb-icon">📋</span>Prosedur</button>
+    <button class="nb" onclick="showPage('simulasi')"><span class="nb-icon">🧪</span>Simulasi</button>
+    <button class="nb" onclick="showPage('data')"><span class="nb-icon">📊</span>Data</button>
+    <button class="nb" onclick="showPage('diskusi')"><span class="nb-icon">💬</span>Diskusi</button>
+  </nav>
+</header>
+
+<div id="app">
+
+<!-- ═══ TUJUAN ═══ -->
+<div class="page active" id="page-tujuan">
+<div class="scroll">
+  <div class="hero">
+    <div>
+      <div class="h-badge">🎯 Tujuan Praktikum</div>
+      <div class="h-title">Termokimia: <span>Sistem dan Lingkungan</span></div>
+      <div class="h-desc">Mempelajari perbedaan sistem terbuka, tertutup, dan terisolasi melalui reaksi kimia HCl + CaCO₃</div>
+    </div>
+  </div>
+  <div class="two-col">
+    <div class="card">
+      <div class="ch"><div class="ci t">🎓</div><div class="ct">Tujuan Pembelajaran</div></div>
+      <div class="goal-item">
+        <div class="goal-num">✦</div>
+        <div class="goal-text">Menentukan perubahan entalpi standar dari suatu reaksi kimia serta penerapannya dalam kehidupan sehari-hari.</div>
+      </div>
+    </div>
+    <div class="card">
+      <div class="ch"><div class="ci b">🔭</div><div class="ct">Tujuan Percobaan</div></div>
+      <div class="goal-item">
+        <div class="goal-num">1</div>
+        <div class="goal-text">Mampu membedakan secara visual dan konseptual antara bagian yang menjadi pusat pengamatan <strong>(sistem)</strong> dan area di sekitarnya <strong>(lingkungan)</strong> dalam suatu reaksi kimia.</div>
+      </div>
+      <div class="goal-item">
+        <div class="goal-num">2</div>
+        <div class="goal-text">Mampu membandingkan karakteristik sistem <strong>terbuka, tertutup,</strong> dan <strong>terisolasi</strong> berdasarkan ada atau tidaknya perpindahan materi dan energi (kalor).</div>
+      </div>
+      <div class="goal-item">
+        <div class="goal-num">3</div>
+        <div class="goal-text">Mampu menentukan arah perpindahan kalor berdasarkan perubahan suhu yang terukur pada berbagai kondisi sistem.</div>
+      </div>
+    </div>
+  </div>
+  <div class="card">
+    <div class="ch"><div class="ci g">🏆</div><div class="ct">Hasil Belajar yang Diharapkan</div></div>
+    <div class="three-col">
+      <div style="background:var(--surf2);border:1px solid var(--border);border-radius:8px;padding:10px;text-align:center;">
+        <div style="font-size:24px;margin-bottom:5px;">🧠</div>
+        <div style="font-family:'Rajdhani',sans-serif;font-size:13px;font-weight:700;color:var(--blue);margin-bottom:3px;">Pengetahuan</div>
+        <div style="font-size:11px;color:var(--text2);line-height:1.5;">Membedakan konsep sistem dan lingkungan serta mengklasifikasikan jenis-jenis sistem.</div>
+      </div>
+      <div style="background:var(--surf2);border:1px solid var(--border);border-radius:8px;padding:10px;text-align:center;">
+        <div style="font-size:24px;margin-bottom:5px;">⚗</div>
+        <div style="font-family:'Rajdhani',sans-serif;font-size:13px;font-weight:700;color:var(--amber);margin-bottom:3px;">Keterampilan</div>
+        <div style="font-size:11px;color:var(--text2);line-height:1.5;">Mengoperasikan simulasi virtual lab dan mencatat data perubahan suhu secara akurat.</div>
+      </div>
+      <div style="background:var(--surf2);border:1px solid var(--border);border-radius:8px;padding:10px;text-align:center;">
+        <div style="font-size:24px;margin-bottom:5px;">💡</div>
+        <div style="font-family:'Rajdhani',sans-serif;font-size:13px;font-weight:700;color:var(--green);margin-bottom:3px;">Sikap</div>
+        <div style="font-size:11px;color:var(--text2);line-height:1.5;">Teliti dalam pengamatan, kritis dalam analisis data, dan mandiri dalam menyelesaikan praktikum.</div>
+      </div>
+    </div>
+  </div>
+</div>
+</div>
+
+<!-- ═══ TEORI ═══ -->
+<div class="page" id="page-teori">
+<div class="scroll" style="display:flex;flex-direction:column;justify-content:space-between;">
+  <div class="hero">
+    <div>
+      <div class="h-badge">📖 Dasar Teori</div>
+      <div class="h-title">Termokimia: <span>Sistem &amp; Lingkungan</span></div>
+    </div>
+  </div>
+  <div class="card">
+    <div class="ch"><div class="ci t">🔥</div><div class="ct">Apa itu Termokimia?</div></div>
+    <p>Termokimia merupakan cabang ilmu kimia yang mempelajari hubungan antara kalor (energi panas) dengan reaksi kimia atau proses fisika. Dalam termokimia, dikenal adanya <strong>sistem</strong> dan <strong>lingkungan</strong>.</p>
+    <img src="https://yulinestiyarum.github.io/sistemlingkungan/teori.png" alt="Ilustrasi Teori Termokimia" class="teori-img" onerror="this.style.display='none'">
+  </div>
+  <div class="two-col">
+    <div class="card">
+      <div class="ch"><div class="ci b">🎯</div><div class="ct">Sistem</div></div>
+      <p>Sistem merupakan sesuatu yang menjadi <strong>pusat perhatian</strong>. Dalam praktikum ini: zat-zat yang direaksikan (<span class="chem-symbol">HCl</span> + <span class="chem-symbol">CaCO₃</span>) dan produk reaksi di dalam wadah.</p>
+    </div>
+    <div class="card">
+      <div class="ch"><div class="ci a">🌐</div><div class="ct">Lingkungan</div></div>
+      <p>Lingkungan merupakan <strong>segala sesuatu di luar sistem</strong>. Dalam praktikum ini: tabung/wadah reaksi, termometer, dan udara di sekitar tempat percobaan berlangsung.</p>
+    </div>
+  </div>
+  <div class="card">
+    <div class="ch"><div class="ci g">⚡</div><div class="ct">Klasifikasi Sistem</div></div>
+    <p>Berdasarkan kemampuannya melakukan pertukaran materi dan energi dengan lingkungan, sistem dibagi menjadi tiga jenis:</p>
+    <div class="system-grid">
+      <div class="sys-card">
+        <div class="sys-icon">🔓</div>
+        <div class="sys-title">Sistem Terbuka</div>
+        <div class="sys-desc">Dapat melakukan pertukaran <strong>materi</strong> dan <strong>energi</strong> dengan lingkungan.</div>
+        <div class="sys-desc" style="margin-top:4px;">Contoh: Reaksi dalam <strong>gelas kimia</strong> tanpa penutup</div>
+        <span class="sys-tag tag-t">↕ Materi + Energi</span>
+      </div>
+      <div class="sys-card">
+        <div class="sys-icon">🔒</div>
+        <div class="sys-title">Sistem Tertutup</div>
+        <div class="sys-desc">Hanya melakukan pertukaran <strong>energi</strong>. Materi tidak dapat keluar.</div>
+        <div class="sys-desc" style="margin-top:4px;">Contoh: Reaksi dalam <strong>labu erlenmeyer</strong> tersumbat</div>
+        <span class="sys-tag tag-c">↕ Energi saja</span>
+      </div>
+      <div class="sys-card">
+        <div class="sys-icon">🛡️</div>
+        <div class="sys-title">Sistem Terisolasi</div>
+        <div class="sys-desc">Tidak ada pertukaran <strong>materi maupun energi</strong> dengan lingkungan.</div>
+        <div class="sys-desc" style="margin-top:4px;">Contoh: Reaksi di dalam <strong>kalorimeter</strong> yang terisolasi</div>
+        <span class="sys-tag tag-i">✗ Materi &amp; Energi</span>
+      </div>
+    </div>
+  </div>
+</div>
+</div>
+
+<!-- ═══ ALAT & BAHAN ═══ -->
+<div class="page" id="page-alatbahan">
+<div class="scroll">
+  <div class="hero">
+    <div>
+      <div class="h-badge">🔬 Peralatan Laboratorium</div>
+      <div class="h-title">Daftar <span>Alat &amp; Bahan</span></div>
+    </div>
+  </div>
+  <div class="card">
+    <div class="ch"><div class="ci t">🧰</div><div class="ct">Alat Percobaan</div></div>
+    <div class="ab-grid">
+      <div class="ab-item">
+        <img class="ab-img" src="https://yulinestiyarum.github.io/sistemlingkungan/beakerglass.png" alt="Gelas Kimia">
+        <div class="ab-name">Gelas Kimia</div>
+        <div class="ab-desc">Beaker glass — wadah reaksi sistem terbuka</div>
+      </div>
+      <div class="ab-item">
+        <img class="ab-img" src="https://yulinestiyarum.github.io/sistemlingkungan/erlenmeyer.png" alt="Erlenmeyer">
+        <div class="ab-name">Labu Erlenmeyer</div>
+        <div class="ab-desc">Dengan sumbat karet — sistem tertutup</div>
+      </div>
+      <div class="ab-item">
+        <img class="ab-img" src="https://yulinestiyarum.github.io/sistemlingkungan/kalorimeter.png" alt="Kalorimeter">
+        <div class="ab-name">Kalorimeter</div>
+        <div class="ab-desc">Kalorimeter sederhana — sistem terisolasi</div>
+      </div>
+      <div class="ab-item">
+        <img class="ab-img" src="https://yulinestiyarum.github.io/sistemlingkungan/termometer.png" alt="Termometer">
+        <div class="ab-name">Termometer Digital</div>
+        <div class="ab-desc">Mengukur perubahan suhu sebelum &amp; sesudah reaksi</div>
+      </div>
+      <div class="ab-item">
+        <img class="ab-img" src="https://yulinestiyarum.github.io/hukumfaraday/neraca.png" alt="Neraca">
+        <div class="ab-name">Neraca Analitik</div>
+        <div class="ab-desc">Digital — mengukur massa secara presisi</div>
+      </div>
+    </div>
+  </div>
+  <div class="card">
+    <div class="ch"><div class="ci a">🧪</div><div class="ct">Bahan Percobaan</div></div>
+    <div class="ab-grid">
+      <div class="ab-item">
+        <img class="ab-img" src="https://yulinestiyarum.github.io/sistemlingkungan/HCl.png" alt="HCl">
+        <div class="ab-name">Larutan HCl</div>
+        <div class="ab-desc"><span class="chem-symbol">HCl(aq)</span> — cairan reaktan (sistem)</div>
+      </div>
+      <div class="ab-item">
+        <img class="ab-img" src="https://yulinestiyarum.github.io/sistemlingkungan/CaCO3.png" alt="CaCO3">
+        <div class="ab-name">Batu Pualam</div>
+        <div class="ab-desc"><span class="chem-symbol">CaCO₃</span> — reaktan padat, menghasilkan gas CO₂</div>
+      </div>
+      <div class="ab-item">
+        <img class="ab-img" src="https://yulinestiyarum.github.io/termokimia/aquades.png" alt="Aquades">
+        <div class="ab-name">Aquades</div>
+        <div class="ab-desc"><span class="chem-symbol">H₂O</span> — bagian dari lingkungan langsung</div>
+      </div>
+    </div>
+  </div>
+</div>
+</div>
+
+<!-- ═══ PROSEDUR ═══ -->
+<div class="page" id="page-prosedur">
+<div class="scroll">
+  <div class="hero">
+    <div>
+      <div class="h-badge">📋 Langkah Kerja</div>
+      <div class="h-title">Prosedur <span>Percobaan</span></div>
+    </div>
+  </div>
+  <div class="proc-tabs">
+    <button class="ptab active" onclick="showProcTab('p1')">🔓 Percobaan 1</button>
+    <button class="ptab" onclick="showProcTab('p2')">🔒 Percobaan 2</button>
+    <button class="ptab" onclick="showProcTab('p3')">🛡️ Percobaan 3</button>
+  </div>
+
+  <div class="proc-content active" id="proc-p1">
+    <div class="card">
+      <div class="ch"><div class="ci t">🔓</div><div class="ct">Percobaan 1</div></div>
+      <div style="margin-bottom:8px;">
+        <span class="sys-tag tag-t" style="font-size:11px;padding:3px 10px;">Alat: Gelas Kimia (Beaker Glass)</span>
+      </div>
+      <div class="steps">
+        <div class="step"><div class="snum">1</div><p>Tarik (drag) <strong>gelas kimia/beaker glass</strong> ke atas <strong>neraca analitik digital</strong>, lalu klik tombol <strong>"Zero"</strong> agar skala menunjukkan angka <strong>0,00 gram</strong>.</p></div>
+        <div class="step"><div class="snum">2</div><p>Tuangkan <strong>50 mL larutan</strong> <span class="chem-symbol">🧪 HCl</span> ke dalam gelas kimia. <em>(Perhatikan efek kucuran dan suara!)</em></p></div>
+        <div class="step"><div class="snum">3</div><p>Pasang <strong>termometer digital</strong> ke dalam larutan, biarkan sejenak, lalu <strong>catat suhu awal (T₀)</strong> dan <strong>massa awal (M₀)</strong>.</p></div>
+        <div class="step"><div class="snum">4</div><p>Masukkan <strong>padatan batu pualam</strong> <span class="chem-symbol">🪨 CaCO₃</span> ke dalam gelas kimia. <em>(Perhatikan efek serbuk dan suara!)</em></p></div>
+        <div class="step"><div class="snum">5</div><p>Amati reaksi yang terjadi — perhatikan <strong>gelembung gas</strong> <span class="chem-symbol">CO₂</span> yang <strong>terlepas ke udara</strong> (sistem terbuka = materi dan energi dapat keluar).</p></div>
+        <div class="step"><div class="snum">6</div><p>Tunggu hingga reaksi berhenti, lalu <strong>catat suhu akhir (T₁)</strong> pada termometer dan <strong>massa akhir (M₁)</strong> pada neraca analitik.</p></div>
+      </div>
+    </div>
+  </div>
+
+  <div class="proc-content" id="proc-p2">
+    <div class="card">
+      <div class="ch"><div class="ci b">🔒</div><div class="ct">Percobaan 2</div></div>
+      <div style="margin-bottom:8px;">
+        <span class="sys-tag tag-c" style="font-size:11px;padding:3px 10px;">Alat: Labu Erlenmeyer + Sumbat Karet</span>
+      </div>
+      <div class="steps">
+        <div class="step"><div class="snum">1</div><p>Tarik <strong>labu erlenmeyer</strong> ke atas <strong>neraca analitik digital</strong>, lalu klik tombol <strong>"Zero"</strong>.</p></div>
+        <div class="step"><div class="snum">2</div><p>Tuangkan <strong>50 mL larutan</strong> <span class="chem-symbol">🧪 HCl</span> ke dalam labu erlenmeyer. <strong>Pastikan erlenmeyer belum ditutup sumbat karet!</strong></p></div>
+        <div class="step"><div class="snum">3</div><p>Pasang <strong>termometer digital</strong> (yang terintegrasi dengan sumbat karet), lalu <strong>catat suhu awal (T₀)</strong> dan <strong>massa awal (M₀)</strong>.</p></div>
+        <div class="step"><div class="snum">4</div><p>Masukkan <strong>padatan batu pualam</strong> <span class="chem-symbol">🪨 CaCO₃</span> ke dalam labu erlenmeyer, kemudian <strong>klik sumbat karet untuk menutup rapat</strong> labu tersebut.</p></div>
+        <div class="step"><div class="snum">5</div><p>Amati reaksi — perhatikan bahwa <strong>gelembung gas tertahan di dalam wadah</strong> (sistem tertutup = materi tidak dapat keluar, energi masih bisa berpindah).</p></div>
+        <div class="step"><div class="snum">6</div><p>Tunggu hingga reaksi berhenti, lalu <strong>catat suhu akhir (T₁)</strong> dan <strong>massa akhir (M₁)</strong> pada neraca analitik.</p></div>
+      </div>
+    </div>
+  </div>
+
+  <div class="proc-content" id="proc-p3">
+    <div class="card">
+      <div class="ch"><div class="ci i">🛡️</div><div class="ct">Percobaan 3</div></div>
+      <div style="margin-bottom:8px;">
+        <span class="sys-tag tag-i" style="font-size:11px;padding:3px 10px;">Alat: Kalorimeter Sederhana</span>
+      </div>
+      <div class="steps">
+        <div class="step"><div class="snum">1</div><p>Tarik <strong>kalorimeter sederhana</strong> ke atas <strong>neraca analitik digital</strong>, lalu klik tombol <strong>"Zero"</strong>.</p></div>
+        <div class="step"><div class="snum">2</div><p>Tuangkan <strong>50 mL larutan</strong> <span class="chem-symbol">🧪 HCl</span> ke dalam kalorimeter. <em>(Perhatikan efek kucuran!)</em></p></div>
+        <div class="step"><div class="snum">3</div><p>Pasang <strong>termometer digital</strong>, lalu <strong>catat suhu awal (T₀)</strong> dan <strong>massa awal (M₀)</strong>.</p></div>
+        <div class="step"><div class="snum">4</div><p>Masukkan <strong>padatan batu pualam</strong> <span class="chem-symbol">🪨 CaCO₃</span> dan <strong>klik penutup kalorimeter</strong> untuk mengisolasi wadah dengan rapat.</p></div>
+        <div class="step"><div class="snum">5</div><p>Amati perubahan suhu pada layar termometer. Dinding luar kalorimeter <strong>tidak berubah suhu</strong> karena tidak ada pertukaran kalor.</p></div>
+        <div class="step"><div class="snum">6</div><p>Tunggu hingga reaksi berhenti, lalu <strong>catat suhu akhir (T₁)</strong> dan <strong>massa akhir (M₁)</strong>.</p></div>
+      </div>
+    </div>
+  </div>
+
+  <div class="card">
+    <div class="ch"><div class="ci p">📊</div><div class="ct">Membaca Hasil Percobaan</div></div>
+    <div class="two-col">
+      <div>
+        <h4>Cek Perubahan Massa (Materi)</h4>
+        <p>• Jika massa <strong>berkurang</strong>: Ada pertukaran materi (gas lepas ke udara) → Sistem Terbuka</p>
+        <p>• Jika massa <strong>tetap</strong>: Tidak ada pertukaran materi (gas tertahan) → Tertutup/Terisolasi</p>
+      </div>
+      <div>
+        <h4>Cek Dinding Wadah (Energi)</h4>
+        <p>• Jika wadah <strong>ikut panas</strong>: Ada pertukaran energi → Terbuka atau Tertutup</p>
+        <p>• Jika wadah <strong>tetap dingin</strong>: Tidak ada pertukaran energi → Sistem Terisolasi</p>
+      </div>
+    </div>
+  </div>
+</div>
+</div>
+
+<!-- ═══ SIMULASI ═══ -->
+<div class="page" id="page-simulasi" style="overflow:hidden;">
+  <div class="sim-tabs">
+    <button class="stab active" onclick="switchSim(0)">🔓 Percobaan 1</button>
+    <button class="stab" onclick="switchSim(1)">🔒 Percobaan 2</button>
+    <button class="stab" onclick="switchSim(2)">🛡️ Percobaan 3</button>
+  </div>
+
+  <!-- SIM 1: Sistem Terbuka -->
+  <div class="sim-area active" id="sim0">
+    <div class="sim-scene" id="scene0">
+      <canvas id="canvas0"></canvas>
+    </div>
+    <div class="sim-ctrl">
+      <div class="sys-type-badge"><div class="stb-inner stb-t">🔓 Sistem Terbuka — Gelas Kimia</div></div>
+      <div class="ctrl-box">
+        <div class="ctrl-title">Langkah Percobaan</div>
+        <div class="sim-steps-list" id="steps0"></div>
+      </div>
+      <div class="ctrl-box">
+        <div class="ctrl-title">Pembacaan Alat</div>
+        <div class="reading-grid">
+          <div class="reading-box"><span class="reading-val" id="temp0">--</span><div class="reading-lbl">🌡️ Suhu (°C)</div></div>
+          <div class="reading-box"><span class="reading-val" id="mass0">--</span><div class="reading-lbl">⚖️ Massa (g)</div></div>
+        </div>
+      </div>
+      <div class="ctrl-box">
+        <div class="ctrl-title">Pesan Simulasi</div>
+        <div class="sim-msg" id="msg0">Klik langkah pertama untuk memulai percobaan!</div>
+      </div>
+      <button class="btn-reset" onclick="resetSim(0)">↩ Ulangi Percobaan 1</button>
+    </div>
+  </div>
+
+  <!-- SIM 2: Sistem Tertutup -->
+  <div class="sim-area" id="sim1">
+    <div class="sim-scene" id="scene1">
+      <canvas id="canvas1"></canvas>
+    </div>
+    <div class="sim-ctrl">
+      <div class="sys-type-badge"><div class="stb-inner stb-c">🔒 Sistem Tertutup — Erlenmeyer</div></div>
+      <div class="ctrl-box">
+        <div class="ctrl-title">Langkah Percobaan</div>
+        <div class="sim-steps-list" id="steps1"></div>
+      </div>
+      <div class="ctrl-box">
+        <div class="ctrl-title">Pembacaan Alat</div>
+        <div class="reading-grid">
+          <div class="reading-box"><span class="reading-val" id="temp1">--</span><div class="reading-lbl">🌡️ Suhu (°C)</div></div>
+          <div class="reading-box"><span class="reading-val" id="mass1">--</span><div class="reading-lbl">⚖️ Massa (g)</div></div>
+        </div>
+      </div>
+      <div class="ctrl-box">
+        <div class="ctrl-title">Pesan Simulasi</div>
+        <div class="sim-msg" id="msg1">Klik langkah pertama untuk memulai percobaan!</div>
+      </div>
+      <button class="btn-reset" onclick="resetSim(1)">↩ Ulangi Percobaan 2</button>
+    </div>
+  </div>
+
+  <!-- SIM 3: Sistem Terisolasi -->
+  <div class="sim-area" id="sim2">
+    <div class="sim-scene" id="scene2">
+      <canvas id="canvas2"></canvas>
+    </div>
+    <div class="sim-ctrl">
+      <div class="sys-type-badge"><div class="stb-inner stb-i">🛡️ Sistem Terisolasi — Kalorimeter</div></div>
+      <div class="ctrl-box">
+        <div class="ctrl-title">Langkah Percobaan</div>
+        <div class="sim-steps-list" id="steps2"></div>
+      </div>
+      <div class="ctrl-box">
+        <div class="ctrl-title">Pembacaan Alat</div>
+        <div class="reading-grid">
+          <div class="reading-box"><span class="reading-val" id="temp2">--</span><div class="reading-lbl">🌡️ Suhu (°C)</div></div>
+          <div class="reading-box"><span class="reading-val" id="mass2">--</span><div class="reading-lbl">⚖️ Massa (g)</div></div>
+        </div>
+      </div>
+      <div class="ctrl-box">
+        <div class="ctrl-title">Pesan Simulasi</div>
+        <div class="sim-msg" id="msg2">Klik langkah pertama untuk memulai percobaan!</div>
+      </div>
+      <button class="btn-reset" onclick="resetSim(2)">↩ Ulangi Percobaan 3</button>
+    </div>
+  </div>
+</div>
+
+<!-- ═══ DATA PENGAMATAN ═══ -->
+<div class="page" id="page-data">
+<div class="scroll">
+  <div class="hero">
+    <div>
+      <div class="h-badge">📊 Data Percobaan</div>
+      <div class="h-title">Tabel <span>Data Pengamatan</span></div>
+    </div>
+  </div>
+  <div class="card">
+    <div class="ch"><div class="ci t">📋</div><div class="ct">Tabel Data Pengamatan</div></div>
+    <div class="data-table-wrap">
+      <table class="data-tbl">
+        <thead>
+          <tr>
+            <th rowspan="2">Percobaan</th>
+            <th rowspan="2">Jenis Sistem</th>
+            <th rowspan="2">Wadah</th>
+            <th colspan="2">Massa (g)</th>
+            <th colspan="2">Suhu (°C)</th>
+            <th colspan="2">Selisih</th>
+          </tr>
+          <tr>
+            <th>Awal (M₀)</th><th>Akhir (M₁)</th>
+            <th>Awal (T₀)</th><th>Akhir (T₁)</th>
+            <th>ΔM</th><th>ΔT</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td style="font-weight:700;color:var(--acc);">P1</td>
+            <td>Terbuka</td>
+            <td>Gelas Kimia</td>
+            <td><input class="data-input" id="d-m0-0" placeholder="...g"></td>
+            <td><input class="data-input" id="d-m1-0" placeholder="...g"></td>
+            <td><input class="data-input" id="d-t0-0" placeholder="...°C"></td>
+            <td><input class="data-input" id="d-t1-0" placeholder="...°C"></td>
+            <td><input class="data-input" id="d-dm-0" placeholder="..." readonly style="color:#ef4444;"></td>
+            <td><input class="data-input" id="d-dt-0" placeholder="..." readonly style="color:#10b981;"></td>
+          </tr>
+          <tr>
+            <td style="font-weight:700;color:var(--blue);">P2</td>
+            <td>Tertutup</td>
+            <td>Erlenmeyer</td>
+            <td><input class="data-input" id="d-m0-1" placeholder="...g"></td>
+            <td><input class="data-input" id="d-m1-1" placeholder="...g"></td>
+            <td><input class="data-input" id="d-t0-1" placeholder="...°C"></td>
+            <td><input class="data-input" id="d-t1-1" placeholder="...°C"></td>
+            <td><input class="data-input" id="d-dm-1" placeholder="..." readonly style="color:#ef4444;"></td>
+            <td><input class="data-input" id="d-dt-1" placeholder="..." readonly style="color:#10b981;"></td>
+          </tr>
+          <tr>
+            <td style="font-weight:700;color:var(--green);">P3</td>
+            <td>Terisolasi</td>
+            <td>Kalorimeter</td>
+            <td><input class="data-input" id="d-m0-2" placeholder="...g"></td>
+            <td><input class="data-input" id="d-m1-2" placeholder="...g"></td>
+            <td><input class="data-input" id="d-t0-2" placeholder="...°C"></td>
+            <td><input class="data-input" id="d-t1-2" placeholder="...°C"></td>
+            <td><input class="data-input" id="d-dm-2" placeholder="..." readonly style="color:#ef4444;"></td>
+            <td><input class="data-input" id="d-dt-2" placeholder="..." readonly style="color:#10b981;"></td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+    <div style="font-size:10.5px;color:var(--text3);margin-top:6px;">💡 Isi data setelah menyelesaikan setiap simulasi. Kolom ΔM dan ΔT akan terisi otomatis.</div>
+  </div>
+</div>
+</div>
+
+<!-- ═══ DISKUSI ═══ -->
+<div class="page" id="page-diskusi">
+<div class="scroll">
+  <div class="hero">
+    <div>
+      <div class="h-badge">💬 Pertanyaan Diskusi</div>
+      <div class="h-title">Analisis &amp; <span>Diskusi</span></div>
+    </div>
+  </div>
+  <div class="card">
+    <div class="ch"><div class="ci p">💬</div><div class="ct">Pertanyaan Diskusi</div></div>
+    <div class="disc-grid">
+      <div class="disc-q">
+        <div class="disc-qnum">PERTANYAAN 01</div>
+        <div class="disc-qtext">Berdasarkan simulasi reaksi antara larutan HCl dan padatan CaCO₃ yang telah kalian amati, identifikasilah komponen mana saja yang bertindak sebagai <strong>sistem</strong> dan komponen mana saja yang bertindak sebagai <strong>lingkungan</strong>! Jelaskan alasan pengelompokan tersebut!</div>
+        <textarea class="disc-area" id="disc-ans-1" placeholder="Jawaban kalian..."></textarea>
+      </div>
+      <div class="disc-q">
+        <div class="disc-qnum">PERTANYAAN 02</div>
+        <div class="disc-qtext">Perhatikan data akhir pada neraca analitik! Mengapa pada percobaan 1 terjadi <strong>penurunan massa</strong> setelah reaksi selesai, sedangkan pada percobaan 2 dan 3 massanya cenderung <strong>tetap</strong>? Kaitkan dengan konsep pertukaran materi!</div>
+        <textarea class="disc-area" id="disc-ans-2" placeholder="Jawaban kalian..."></textarea>
+      </div>
+      <div class="disc-q">
+        <div class="disc-qnum">PERTANYAAN 03</div>
+        <div class="disc-qtext">Pada Percobaan 1 dan 2, termometer mendeteksi adanya <strong>kenaikan suhu</strong>. Berdasarkan perubahan suhu tersebut, analisislah ke mana arah perpindahan energi (kalor) yang terjadi! Apakah kalor berpindah dari sistem ke lingkungan, atau sebaliknya?</div>
+        <textarea class="disc-area" id="disc-ans-3" placeholder="Jawaban kalian..."></textarea>
+      </div>
+      <div class="disc-q">
+        <div class="disc-qnum">PERTANYAAN 04</div>
+        <div class="disc-qtext">Meskipun labu erlenmeyer tersumbat dan kalorimeter sama-sama tidak menunjukkan perubahan massa, keduanya memiliki karakteristik yang berbeda. Jelaskan perbedaan utama antara <strong>sistem tertutup</strong> dan <strong>sistem terisolasi</strong> berdasarkan pengamatanmu!</div>
+        <textarea class="disc-area" id="disc-ans-4" placeholder="Jawaban kalian..."></textarea>
+      </div>
+    </div>
+    <div class="disc-actions">
+      <button id="btnKumpul" onclick="kumpulkanJawaban()" style="
+        background:linear-gradient(135deg,#00c9b1,#3b82f6);
+        color:#fff;border:none;border-radius:10px;padding:9px 24px;
+        font-family:'Rajdhani',sans-serif;font-size:14px;font-weight:700;
+        cursor:pointer;letter-spacing:.05em;
+        box-shadow:0 0 24px rgba(0,201,177,.4);transition:all .2s;
+      ">📤 Kumpulkan Jawaban</button>
+      <button class="btn-download-pdf" onclick="downloadDiskusiPDF()">📥 Unduh PDF</button>
+    </div>
+    <div id="kumpul-status" style="display:none;margin-top:6px;text-align:center;font-size:11px;color:var(--green);font-weight:700;"></div>
+  </div>
+</div>
+</div>
+
+</div><!-- end #app -->
+</div><!-- end #mainApp -->
+
+<div class="notif" id="notif"></div>
+
+<script>
+// ═══════════════════════════════════════
+// LOADING
+// ═══════════════════════════════════════
+(function(){
+  const bar=document.getElementById('loadBar');
+  const pct=document.getElementById('loadPct');
+  const status=document.getElementById('loadStatus');
+  const msgs=['Memuat laboratorium virtual…','Menyiapkan reagen kimia…','Mengkalibrasi termometer…','Menyiapkan neraca analitik…','Memuat simulasi interaktif…','Laboratorium siap!'];
+  let current=0, msgIdx=0;
+  const total=3200, step=16;
+  const inc=100/(total/step);
+  const iv=setInterval(()=>{
+    current=Math.min(100,current+inc);
+    const v=Math.floor(current);
+    bar.style.width=v+'%';
+    pct.textContent=v+'%';
+    const mi=Math.floor(v/20);
+    if(mi<msgs.length&&mi!==msgIdx){msgIdx=mi;status.textContent=msgs[mi];}
+    if(current>=100){
+      clearInterval(iv);
+      pct.textContent='100%';
+      status.textContent='✅ Laboratorium siap digunakan!';
+      setTimeout(()=>{document.getElementById('btnStart').style.display='inline-block';},400);
+    }
+  },step);
+})();
+
+function startLab(){
+  playClickSfx();
+  const ls=document.getElementById('loadScreen');
+  ls.classList.add('hide');
+  setTimeout(()=>{
+    ls.style.display='none';
+    document.getElementById('coverPage').style.display='flex';
+  },600);
+}
+
+function enterLab(){
+  playClickSfx();
+  document.getElementById('coverPage').style.display='none';
+  const ma=document.getElementById('mainApp');
+  ma.style.display='flex';
+  initAllSims();
+  setupDataListeners();
+}
+
+// ═══════════════════════════════════════
+// GLOBAL CLICK SOUND EFFECT
+// ═══════════════════════════════════════
+function playClickSfx(){
+  try{
+    const ctx=getAudioCtx();
+    // Pop click sound
+    const osc=ctx.createOscillator();osc.type='sine';
+    osc.frequency.setValueAtTime(800,ctx.currentTime);
+    osc.frequency.exponentialRampToValueAtTime(500,ctx.currentTime+.06);
+    const gain=ctx.createGain();
+    gain.gain.setValueAtTime(.13,ctx.currentTime);
+    gain.gain.exponentialRampToValueAtTime(.001,ctx.currentTime+.08);
+    osc.connect(gain);gain.connect(ctx.destination);
+    osc.start();osc.stop(ctx.currentTime+.09);
+    // Tick
+    const osc2=ctx.createOscillator();osc2.type='triangle';
+    osc2.frequency.value=1200;
+    const g2=ctx.createGain();
+    g2.gain.setValueAtTime(.06,ctx.currentTime);
+    g2.gain.exponentialRampToValueAtTime(.001,ctx.currentTime+.04);
+    osc2.connect(g2);g2.connect(ctx.destination);
+    osc2.start();osc2.stop(ctx.currentTime+.05);
+  }catch(e){}
+}
+
+// Global click sound on every interactive element
+document.addEventListener('click',function(e){
+  const el=e.target.closest('button, .nb, .ptab, .stab, .sim-step-btn, .btn-reset, .cover-btn, select, input[type="range"]');
+  if(!el) return;
+  // Skip elements that already have their own custom sounds
+  if(el.id==='btnStart'||el.classList.contains('cover-btn')) return;
+  playClickSfx();
+});
+
+// ═══════════════════════════════════════
+// NAVIGATION
+// ═══════════════════════════════════════
+function showPage(id){
+  document.querySelectorAll('.page').forEach(p=>p.classList.remove('active'));
+  document.querySelectorAll('.nb').forEach(b=>b.classList.remove('active'));
+  document.getElementById('page-'+id).classList.add('active');
+  const btns=document.querySelectorAll('#mainNav .nb');
+  const ids=['tujuan','teori','alatbahan','prosedur','simulasi','data','diskusi'];
+  const idx=ids.indexOf(id);
+  if(idx>=0)btns[idx].classList.add('active');
+  if(id==='simulasi'){resizeAllCanvases();}
+}
+
+function showProcTab(t){
+  document.querySelectorAll('.proc-content').forEach(c=>c.classList.remove('active'));
+  document.querySelectorAll('.ptab').forEach(b=>b.classList.remove('active'));
+  document.getElementById('proc-'+t).classList.add('active');
+  event.currentTarget.classList.add('active');
+}
+
+// ═══════════════════════════════════════
+// AUDIO ENGINE
+// ═══════════════════════════════════════
+let audioCtx=null;
+function getAudioCtx(){
+  if(!audioCtx)audioCtx=new(window.AudioContext||window.webkitAudioContext)();
+  return audioCtx;
+}
+
+function playPour(duration=2.2){
+  try{
+    const ctx=getAudioCtx();
+    const buf=ctx.createBuffer(1,Math.floor(ctx.sampleRate*duration),ctx.sampleRate);
+    const d=buf.getChannelData(0);
+    for(let i=0;i<d.length;i++) d[i]=(Math.random()*2-1);
+    const src=ctx.createBufferSource();src.buffer=buf;
+    const lp=ctx.createBiquadFilter();lp.type='lowpass';lp.frequency.value=900;lp.Q.value=3;
+    const gain=ctx.createGain();
+    gain.gain.setValueAtTime(0,ctx.currentTime);
+    gain.gain.linearRampToValueAtTime(.12,ctx.currentTime+.25);
+    gain.gain.linearRampToValueAtTime(.09,ctx.currentTime+duration-.3);
+    gain.gain.linearRampToValueAtTime(0,ctx.currentTime+duration);
+    src.connect(lp);lp.connect(gain);gain.connect(ctx.destination);
+    src.start();src.stop(ctx.currentTime+duration);
+    // Low rumble
+    const osc=ctx.createOscillator();osc.type='sine';osc.frequency.value=120;
+    const g2=ctx.createGain();
+    g2.gain.setValueAtTime(0,ctx.currentTime);
+    g2.gain.linearRampToValueAtTime(.04,ctx.currentTime+.3);
+    g2.gain.linearRampToValueAtTime(.02,ctx.currentTime+duration-.3);
+    g2.gain.linearRampToValueAtTime(0,ctx.currentTime+duration);
+    osc.connect(g2);g2.connect(ctx.destination);
+    osc.start();osc.stop(ctx.currentTime+duration);
+  }catch(e){}
+}
+
+function playPowder(duration=1.5){
+  try{
+    const ctx=getAudioCtx();
+    for(let b=0;b<8;b++){
+      const t=ctx.currentTime+b*duration/8+Math.random()*.05;
+      const buf=ctx.createBuffer(1,Math.floor(ctx.sampleRate*.08),ctx.sampleRate);
+      const data=buf.getChannelData(0);
+      for(let i=0;i<data.length;i++) data[i]=(Math.random()*2-1);
+      const src=ctx.createBufferSource();src.buffer=buf;
+      const hp=ctx.createBiquadFilter();hp.type='highpass';hp.frequency.value=3000+Math.random()*2000;
+      const gain=ctx.createGain();gain.gain.value=.06+Math.random()*.04;
+      src.connect(hp);hp.connect(gain);gain.connect(ctx.destination);
+      src.start(t);src.stop(t+.08);
+    }
+  }catch(e){}
+}
+
+function playBeep(freq=523,dur=.15){
+  try{
+    const ctx=getAudioCtx();
+    const osc=ctx.createOscillator();osc.type='sine';osc.frequency.value=freq;
+    const gain=ctx.createGain();
+    gain.gain.setValueAtTime(0,ctx.currentTime);
+    gain.gain.linearRampToValueAtTime(.12,ctx.currentTime+.02);
+    gain.gain.linearRampToValueAtTime(0,ctx.currentTime+dur);
+    osc.connect(gain);gain.connect(ctx.destination);
+    osc.start();osc.stop(ctx.currentTime+dur+.02);
+  }catch(e){}
+}
+
+function playSuccess(){playBeep(523,.15);setTimeout(()=>playBeep(659,.15),170);setTimeout(()=>playBeep(784,.25),340);}
+
+function playBubble(){
+  try{
+    const ctx=getAudioCtx();
+    const osc=ctx.createOscillator();osc.type='sine';
+    osc.frequency.setValueAtTime(600+Math.random()*300,ctx.currentTime);
+    osc.frequency.exponentialRampToValueAtTime(200,ctx.currentTime+.12);
+    const gain=ctx.createGain();
+    gain.gain.setValueAtTime(.08,ctx.currentTime);
+    gain.gain.exponentialRampToValueAtTime(.001,ctx.currentTime+.12);
+    osc.connect(gain);gain.connect(ctx.destination);
+    osc.start();osc.stop(ctx.currentTime+.13);
+  }catch(e){}
+}
+
+function playZero(){
+  try{
+    const ctx=getAudioCtx();
+    const osc=ctx.createOscillator();osc.type='square';osc.frequency.value=220;
+    const gain=ctx.createGain();gain.gain.value=.04;
+    osc.connect(gain);gain.connect(ctx.destination);
+    osc.start();osc.stop(ctx.currentTime+.08);
+  }catch(e){}
+}
+
+// ═══════════════════════════════════════
+// SIMULATION ENGINE
+// ═══════════════════════════════════════
+const SIM_CONFIGS=[
+  {
+    id:0, vessel:'beaker', label:'Sistem Terbuka',
+    steps:[
+      {text:'Letakkan gelas kimia di neraca analitik',icon:'⚖️'},
+      {text:'Klik "Zero" untuk mengatur ulang neraca',icon:'🔄'},
+      {text:'Tuang 50 mL larutan HCl ke dalam gelas kimia',icon:'🧪'},
+      {text:'Pasang termometer ke dalam larutan',icon:'🌡️'},
+      {text:'Catat suhu awal (T₀) dan massa awal (M₀)',icon:'📝'},
+      {text:'Masukkan padatan CaCO₃ ke dalam gelas kimia',icon:'🪨'},
+      {text:'Amati reaksi dan gelembung CO₂ yang lepas',icon:'👁️'},
+      {text:'Catat suhu akhir (T₁) dan massa akhir (M₁)',icon:'✅'},
+    ],
+    data:{t0:25.0,t1:28.5,m0:55.2,m1:53.8}
+  },
+  {
+    id:1, vessel:'erlenmeyer', label:'Sistem Tertutup',
+    steps:[
+      {text:'Letakkan erlenmeyer di neraca analitik',icon:'⚖️'},
+      {text:'Klik "Zero" untuk mengatur ulang neraca',icon:'🔄'},
+      {text:'Tuang 50 mL HCl ke erlenmeyer (belum ditutup)',icon:'🧪'},
+      {text:'Pasang termometer + sumbat karet',icon:'🌡️'},
+      {text:'Catat suhu awal (T₀) dan massa awal (M₀)',icon:'📝'},
+      {text:'Masukkan CaCO₃ → Tutup sumbat karet rapat',icon:'🪨'},
+      {text:'Amati gelembung gas yang tertahan di dalam',icon:'👁️'},
+      {text:'Catat suhu akhir (T₁) dan massa akhir (M₁)',icon:'✅'},
+    ],
+    data:{t0:25.0,t1:28.4,m0:56.8,m1:56.8}
+  },
+  {
+    id:2, vessel:'calorimeter', label:'Sistem Terisolasi',
+    steps:[
+      {text:'Letakkan kalorimeter di neraca analitik',icon:'⚖️'},
+      {text:'Klik "Zero" untuk mengatur ulang neraca',icon:'🔄'},
+      {text:'Tuang 50 mL HCl ke dalam kalorimeter',icon:'🧪'},
+      {text:'Pasang termometer digital',icon:'🌡️'},
+      {text:'Catat suhu awal (T₀) dan massa awal (M₀)',icon:'📝'},
+      {text:'Masukkan CaCO₃ → Tutup penutup kalorimeter',icon:'🪨'},
+      {text:'Amati suhu dalam kalorimeter naik signifikan',icon:'👁️'},
+      {text:'Catat suhu akhir (T₁) dan massa akhir (M₁)',icon:'✅'},
+    ],
+    data:{t0:25.0,t1:29.2,m0:58.5,m1:58.5}
+  }
+];
+
+const simStates=[
+  {step:-1,bubbling:false,pouringHCl:false,addingPowder:false,closed:false,tempLevel:0,massLevel:0,hasHCl:false,hasCaCO3:false,hasThermo:false,onScale:false,zeroed:false,reacting:false,done:false},
+  {step:-1,bubbling:false,pouringHCl:false,addingPowder:false,closed:false,tempLevel:0,massLevel:0,hasHCl:false,hasCaCO3:false,hasThermo:false,onScale:false,zeroed:false,reacting:false,done:false},
+  {step:-1,bubbling:false,pouringHCl:false,addingPowder:false,closed:false,tempLevel:0,massLevel:0,hasHCl:false,hasCaCO3:false,hasThermo:false,onScale:false,zeroed:false,reacting:false,done:false},
+];
+const bubbleIntervals=[null,null,null];
+const animFrames=[null,null,null];
+
+function initAllSims(){
+  for(let i=0;i<3;i++){
+    buildStepBtns(i);
+    resizeCanvas(i);
+    drawScene(i);
+  }
+}
+
+function buildStepBtns(si){
+  const cfg=SIM_CONFIGS[si];
+  const container=document.getElementById('steps'+si);
+  container.innerHTML='';
+  cfg.steps.forEach((s,i)=>{
+    const btn=document.createElement('button');
+    btn.className='sim-step-btn'+(i===0?' active':'');
+    btn.id=`stepbtn${si}_${i}`;
+    btn.disabled=(i!==0);
+    btn.innerHTML=`<span class="step-icon">${s.icon}</span><span>${s.text}</span><span class="step-check${i===0?' active':''}"></span>`;
+    btn.onclick=()=>executeStep(si,i);
+    container.appendChild(btn);
+  });
+}
+
+function updateStepBtns(si,currentStep){
+  const cfg=SIM_CONFIGS[si];
+  cfg.steps.forEach((_,i)=>{
+    const btn=document.getElementById(`stepbtn${si}_${i}`);
+    const check=btn.querySelector('.step-check');
+    if(i<currentStep){
+      btn.className='sim-step-btn done';btn.disabled=true;
+      check.className='step-check done';
+    } else if(i===currentStep){
+      btn.className='sim-step-btn active';btn.disabled=false;
+      check.className='step-check active';
+    } else {
+      btn.className='sim-step-btn';btn.disabled=true;
+      check.className='step-check';
+    }
+  });
+}
+
+function setMsg(si,text,type=''){
+  const el=document.getElementById('msg'+si);
+  el.className='sim-msg'+(type?' '+type:'');
+  el.textContent=text;
+}
+
+function setReadings(si,temp,mass){
+  document.getElementById('temp'+si).textContent=temp!==null?temp.toFixed(1)+'°':'--';
+  document.getElementById('mass'+si).textContent=mass!==null?mass.toFixed(1):'--';
+}
+
+function executeStep(si,step){
+  const st=simStates[si];
+  const cfg=SIM_CONFIGS[si];
+  const d=cfg.data;
+  st.step=step;
+  updateStepBtns(si,step+1);
+  
+  switch(step){
+    case 0: // Place vessel on scale
+      st.onScale=true;
+      playBeep(440,.2);
+      setMsg(si,'Wadah telah diletakkan di atas neraca analitik.','info');
+      setReadings(si,null,null);
+      break;
+    case 1: // Zero scale
+      st.zeroed=true;
+      playZero();
+      setMsg(si,'✔ Neraca dikalibrasi ke 0,00 gram.','info');
+      setReadings(si,null,0.00);
+      break;
+    case 2: // Pour HCl
+      st.pouringHCl=true;
+      playPour(2.2);
+      setMsg(si,'⏳ Menuangkan 50 mL larutan HCl…','react');
+      startRenderLoop(si);
+      setTimeout(()=>{
+        st.pouringHCl=false;
+        st.hasHCl=true;
+        setMsg(si,'💧 50 mL HCl berhasil dituang ke dalam wadah.','info');
+        drawScene(si);
+      },2200);
+      break;
+    case 3: // Install thermometer
+      st.hasThermo=true;
+      playBeep(660,.1);
+      setMsg(si,'🌡️ Termometer dipasang dalam larutan.','info');
+      break;
+    case 4: // Record initial
+      setReadings(si,d.t0,d.m0);
+      playBeep(523,.1);setTimeout(()=>playBeep(659,.1),120);
+      setMsg(si,`📝 T₀ = ${d.t0}°C | M₀ = ${d.m0}g — Catat pada tabel!`,'info');
+      break;
+    case 5: // Add CaCO3
+      st.addingPowder=true;
+      playPowder(1.6);
+      const closingLabel=si===1?'Tutup sumbat karet!':si===2?'Tutup kalorimeter!':'';
+      setMsg(si,'⏳ Memasukkan padatan CaCO₃…'+(closingLabel?' '+closingLabel:''),'react');
+      startRenderLoop(si);
+      setTimeout(()=>{
+        st.addingPowder=false;
+        st.hasCaCO3=true;
+        if(si===1||si===2){st.closed=true;}
+        st.reacting=true;
+        st.bubbling=true;
+        startRenderLoop(si);
+        // Animate temperature rise
+        animateTemp(si);
+        setMsg(si,'🔥 Reaksi berlangsung! '+
+          (si===0?'Gas CO₂ terlepas ke udara.':si===1?'Gas CO₂ tertahan dalam labu.':'Kalor tidak dapat keluar dari kalorimeter.'),'react');
+      },1600);
+      break;
+    case 6: // Observe
+      setMsg(si,si===0?'👁️ Amati gelembung CO₂ yang terlepas! Gas = materi keluar.':
+        si===1?'👁️ Amati gelembung CO₂ yang tertahan di dalam labu!':
+        '👁️ Amati suhu dalam kalorimeter naik lebih tinggi!','react');
+      break;
+    case 7: // Record final
+      stopBubbles(si);
+      st.reacting=false;
+      setReadings(si,d.t1,d.m1);
+      playSuccess();
+      setMsg(si,`✅ T₁ = ${d.t1}°C | M₁ = ${d.m1}g\nΔT = +${(d.t1-d.t0).toFixed(1)}°C | ΔM = ${(d.m1-d.m0).toFixed(1)}g\nCatat pada tabel Data Pengamatan!`,'done');
+      st.done=true;
+      // Auto-fill data table
+      const rowIdx=si;
+      document.getElementById(`d-t0-${rowIdx}`).value=d.t0;
+      document.getElementById(`d-t1-${rowIdx}`).value=d.t1;
+      document.getElementById(`d-m0-${rowIdx}`).value=d.m0;
+      document.getElementById(`d-m1-${rowIdx}`).value=d.m1;
+      updateCalc(rowIdx);
+      break;
+  }
+  drawScene(si);
+}
+
+function animateTemp(si){
+  const d=SIM_CONFIGS[si].data;
+  let current=d.t0;
+  const target=d.t1;
+  const duration=4000;
+  const startTime=Date.now();
+  function tick(){
+    const elapsed=Date.now()-startTime;
+    const progress=Math.min(1,elapsed/duration);
+    current=d.t0+(target-d.t0)*easeOut(progress);
+    simStates[si].tempLevel=current;
+    drawScene(si);
+    if(progress<1) animFrames[si]=requestAnimationFrame(tick);
+  }
+  requestAnimationFrame(tick);
+}
+
+function easeOut(t){return 1-(1-t)*(1-t);}
+
+const renderLoops=[null,null,null];
+
+function startRenderLoop(si){
+  if(renderLoops[si]) return;
+  let lastBubble=0;
+  function loop(ts){
+    drawScene(si);
+    const st=simStates[si];
+    if(st.pouringHCl||st.addingPowder||st.reacting||st.bubbling){
+      if(st.reacting&&ts-lastBubble>350+Math.random()*200){
+        if(Math.random()>.3) playBubble();
+        lastBubble=ts;
+      }
+      renderLoops[si]=requestAnimationFrame(loop);
+    } else {
+      renderLoops[si]=null;
+      drawScene(si);
+    }
+  }
+  renderLoops[si]=requestAnimationFrame(loop);
+}
+
+function startBubbles(si){
+  startRenderLoop(si);
+}
+
+function stopBubbles(si){
+  // render loop will stop on its own when st.reacting=false
+}
+
+function resetSim(si){
+  if(renderLoops[si]){cancelAnimationFrame(renderLoops[si]);renderLoops[si]=null;}
+  if(animFrames[si]){cancelAnimationFrame(animFrames[si]);animFrames[si]=null;}
+  simStates[si]={step:-1,bubbling:false,pouringHCl:false,addingPowder:false,closed:false,
+    tempLevel:0,massLevel:0,hasHCl:false,hasCaCO3:false,hasThermo:false,onScale:false,zeroed:false,reacting:false,done:false};
+  buildStepBtns(si);
+  setMsg(si,'Klik langkah pertama untuk memulai percobaan!');
+  setReadings(si,null,null);
+  drawScene(si);
+}
+
+function switchSim(si){
+  document.querySelectorAll('.sim-area').forEach(a=>a.classList.remove('active'));
+  document.querySelectorAll('.stab').forEach(b=>b.classList.remove('active'));
+  document.getElementById('sim'+si).classList.add('active');
+  document.querySelectorAll('.stab')[si].classList.add('active');
+  setTimeout(()=>{resizeCanvas(si);drawScene(si);},50);
+}
+
+// ═══════════════════════════════════════
+// CANVAS DRAWING
+// ═══════════════════════════════════════
+function resizeCanvas(si){
+  const canvas=document.getElementById('canvas'+si);
+  const scene=document.getElementById('scene'+si);
+  const r=scene.getBoundingClientRect();
+  canvas.width=r.width*window.devicePixelRatio||r.width;
+  canvas.height=r.height*window.devicePixelRatio||r.height;
+  canvas.style.width=r.width+'px';
+  canvas.style.height=r.height+'px';
+  drawScene(si);
+}
+function resizeAllCanvases(){for(let i=0;i<3;i++)resizeCanvas(i);}
+window.addEventListener('resize',resizeAllCanvases);
+
+function drawScene(si){
+  const canvas=document.getElementById('canvas'+si);
+  const ctx=canvas.getContext('2d');
+  const W=canvas.width, H=canvas.height;
+  const st=simStates[si];
+  const cfg=SIM_CONFIGS[si];
+  const dpr=window.devicePixelRatio||1;
+  ctx.save();
+  ctx.scale(dpr,dpr);
+  const w=W/dpr, h=H/dpr;
+
+  // Background
+  const bgGrad=ctx.createLinearGradient(0,0,0,h);
+  bgGrad.addColorStop(0,'#1c3050');bgGrad.addColorStop(1,'#0f1c2e');
+  ctx.fillStyle=bgGrad;ctx.fillRect(0,0,w,h);
+
+  // Lab bench
+  const benchY=h*.68, benchH=h*.32;
+  const benchGrad=ctx.createLinearGradient(0,benchY,0,benchY+benchH);
+  benchGrad.addColorStop(0,'#2a4060');benchGrad.addColorStop(1,'#1a2a40');
+  ctx.fillStyle=benchGrad;ctx.fillRect(0,benchY,w,benchH);
+  ctx.strokeStyle='rgba(0,201,177,.3)';ctx.lineWidth=1.5;
+  ctx.beginPath();ctx.moveTo(0,benchY);ctx.lineTo(w,benchY);ctx.stroke();
+
+  // Grid lines on bench
+  ctx.strokeStyle='rgba(0,201,177,.05)';ctx.lineWidth=1;
+  for(let x=0;x<w;x+=40){ctx.beginPath();ctx.moveTo(x,benchY);ctx.lineTo(x,benchY+benchH);ctx.stroke();}
+
+  // Scale (Neraca)
+  const scaleX=w*.15, scaleY=benchY-50, scaleW=100, scaleH=50;
+  if(st.onScale||st.done){
+    drawScale(ctx,scaleX,scaleY,scaleW,scaleH,st);
+  } else {
+    drawScaleEmpty(ctx,scaleX,scaleY+15,scaleW,scaleH-15);
+  }
+
+  // Reagent bottles on right (only when not actively pouring/adding)
+  if(!st.pouringHCl) drawHClBottle(ctx,w*.72,benchY-80);
+  if(!st.addingPowder) drawCaCO3(ctx,w*.86,benchY-70);
+
+  // Main vessel
+  const vesselX=w*.4, vesselY=benchY-160;
+  if(st.onScale) drawVesselOnScale(ctx,scaleX+scaleW/2,benchY,cfg.vessel,st,cfg);
+  else drawVesselAside(ctx,vesselX,benchY,cfg.vessel,st,cfg);
+
+  // Pour animation HCl - bottle tilted dramatically in pouring position
+  if(st.pouringHCl){
+    const toX=st.onScale?scaleX+50:vesselX+40;
+    const toY=benchY-100;
+    // Draw bottle strongly tilted (~70°) for realistic pouring
+    ctx.save();
+    ctx.translate(toX+30,toY-75);
+    ctx.rotate(-1.2);
+    drawHClBottle(ctx,-16,-15);
+    ctx.restore();
+    drawPourEffect(ctx,toX+5,toY-25,toX,toY);
+  }
+
+  // Powder animation - bag appears lifted above vessel
+  if(st.addingPowder){
+    const toX=st.onScale?scaleX+50:vesselX+40;
+    const toY=benchY-100;
+    // Draw CaCO3 bag tilted above vessel mouth
+    ctx.save();
+    ctx.translate(toX,toY-80);
+    ctx.rotate(0.3);
+    drawCaCO3(ctx,-19,-15);
+    ctx.restore();
+    drawPowderEffect(ctx,toX,toY-20,toX,toY);
+  }
+
+  // Labels
+  drawLabels(ctx,w,h,cfg,st);
+
+  ctx.restore();
+}
+
+function drawScale(ctx,x,y,w,h,st){
+  // Determine which sim this is
+  let simIdx=0;
+  for(let i=0;i<3;i++){if(simStates[i]===st){simIdx=i;break;}}
+  const d=SIM_CONFIGS[simIdx].data;
+  const g=ctx.createLinearGradient(x,y,x,y+h);
+  g.addColorStop(0,'#2a4a70');g.addColorStop(1,'#1a3050');
+  ctx.fillStyle=g;
+  roundRect(ctx,x,y+h*.4,w,h*.6,5);ctx.fill();
+  ctx.strokeStyle='rgba(0,201,177,.3)';ctx.lineWidth=1;
+  roundRect(ctx,x,y+h*.4,w,h*.6,5);ctx.stroke();
+  // Platform
+  const pg=ctx.createLinearGradient(x-5,y,x-5,y+h*.4);
+  pg.addColorStop(0,'#3a5a80');pg.addColorStop(1,'#2a4a70');
+  ctx.fillStyle=pg;
+  roundRect(ctx,x-5,y,w+10,h*.35,3);ctx.fill();
+  ctx.strokeStyle='rgba(0,201,177,.2)';ctx.lineWidth=1;
+  roundRect(ctx,x-5,y,w+10,h*.35,3);ctx.stroke();
+  // Display
+  ctx.fillStyle='#0a1520';
+  roundRect(ctx,x+5,y+h*.45,w-10,h*.4,3);ctx.fill();
+  ctx.fillStyle=st.zeroed?'#00c9b1':'#f59e0b';
+  ctx.font=`bold ${Math.max(9,h*.22)}px Fira Code,monospace`;ctx.textAlign='center';
+  let dispMass='--';
+  if(st.zeroed&&!st.hasHCl) dispMass='0.00';
+  else if(st.hasHCl&&!st.hasCaCO3) dispMass=d.m0.toFixed(2);
+  else if(st.hasCaCO3) dispMass=(st.done?d.m1:d.m0+(d.m1-d.m0)*.5).toFixed(2);
+  ctx.fillText(dispMass+' g',x+w/2,y+h*.77);
+  // ZERO button
+  ctx.fillStyle='#00c9b1';
+  roundRect(ctx,x+w*.1,y+h*.88,w*.8,h*.09,3);ctx.fill();
+  ctx.fillStyle='#fff';ctx.font=`bold ${Math.max(7,h*.07)}px Nunito,sans-serif`;
+  ctx.fillText('ZERO / TARE',x+w/2,y+h*.965);
+}
+
+function drawScaleEmpty(ctx,x,y,w,h){
+  ctx.fillStyle='rgba(42,64,96,.7)';
+  roundRect(ctx,x,y,w,h,5);ctx.fill();
+  ctx.strokeStyle='rgba(0,201,177,.2)';ctx.lineWidth=1;
+  roundRect(ctx,x,y,w,h,5);ctx.stroke();
+  ctx.fillStyle='rgba(0,201,177,.4)';ctx.font='9px Nunito,sans-serif';
+  ctx.textAlign='center';ctx.fillText('Neraca Analitik',x+w/2,y+h/2+4);
+}
+
+function drawVesselOnScale(ctx,cx,benchY,vessel,st,cfg){
+  const vY=benchY-15;
+  drawVessel(ctx,cx,vY,vessel,st,cfg);
+}
+
+function drawVesselAside(ctx,vx,benchY,vessel,st,cfg){
+  drawVessel(ctx,vx,benchY-10,vessel,st,cfg);
+}
+
+function drawVessel(ctx,cx,baseY,vessel,st,cfg){
+  const d=cfg.data;
+  let simIdx=0;
+  for(let i=0;i<3;i++){if(SIM_CONFIGS[i]===cfg){simIdx=i;break;}}
+
+  if(vessel==='beaker'){
+    drawBeaker(ctx,cx,baseY,st,d,simIdx);
+  } else if(vessel==='erlenmeyer'){
+    drawErlenmeyer(ctx,cx,baseY,st,d,simIdx);
+  } else if(vessel==='calorimeter'){
+    drawCalorimeter(ctx,cx,baseY,st,d,simIdx);
+  }
+}
+
+function drawBeaker(ctx,cx,baseY,st,d,si){
+  const bw=70,bh=100,bx=cx-bw/2,by=baseY-bh;
+  // Body
+  const g=ctx.createLinearGradient(bx,by,bx+bw,by+bh);
+  g.addColorStop(0,'rgba(180,210,240,.15)');g.addColorStop(.5,'rgba(180,210,240,.08)');g.addColorStop(1,'rgba(180,210,240,.18)');
+  ctx.fillStyle=g;
+  ctx.beginPath();ctx.moveTo(bx,by);ctx.lineTo(bx+bw,by);ctx.lineTo(bx+bw-6,by+bh);ctx.lineTo(bx+6,by+bh);ctx.closePath();ctx.fill();
+  // HCl liquid
+  if(st.hasHCl){
+    const liqH=bh*.5;
+    ctx.save();ctx.beginPath();ctx.moveTo(bx,by);ctx.lineTo(bx+bw,by);ctx.lineTo(bx+bw-6,by+bh);ctx.lineTo(bx+6,by+bh);ctx.closePath();ctx.clip();
+    const lg=ctx.createLinearGradient(0,by+bh-liqH,0,by+bh);
+    lg.addColorStop(0,'rgba(100,200,220,.4)');lg.addColorStop(1,'rgba(60,160,200,.6)');
+    ctx.fillStyle=lg;ctx.fillRect(bx,by+bh-liqH,bw,liqH);
+    // Surface animation
+    if(st.reacting){
+      ctx.fillStyle='rgba(100,220,255,.3)';
+      for(let b=0;b<6;b++){
+        const bx2=bx+10+b*9,br=2+Math.random()*2;
+        const bdy=(by+bh-liqH)-(Math.random()*20);
+        ctx.beginPath();ctx.arc(bx2,bdy,br,0,Math.PI*2);ctx.fill();
+      }
+      // Gas escaping (sistem terbuka)
+      ctx.fillStyle='rgba(180,240,255,.15)';
+      for(let g=0;g<4;g++){
+        const gx=bx+15+g*13,gy=by-20-g*8,gr=4+g*2;
+        ctx.beginPath();ctx.arc(gx,gy,gr,0,Math.PI*2);ctx.fill();
+        ctx.strokeStyle='rgba(180,240,255,.2)';ctx.lineWidth=.5;ctx.stroke();
+      }
+    }
+    ctx.restore();
+  }
+  // Outline
+  ctx.strokeStyle='rgba(0,201,177,.6)';ctx.lineWidth=1.5;
+  ctx.beginPath();ctx.moveTo(bx,by);ctx.lineTo(bx+bw,by);ctx.lineTo(bx+bw-6,by+bh);ctx.lineTo(bx+6,by+bh);ctx.closePath();ctx.stroke();
+  // Spout
+  ctx.strokeStyle='rgba(0,201,177,.5)';ctx.lineWidth=1.5;
+  ctx.beginPath();ctx.moveTo(bx,by);ctx.lineTo(bx-8,by-8);ctx.stroke();
+  // Thermometer
+  if(st.hasThermo) drawThermometer(ctx,cx+20,by-20,by+bh*.5,st.tempLevel||d.t0);
+  // Label
+  ctx.fillStyle='rgba(0,201,177,.6)';ctx.font='bold 9px Nunito,sans-serif';ctx.textAlign='center';
+  ctx.fillText('Gelas Kimia',cx,baseY+14);
+}
+
+function drawErlenmeyer(ctx,cx,baseY,st,d,si){
+  const bw=80,bh=120,bx=cx-bw/2,by=baseY-bh;
+  // Flask shape path
+  ctx.save();
+  const flaskPath=new Path2D();
+  flaskPath.moveTo(cx-10,by);flaskPath.lineTo(cx+10,by);
+  flaskPath.quadraticCurveTo(cx+12,by+bh*.4,cx+bw/2,by+bh);
+  flaskPath.lineTo(cx-bw/2,by+bh);
+  flaskPath.quadraticCurveTo(cx-12,by+bh*.4,cx-10,by);
+  // Fill
+  const g=ctx.createLinearGradient(bx,by,bx+bw,by+bh);
+  g.addColorStop(0,'rgba(180,210,240,.12)');g.addColorStop(1,'rgba(180,210,240,.2)');
+  ctx.fillStyle=g;ctx.fill(flaskPath);
+  // HCl liquid
+  if(st.hasHCl){
+    ctx.save();ctx.clip(flaskPath);
+    const liqH=bh*.45;
+    const lg=ctx.createLinearGradient(0,by+bh-liqH,0,by+bh);
+    lg.addColorStop(0,'rgba(100,200,220,.4)');lg.addColorStop(1,'rgba(60,160,200,.6)');
+    ctx.fillStyle=lg;ctx.fillRect(cx-bw/2,by+bh-liqH,bw,liqH);
+    // Bubbles trapped
+    if(st.reacting){
+      ctx.fillStyle='rgba(100,220,255,.4)';
+      for(let b=0;b<8;b++){
+        const bxb=cx-20+b*7,br=1.5+Math.random()*2;
+        const byb=by+bh-liqH-Math.random()*30;
+        ctx.beginPath();ctx.arc(bxb,byb,br,0,Math.PI*2);ctx.fill();
+      }
+    }
+    ctx.restore();
+  }
+  // Outline
+  ctx.strokeStyle='rgba(0,201,177,.6)';ctx.lineWidth=1.5;ctx.stroke(flaskPath);
+  ctx.restore();
+  // Stopper
+  if(st.hasThermo&&st.closed){
+    ctx.fillStyle='#8b5cf6';
+    roundRect(ctx,cx-12,by-12,24,12,4);ctx.fill();
+    ctx.fillStyle='rgba(139,92,246,.3)';
+    roundRect(ctx,cx-8,by-18,16,6,3);ctx.fill();
+  } else if(st.hasThermo){
+    ctx.fillStyle='#6b7280';
+    roundRect(ctx,cx-10,by-10,20,10,3);ctx.fill();
+  }
+  // Thermometer
+  if(st.hasThermo) drawThermometer(ctx,cx,by-30,by+bh*.5,st.tempLevel||d.t0);
+  ctx.fillStyle='rgba(0,201,177,.6)';ctx.font='bold 9px Nunito,sans-serif';ctx.textAlign='center';
+  ctx.fillText('Labu Erlenmeyer',cx,baseY+14);
+}
+
+function drawCalorimeter(ctx,cx,baseY,st,d,si){
+  const bw=90,bh=110,bx=cx-bw/2,by=baseY-bh;
+  // Outer insulation
+  const ig=ctx.createLinearGradient(bx,by,bx+bw,by+bh);
+  ig.addColorStop(0,'rgba(80,120,160,.3)');ig.addColorStop(1,'rgba(40,80,120,.4)');
+  ctx.fillStyle=ig;roundRect(ctx,bx-5,by,bw+10,bh,8);ctx.fill();
+  // Insulation pattern
+  ctx.strokeStyle='rgba(100,160,200,.1)';ctx.lineWidth=2;
+  for(let i=10;i<bh;i+=10){ctx.beginPath();ctx.moveTo(bx-5,by+i);ctx.lineTo(bx+bw+5,by+i);ctx.stroke();}
+  // Inner vessel
+  const g=ctx.createLinearGradient(bx,by+5,bx+bw,by+bh-5);
+  g.addColorStop(0,'rgba(180,210,240,.1)');g.addColorStop(1,'rgba(180,210,240,.18)');
+  ctx.fillStyle=g;roundRect(ctx,bx+5,by+5,bw-10,bh-5,4);ctx.fill();
+  // HCl liquid
+  if(st.hasHCl){
+    ctx.save();
+    const clipPath=new Path2D();clipPath.rect(bx+5,by+5,bw-10,bh-5);ctx.clip(clipPath);
+    const liqH=(bh-5)*.5;
+    const lg=ctx.createLinearGradient(0,by+bh-liqH,0,by+bh);
+    lg.addColorStop(0,'rgba(100,200,220,.4)');lg.addColorStop(1,'rgba(60,160,200,.6)');
+    ctx.fillStyle=lg;ctx.fillRect(bx+5,by+bh-liqH,bw-10,liqH);
+    // Temperature animation inside
+    if(st.reacting){
+      const tempProgress=(st.tempLevel-d.t0)/(d.t1-d.t0);
+      ctx.fillStyle=`rgba(255,${Math.floor(150-tempProgress*100)},0,${tempProgress*.3})`;
+      ctx.fillRect(bx+5,by+bh-liqH,bw-10,liqH);
+    }
+    ctx.restore();
+  }
+  // Lid
+  if(st.closed){
+    ctx.fillStyle='rgba(42,64,96,.9)';roundRect(ctx,bx-5,by-10,bw+10,15,5);ctx.fill();
+    ctx.strokeStyle='rgba(0,201,177,.4)';ctx.lineWidth=1;roundRect(ctx,bx-5,by-10,bw+10,15,5);ctx.stroke();
+    // Lock icon
+    ctx.fillStyle='rgba(0,201,177,.8)';ctx.font='bold 10px sans-serif';ctx.textAlign='center';
+    ctx.fillText('🔒',cx,by-1);
+  }
+  // Outer outline
+  ctx.strokeStyle='rgba(0,201,177,.5)';ctx.lineWidth=1.5;roundRect(ctx,bx-5,by,bw+10,bh,8);ctx.stroke();
+  ctx.strokeStyle='rgba(0,201,177,.3)';ctx.lineWidth=1;roundRect(ctx,bx+5,by+5,bw-10,bh-5,4);ctx.stroke();
+  // Thermometer
+  if(st.hasThermo) drawThermometer(ctx,cx,by-20,by+bh*.5,st.tempLevel||d.t0);
+  ctx.fillStyle='rgba(0,201,177,.6)';ctx.font='bold 9px Nunito,sans-serif';ctx.textAlign='center';
+  ctx.fillText('Kalorimeter',cx,baseY+14);
+}
+
+function drawThermometer(ctx,x,topY,bulbY,temp){
+  const tH=bulbY-topY;
+  // Stem
+  ctx.strokeStyle='rgba(200,220,240,.4)';ctx.lineWidth=5;ctx.lineCap='round';
+  ctx.beginPath();ctx.moveTo(x,topY);ctx.lineTo(x,bulbY);ctx.stroke();
+  // Mercury level
+  const tLevel=Math.min(1,(temp-20)/15);const tY=topY+(tH*(1-tLevel*.7));
+  ctx.strokeStyle='#ef4444';ctx.lineWidth=3;ctx.lineCap='round';
+  ctx.beginPath();ctx.moveTo(x,tY);ctx.lineTo(x,bulbY);ctx.stroke();
+  // Bulb
+  ctx.fillStyle='#ef4444';ctx.beginPath();ctx.arc(x,bulbY,5,0,Math.PI*2);ctx.fill();
+  // Reading
+  ctx.fillStyle='#0a1520';
+  roundRect(ctx,x+8,tY-10,40,18,3);ctx.fill();
+  ctx.strokeStyle='rgba(0,201,177,.4)';ctx.lineWidth=.5;
+  roundRect(ctx,x+8,tY-10,40,18,3);ctx.stroke();
+  ctx.fillStyle='#00c9b1';ctx.font='bold 9px Fira Code,monospace';ctx.textAlign='left';
+  ctx.fillText(temp.toFixed(1)+'°C',x+11,tY+3);
+}
+
+function drawHClBottle(ctx,x,y){
+  const bh=65,bw=32;
+  // Body
+  const g=ctx.createLinearGradient(x,y,x+bw,y+bh);
+  g.addColorStop(0,'rgba(100,200,220,.5)');g.addColorStop(1,'rgba(60,140,180,.6)');
+  ctx.fillStyle=g;roundRect(ctx,x,y+15,bw,bh,4);ctx.fill();
+  // Liquid level
+  ctx.save();const cp=new Path2D();cp.rect(x+2,y+20,bw-4,bh-5);ctx.clip(cp);
+  ctx.fillStyle='rgba(80,180,220,.7)';ctx.fillRect(x+2,y+30,bw-4,bh-15);ctx.restore();
+  // Neck
+  ctx.fillStyle='rgba(120,180,200,.4)';roundRect(ctx,x+8,y+5,bw-16,15,2);ctx.fill();
+  // Cap
+  ctx.fillStyle='#8b5cf6';roundRect(ctx,x+6,y,bw-12,8,2);ctx.fill();
+  // Label
+  ctx.strokeStyle='rgba(0,201,177,.5)';ctx.lineWidth=1;roundRect(ctx,x,y+15,bw,bh,4);ctx.stroke();
+  ctx.fillStyle='rgba(0,201,177,.8)';ctx.font='bold 7px Nunito';ctx.textAlign='center';
+  ctx.fillText('HCl',x+bw/2,y+45);ctx.fillText('aq',x+bw/2,y+55);
+}
+
+function drawCaCO3(ctx,x,y){
+  const bh=50,bw=38;
+  // Bag shape
+  ctx.fillStyle='rgba(200,180,140,.4)';
+  roundRect(ctx,x,y,bw,bh,5);ctx.fill();
+  ctx.strokeStyle='rgba(200,180,140,.7)';ctx.lineWidth=1;
+  roundRect(ctx,x,y,bw,bh,5);ctx.stroke();
+  // Powder inside
+  ctx.fillStyle='rgba(240,220,200,.6)';
+  roundRect(ctx,x+3,y+5,bw-6,bh-10,3);ctx.fill();
+  // Label
+  ctx.fillStyle='rgba(80,50,30,.9)';ctx.font='bold 6px Nunito';ctx.textAlign='center';
+  ctx.fillText('CaCO₃',x+bw/2,y+28);ctx.fillText('Batu Pualam',x+bw/2,y+37);
+  // Tie at top
+  ctx.strokeStyle='rgba(140,110,70,.7)';ctx.lineWidth=1.5;
+  ctx.beginPath();ctx.moveTo(x+5,y+2);ctx.quadraticCurveTo(x+bw/2,y-8,x+bw-5,y+2);ctx.stroke();
+}
+
+function drawPourEffect(ctx,fromX,fromY,toX,toY){
+  // Stream
+  const gradient=ctx.createLinearGradient(fromX,fromY,toX,toY);
+  gradient.addColorStop(0,'rgba(80,180,220,.6)');gradient.addColorStop(1,'rgba(80,180,220,.1)');
+  ctx.strokeStyle=gradient;ctx.lineWidth=4;ctx.lineCap='round';
+  ctx.setLineDash([8,4]);ctx.lineDashOffset=-Date.now()*.01%12;
+  ctx.beginPath();ctx.moveTo(fromX,fromY);ctx.lineTo(toX,toY);ctx.stroke();
+  ctx.setLineDash([]);
+  // Droplets
+  for(let i=0;i<4;i++){
+    const t=((Date.now()*.001+i*.25)%1);
+    const dx=fromX+(toX-fromX)*t;const dy=fromY+(toY-fromY)*t;
+    ctx.fillStyle=`rgba(80,180,220,${.7-t*.5})`;
+    ctx.beginPath();ctx.arc(dx,dy,3,0,Math.PI*2);ctx.fill();
+  }
+}
+
+function drawPowderEffect(ctx,fromX,fromY,toX,toY){
+  for(let i=0;i<12;i++){
+    const t=((Date.now()*.0008+i*.083)%1);
+    const scatter=(Math.sin(i*137.5*Math.PI/180))*20;
+    const dx=fromX+(toX-fromX)*t+scatter*t;
+    const dy=fromY+(toY-fromY)*t;
+    const alpha=0.7*(1-t);const sz=3+Math.random()*3;
+    ctx.fillStyle=`rgba(220,200,180,${alpha})`;
+    ctx.beginPath();ctx.arc(dx,dy,sz,0,Math.PI*2);ctx.fill();
+  }
+}
+
+function drawLabels(ctx,w,h,cfg,st){
+  // Corner label
+  ctx.fillStyle='rgba(0,201,177,.5)';ctx.font='bold 10px Rajdhani,sans-serif';ctx.textAlign='left';
+  ctx.fillText('⚗ Lab Kimia Virtual',10,h-8);
+  ctx.textAlign='right';ctx.fillStyle='rgba(0,201,177,.3)';
+  ctx.fillText(cfg.label,w-10,h-8);
+}
+
+function roundRect(ctx,x,y,w,h,r){
+  ctx.beginPath();ctx.roundRect(x,y,w,h,r);
+}
+
+// ═══════════════════════════════════════
+// DATA TABLE LISTENERS
+// ═══════════════════════════════════════
+function setupDataListeners(){
+  for(let i=0;i<3;i++){
+    ['m0','m1','t0','t1'].forEach(f=>{
+      const el=document.getElementById(`d-${f}-${i}`);
+      if(el) el.addEventListener('input',()=>updateCalc(i));
+    });
+  }
+}
+
+function updateCalc(i){
+  const m0=parseFloat(document.getElementById(`d-m0-${i}`)?.value);
+  const m1=parseFloat(document.getElementById(`d-m1-${i}`)?.value);
+  const t0=parseFloat(document.getElementById(`d-t0-${i}`)?.value);
+  const t1=parseFloat(document.getElementById(`d-t1-${i}`)?.value);
+  const dm=document.getElementById(`d-dm-${i}`);
+  const dt=document.getElementById(`d-dt-${i}`);
+  if(!isNaN(m0)&&!isNaN(m1)&&dm) dm.value=(m1-m0).toFixed(2);
+  if(!isNaN(t0)&&!isNaN(t1)&&dt) dt.value=(t1-t0).toFixed(2);
+}
+
+// ═══════════════════════════════════════
+// NOTIF
+// ═══════════════════════════════════════
+function showNotif(msg){
+  const n=document.getElementById('notif');
+  n.textContent=msg;n.classList.add('show');
+  setTimeout(()=>n.classList.remove('show'),2500);
+}
+
+// ═══════════════════════════════════════
+// KUMPULKAN JAWABAN DISKUSI
+// ═══════════════════════════════════════
+function kumpulkanJawaban(){
+  const answers=[
+    {no:'01',el:document.getElementById('disc-ans-1')},
+    {no:'02',el:document.getElementById('disc-ans-2')},
+    {no:'03',el:document.getElementById('disc-ans-3')},
+    {no:'04',el:document.getElementById('disc-ans-4')},
+  ];
+  const empty=answers.filter(a=>!a.el.value.trim());
+  if(empty.length>0){
+    showNotif('⚠️ Pertanyaan '+empty.map(a=>a.no).join(', ')+' belum dijawab!');
+    empty[0].el.focus();
+    return;
+  }
+  // Highlight all answered
+  answers.forEach(a=>{a.el.style.borderColor='var(--green)';});
+  const btn=document.getElementById('btnKumpul');
+  btn.disabled=true;
+  btn.style.opacity='.6';
+  btn.textContent='✅ Jawaban Terkumpul';
+  const status=document.getElementById('kumpul-status');
+  status.style.display='block';
+  status.innerHTML='✅ Semua jawaban berhasil dikumpulkan! Terima kasih, silakan serahkan ke guru/pengawas.';
+  showNotif('✅ Jawaban diskusi berhasil dikumpulkan!');
+}
+
+// Handle touch events for canvases
+document.querySelectorAll('canvas').forEach(c=>{
+  c.addEventListener('touchstart',e=>{e.preventDefault();},{ passive:false });
+});
+
+// ═══════════════════════════════════════
+// PDF DOWNLOAD - Jawaban Diskusi
+// ═══════════════════════════════════════
+function downloadDiskusiPDF(){
+  playClickSfx();
+  const questions=[
+    'Berdasarkan simulasi reaksi antara larutan HCl dan padatan CaCO₃ yang telah kalian amati, identifikasilah komponen mana saja yang bertindak sebagai sistem dan komponen mana saja yang bertindak sebagai lingkungan! Jelaskan alasan pengelompokan tersebut!',
+    'Perhatikan data akhir pada neraca analitik! Mengapa pada percobaan 1 terjadi penurunan massa setelah reaksi selesai, sedangkan pada percobaan 2 dan 3 massanya cenderung tetap? Kaitkan dengan konsep pertukaran materi!',
+    'Pada Percobaan 1 dan 2, termometer mendeteksi adanya kenaikan suhu. Berdasarkan perubahan suhu tersebut, analisislah ke mana arah perpindahan energi (kalor) yang terjadi! Apakah kalor berpindah dari sistem ke lingkungan, atau sebaliknya?',
+    'Meskipun labu erlenmeyer tersumbat dan kalorimeter sama-sama tidak menunjukkan perubahan massa, keduanya memiliki karakteristik yang berbeda. Jelaskan perbedaan utama antara sistem tertutup dan sistem terisolasi berdasarkan pengamatanmu!'
+  ];
+  const answers=[];
+  let hasEmpty=false;
+  for(let i=1;i<=4;i++){
+    const v=document.getElementById('disc-ans-'+i).value.trim();
+    answers.push(v);
+    if(!v) hasEmpty=true;
+  }
+  if(hasEmpty){
+    showNotif('⚠️ Isi semua jawaban terlebih dahulu sebelum mengunduh PDF!');
+    return;
+  }
+
+  // Load jsPDF dynamically
+  if(typeof window.jspdf==='undefined'){
+    const s=document.createElement('script');
+    s.src='https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js';
+    s.onload=()=>generatePDF(questions,answers);
+    s.onerror=()=>{showNotif('⚠️ Gagal memuat library PDF. Periksa koneksi internet.');};
+    document.head.appendChild(s);
+  } else {
+    generatePDF(questions,answers);
+  }
+}
+
+function generatePDF(questions,answers){
+  try{
+    const{jsPDF}=window.jspdf;
+    const doc=new jsPDF({orientation:'portrait',unit:'mm',format:'a4'});
+    const pw=210, ph=297;
+    const ml=20, mr=20, mt=20;
+    const cw=pw-ml-mr;
+    let y=mt;
+
+    // Header background
+    doc.setFillColor(15,28,46);
+    doc.rect(0,0,pw,45,'F');
+    doc.setFillColor(0,201,177);
+    doc.rect(0,44,pw,1.5,'F');
+
+    // Title
+    doc.setTextColor(255,255,255);
+    doc.setFont('helvetica','bold');
+    doc.setFontSize(18);
+    doc.text('Lab Maya Kimia',ml,15);
+    doc.setFontSize(11);
+    doc.setTextColor(0,201,177);
+    doc.text('TERMOKIMIA: Sistem dan Lingkungan',ml,23);
+    doc.setFontSize(9);
+    doc.setTextColor(148,170,200);
+    doc.text('Jawaban Diskusi Praktikum',ml,30);
+    const now=new Date();
+    doc.text('Tanggal: '+now.toLocaleDateString('id-ID',{day:'numeric',month:'long',year:'numeric'})+' | '+now.toLocaleTimeString('id-ID',{hour:'2-digit',minute:'2-digit'}),ml,37);
+
+    y=55;
+
+    for(let i=0;i<4;i++){
+      // Question header bar
+      doc.setFillColor(21,37,61);
+      doc.roundedRect(ml,y,cw,8,2,2,'F');
+      doc.setTextColor(0,201,177);
+      doc.setFont('helvetica','bold');
+      doc.setFontSize(10);
+      doc.text('PERTANYAAN 0'+(i+1),ml+4,y+5.5);
+      y+=12;
+
+      // Question text
+      doc.setTextColor(80,80,80);
+      doc.setFont('helvetica','normal');
+      doc.setFontSize(9.5);
+      const qLines=doc.splitTextToSize(questions[i],cw);
+      doc.text(qLines,ml,y);
+      y+=qLines.length*4.5+4;
+
+      // Answer box
+      doc.setDrawColor(0,201,177);
+      doc.setLineWidth(0.3);
+      doc.setFillColor(245,248,252);
+      const aLines=doc.splitTextToSize(answers[i],cw-8);
+      const boxH=Math.max(15,aLines.length*4.5+8);
+
+      // Check page break
+      if(y+boxH>ph-20){
+        doc.addPage();
+        y=mt;
+      }
+
+      doc.roundedRect(ml,y,cw,boxH,2,2,'FD');
+      doc.setTextColor(30,30,30);
+      doc.setFont('helvetica','normal');
+      doc.setFontSize(9.5);
+      doc.text(aLines,ml+4,y+5.5);
+      y+=boxH+10;
+
+      // Page break check
+      if(y>ph-30&&i<3){
+        doc.addPage();
+        y=mt;
+      }
+    }
+
+    // Footer
+    const pCount=doc.internal.getNumberOfPages();
+    for(let p=1;p<=pCount;p++){
+      doc.setPage(p);
+      doc.setFillColor(15,28,46);
+      doc.rect(0,ph-12,pw,12,'F');
+      doc.setTextColor(100,140,170);
+      doc.setFontSize(7);
+      doc.setFont('helvetica','normal');
+      doc.text('Lab Maya Kimia - Termokimia: Sistem dan Lingkungan | Halaman '+p+'/'+pCount,pw/2,ph-5,{align:'center'});
+    }
+
+    doc.save('Jawaban_Diskusi_Termokimia.pdf');
+    showNotif('✅ PDF berhasil diunduh!');
+    playSuccess();
+  }catch(e){
+    console.error(e);
+    showNotif('⚠️ Gagal membuat PDF: '+e.message);
+  }
+}
+</script>
+</body>
+</html>
