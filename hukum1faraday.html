@@ -1,0 +1,1926 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<title>Lab Maya Kimia – Sel Elektrolisis: Hukum I Faraday</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;600;700;900&family=Exo+2:ital,wght@0,300;0,400;0,600;0,700;1,400&family=Share+Tech+Mono&display=swap" rel="stylesheet">
+<style>
+:root{
+  --bg:#060f1e;--surf:#0b1a30;--surf2:#0f2244;--surf3:#152d52;
+  --border:rgba(0,200,255,0.12);--border2:rgba(0,200,255,0.28);
+  --acc:#00d4ff;--acc2:#0099cc;--acc3:#00ffcc;
+  --warn:#ff6b35;--red:#ff3b5c;--green:#00e676;
+  --text:#d0eaff;--text2:#8ab4d0;--text3:#456080;
+  --h:50px;
+  --gold:#ffd700;
+}
+*{margin:0;padding:0;box-sizing:border-box;}
+html{width:100vw;height:100vh;overflow:hidden;}
+body{
+  font-family:'Exo 2',sans-serif;background:var(--bg);color:var(--text);
+  display:flex;flex-direction:column;
+  width:100vw;height:100vh;overflow:hidden;
+  background-image:
+    radial-gradient(ellipse 70% 40% at 15% 5%,rgba(0,212,255,.06) 0%,transparent 60%),
+    radial-gradient(ellipse 50% 60% at 85% 95%,rgba(0,255,204,.04) 0%,transparent 60%),
+    repeating-linear-gradient(0deg,transparent,transparent 49px,rgba(0,200,255,.03) 50px),
+    repeating-linear-gradient(90deg,transparent,transparent 49px,rgba(0,200,255,.03) 50px);
+}
+/* SCROLLBAR */
+::-webkit-scrollbar{width:4px;height:4px;}
+::-webkit-scrollbar-track{background:transparent;}
+::-webkit-scrollbar-thumb{background:var(--acc2);border-radius:2px;opacity:.5;}
+/* HEADER */
+header{
+  position:relative;z-index:10;height:var(--h);flex-shrink:0;
+  background:linear-gradient(135deg,rgba(6,15,30,.98),rgba(11,26,48,.98));
+  border-bottom:1px solid var(--border2);
+  display:flex;align-items:center;padding:0 12px;gap:8px;
+  box-shadow:0 2px 20px rgba(0,212,255,.15);
+}
+.logo{display:flex;align-items:center;gap:8px;flex-shrink:0;}
+.logo-icon{width:36px;height:36px;border-radius:8px;background:linear-gradient(135deg,#0b1a30,#152d52);border:1px solid var(--border2);display:flex;align-items:center;justify-content:center;font-size:18px;}
+.logo-text{font-family:'Orbitron',monospace;font-size:clamp(13px,1.8vw,17px);font-weight:700;color:var(--acc);line-height:1;}
+.logo-sub{font-size:9px;color:var(--text2);letter-spacing:.08em;text-transform:uppercase;}
+nav{display:flex;gap:2px;flex:1;overflow-x:auto;justify-content:flex-end;}
+nav::-webkit-scrollbar{display:none;}
+.nb{position:relative;background:none;border:none;color:var(--text2);cursor:pointer;
+  font-family:'Exo 2',sans-serif;font-size:clamp(11px,1.2vw,13px);font-weight:600;
+  padding:0 11px;height:var(--h);white-space:nowrap;transition:color .2s;letter-spacing:.02em;}
+.nb::after{content:'';position:absolute;bottom:0;left:8px;right:8px;height:2px;
+  background:linear-gradient(90deg,var(--acc),var(--acc3));transform:scaleX(0);
+  transition:transform .2s;border-radius:2px 2px 0 0;}
+.nb:hover{color:var(--acc);}
+.nb.active{color:var(--acc);}
+.nb.active::after{transform:scaleX(1);}
+.nb-icon{font-size:14px;margin-right:4px;}
+#app{position:relative;z-index:1;flex:1;overflow:hidden;display:flex;flex-direction:column;}
+.page{display:none;flex:1;overflow:hidden;flex-direction:column;}
+.page.active{display:flex;}
+@keyframes pageIn{from{opacity:0;transform:translateY(8px);}to{opacity:1;transform:translateY(0);}}
+.page.active{animation:pageIn .22s ease;}
+.inner-scroll{flex:1;overflow-y:auto;padding:8px 12px 10px;}
+/* SAMPUL */
+#page-sampul{align-items:center;justify-content:center;position:relative;overflow:hidden;}
+#page-sampul::before{content:'';position:absolute;inset:0;
+  background:radial-gradient(ellipse 80% 60% at 50% 40%,rgba(0,212,255,.08) 0%,transparent 70%);pointer-events:none;}
+.sampul-content{display:flex;flex-direction:column;align-items:center;justify-content:center;gap:10px;padding:14px;text-align:center;position:relative;z-index:1;}
+.sampul-img{width:clamp(160px,22vw,280px);filter:drop-shadow(0 0 30px rgba(0,212,255,.4));}
+.sampul-badge{font-family:'Share Tech Mono',monospace;font-size:10px;color:var(--acc3);letter-spacing:.2em;text-transform:uppercase;border:1px solid rgba(0,255,204,.3);padding:4px 14px;border-radius:20px;background:rgba(0,255,204,.06);}
+.sampul-title{font-family:'Orbitron',monospace;font-size:clamp(18px,3vw,32px);font-weight:900;color:#fff;line-height:1.15;text-shadow:0 0 30px rgba(0,212,255,.5);}
+.sampul-title span{color:var(--acc);}
+.sampul-sub{font-size:clamp(12px,1.4vw,15px);color:var(--text2);max-width:500px;}
+.btn-start{background:linear-gradient(135deg,#0099cc,#00d4ff);color:#fff;border:none;
+  border-radius:10px;padding:12px 36px;font-family:'Orbitron',monospace;font-size:14px;font-weight:700;
+  cursor:pointer;letter-spacing:.05em;box-shadow:0 0 20px rgba(0,212,255,.4);
+  transition:all .2s;}
+.btn-start:hover{transform:translateY(-2px);box-shadow:0 0 35px rgba(0,212,255,.6);}
+/* CARD */
+.card{background:var(--surf);border:1px solid var(--border);border-radius:10px;
+  padding:8px 12px;margin-bottom:6px;transition:border-color .2s;box-shadow:0 2px 12px rgba(0,0,0,.2);}
+.card:hover{border-color:var(--border2);}
+.ch{display:flex;align-items:center;gap:7px;margin-bottom:6px;}
+.ci{width:26px;height:26px;border-radius:7px;display:flex;align-items:center;justify-content:center;font-size:13px;flex-shrink:0;}
+.ci.b{background:rgba(0,212,255,.12);border:1px solid rgba(0,212,255,.25);}
+.ci.g{background:rgba(0,230,118,.12);border:1px solid rgba(0,230,118,.25);}
+.ci.o{background:rgba(255,107,53,.12);border:1px solid rgba(255,107,53,.25);}
+.ci.p{background:rgba(180,100,255,.12);border:1px solid rgba(180,100,255,.25);}
+.ct{font-family:'Orbitron',monospace;font-size:clamp(11px,1.4vw,13.5px);font-weight:700;color:var(--acc);}
+.card p{font-size:clamp(11px,1.1vw,13px);line-height:1.6;color:var(--text2);margin-bottom:4px;}
+.card p:last-child{margin-bottom:0;}
+.card h4{font-size:11px;font-weight:700;color:var(--acc3);letter-spacing:.1em;text-transform:uppercase;margin:8px 0 4px;}
+.two-col{display:grid;grid-template-columns:1fr 1fr;gap:7px;}
+.three-col{display:grid;grid-template-columns:1fr 1fr 1fr;gap:7px;}
+/* FORMULA BOX */
+.formula{font-family:'Share Tech Mono',monospace;font-size:clamp(13px,1.8vw,18px);
+  background:rgba(0,212,255,.07);border:1px solid rgba(0,212,255,.2);border-left:3px solid var(--acc);
+  padding:10px 16px;border-radius:0 8px 8px 0;color:var(--acc);margin:8px 0;text-align:center;}
+/* OLIST */
+.olist{list-style:none;}
+.olist li{display:flex;align-items:flex-start;gap:7px;font-size:clamp(11px,1.1vw,12.5px);
+  color:var(--text2);line-height:1.55;padding:3px 0;border-bottom:1px solid rgba(0,200,255,.06);}
+.olist li:last-child{border-bottom:none;}
+.olist li::before{content:'▸';color:var(--acc);font-size:11px;margin-top:2px;flex-shrink:0;}
+/* STEP */
+.steps-list{display:flex;flex-direction:column;gap:3px;}
+.step-item{display:flex;gap:8px;align-items:flex-start;background:var(--surf2);
+  border:1px solid var(--border);border-radius:7px;padding:5px 9px;transition:all .17s;}
+.step-item:hover{border-color:var(--border2);background:var(--surf3);}
+.snum{min-width:20px;height:20px;border-radius:50%;background:rgba(0,212,255,.12);
+  border:1px solid rgba(0,212,255,.3);display:flex;align-items:center;justify-content:center;
+  font-family:'Share Tech Mono',monospace;font-size:9px;color:var(--acc);flex-shrink:0;}
+.step-item p{font-size:clamp(10.5px,1.05vw,12.5px);color:var(--text2);line-height:1.55;margin:0;}
+/* EQUIPMENT GRID */
+.eq-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(130px,1fr));gap:7px;}
+.eq-item{background:var(--surf2);border:1px solid var(--border);border-radius:9px;
+  padding:9px 8px;display:flex;flex-direction:column;align-items:center;gap:6px;
+  transition:all .2s;cursor:default;text-align:center;}
+.eq-item:hover{border-color:var(--border2);background:var(--surf3);transform:translateY(-2px);box-shadow:0 6px 20px rgba(0,212,255,.1);}
+.eq-item img{width:56px;height:56px;object-fit:contain;filter:drop-shadow(0 2px 6px rgba(0,0,0,.3));}
+.eq-item strong{font-size:11px;color:var(--acc);display:block;font-weight:700;line-height:1.3;}
+.eq-item span{font-size:10px;color:var(--text3);line-height:1.4;}
+/* PROSEDUR tabs */
+.ptabs{display:flex;gap:5px;margin-bottom:8px;flex-shrink:0;}
+.ptab{background:var(--surf2);border:1px solid var(--border);border-radius:7px;
+  padding:6px 13px;font-family:'Exo 2',sans-serif;font-size:11.5px;font-weight:600;
+  color:var(--text2);cursor:pointer;transition:all .17s;}
+.ptab.active{background:linear-gradient(135deg,rgba(0,153,204,.3),rgba(0,212,255,.2));
+  border-color:var(--border2);color:var(--acc);}
+.pcontent{display:none;}
+.pcontent.active{display:block;}
+.notebox{background:rgba(255,107,53,.07);border:1px solid rgba(255,107,53,.25);border-radius:7px;padding:8px 12px;margin-top:7px;}
+.notebox .nt{font-size:9.5px;font-weight:700;color:var(--warn);letter-spacing:.06em;text-transform:uppercase;margin-bottom:3px;}
+.notebox p{font-size:12px;color:rgba(255,150,100,.9);line-height:1.6;margin:0;}
+/* SIMULASI */
+.sim-layout{display:grid;grid-template-columns:190px 1fr;gap:5px;flex:1;min-height:0;}
+.sim-ctrl{background:var(--surf);border:1px solid var(--border);border-radius:10px;
+  padding:11px;display:flex;flex-direction:column;gap:7px;overflow-y:auto;}
+.sim-ctrl-title{font-family:'Orbitron',monospace;font-size:11px;font-weight:700;color:var(--acc);}
+.exp-tabs{display:flex;flex-direction:column;gap:4px;}
+.exp-tab{background:var(--surf2);border:1px solid var(--border);border-radius:7px;
+  padding:7px 10px;cursor:pointer;transition:all .17s;text-align:left;}
+.exp-tab:hover{border-color:var(--border2);}
+.exp-tab.active{background:rgba(0,212,255,.1);border-color:var(--border2);}
+.exp-tab strong{display:block;font-size:11px;color:var(--acc);font-weight:700;margin-bottom:2px;}
+.exp-tab span{font-size:10px;color:var(--text3);line-height:1.4;}
+.ctrl-group{display:flex;flex-direction:column;gap:4px;}
+.ctrl-label{font-size:9.5px;font-weight:700;color:var(--text3);letter-spacing:.07em;text-transform:uppercase;}
+.ctrl-val{font-family:'Share Tech Mono',monospace;font-size:13px;color:var(--acc);font-weight:600;text-align:right;}
+.btn-sim{width:100%;border:none;border-radius:7px;padding:8px;
+  font-family:'Exo 2',sans-serif;font-size:12px;font-weight:700;cursor:pointer;transition:all .18s;}
+.btn-sim-start{background:linear-gradient(135deg,#006b99,#00d4ff);color:#fff;box-shadow:0 3px 12px rgba(0,212,255,.3);}
+.btn-sim-start:hover{transform:translateY(-1px);box-shadow:0 5px 20px rgba(0,212,255,.45);}
+.btn-sim-start:disabled{opacity:.35;cursor:not-allowed;transform:none;}
+.btn-sim-stop{background:rgba(255,59,92,.12);border:1px solid rgba(255,59,92,.3);color:var(--red);}
+.btn-sim-stop:hover{background:rgba(255,59,92,.2);}
+.btn-sim-reset{background:var(--surf2);border:1px solid var(--border);color:var(--text2);}
+.btn-sim-reset:hover{border-color:var(--border2);color:var(--acc);}
+.sim-canvas-wrap{background:var(--surf);border:1px solid var(--border);border-radius:10px;
+  display:flex;flex-direction:column;flex:1;overflow:hidden;min-height:0;}
+.sim-canvas-header{padding:8px 12px;border-bottom:1px solid var(--border);flex-shrink:0;
+  display:flex;align-items:center;justify-content:space-between;}
+.sim-canvas-title{font-family:'Orbitron',monospace;font-size:11px;color:var(--acc);font-weight:700;}
+.sim-status{font-size:10px;color:var(--text3);}
+.sim-status.running{color:var(--green);}
+.sim-canvas-body{flex:1;display:flex;gap:7px;padding:8px;min-height:0;}
+#simCanvas{flex:1;border-radius:8px;display:block;background:#04090f;}
+.sim-data-panel{width:160px;display:flex;flex-direction:column;gap:6px;flex-shrink:0;}
+.data-box{background:var(--surf2);border:1px solid var(--border);border-radius:8px;padding:8px 10px;}
+.data-box-title{font-size:9.5px;font-weight:700;color:var(--text3);letter-spacing:.07em;text-transform:uppercase;margin-bottom:5px;}
+.data-row{display:flex;justify-content:space-between;align-items:center;padding:3px 0;border-bottom:1px solid rgba(0,200,255,.05);}
+.data-row:last-child{border-bottom:none;}
+.data-lbl{font-size:10.5px;color:var(--text2);}
+.data-val{font-family:'Share Tech Mono',monospace;font-size:11px;color:var(--acc);font-weight:600;}
+.data-val.green{color:var(--green);}
+.step-guide{background:var(--surf2);border:1px solid var(--border);border-radius:8px;padding:8px 10px;flex:1;overflow-y:auto;}
+.step-guide-title{font-size:9.5px;font-weight:700;color:var(--text3);letter-spacing:.07em;text-transform:uppercase;margin-bottom:6px;}
+.sg-item{display:flex;gap:6px;align-items:flex-start;margin-bottom:5px;padding:5px 7px;border-radius:6px;transition:all .17s;}
+.sg-item.done{background:rgba(0,230,118,.07);border:1px solid rgba(0,230,118,.15);}
+.sg-item.current{background:rgba(0,212,255,.1);border:1px solid rgba(0,212,255,.25);}
+.sg-item.pending{border:1px solid transparent;}
+.sg-num{min-width:18px;height:18px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-family:'Share Tech Mono',monospace;font-size:9px;flex-shrink:0;}
+.sg-item.done .sg-num{background:rgba(0,230,118,.2);color:var(--green);}
+.sg-item.current .sg-num{background:rgba(0,212,255,.2);color:var(--acc);}
+.sg-item.pending .sg-num{background:var(--surf3);color:var(--text3);}
+.sg-text{font-size:10.5px;color:var(--text2);line-height:1.5;}
+.sg-item.done .sg-text{color:rgba(0,230,118,.8);}
+.sg-item.current .sg-text{color:var(--acc);}
+.sg-item.pending .sg-text{color:var(--text3);}
+/* DISKUSI */
+.disc-q{background:var(--surf);border:1px solid var(--border);border-radius:10px;padding:11px 13px;margin-bottom:7px;}
+.disc-q-num{font-family:'Share Tech Mono',monospace;font-size:9px;color:var(--acc3);letter-spacing:.1em;margin-bottom:4px;}
+.disc-q-text{font-size:clamp(11.5px,1.2vw,13px);color:var(--text);line-height:1.65;margin-bottom:7px;}
+.disc-textarea{width:100%;border:1px solid var(--border);border-radius:7px;padding:8px 11px;
+  font-family:'Exo 2',sans-serif;font-size:12px;color:var(--text);background:var(--surf2);
+  resize:none;outline:none;transition:border-color .17s;line-height:1.6;height:80px;}
+.disc-textarea:focus{border-color:var(--border2);box-shadow:0 0 0 2px rgba(0,212,255,.1);}
+.disc-actions{display:flex;gap:6px;margin-top:5px;}
+.btn-save{background:linear-gradient(135deg,rgba(0,200,255,.2),rgba(0,255,204,.15));
+  border:1px solid var(--border2);color:var(--acc3);padding:5px 14px;border-radius:6px;
+  font-family:'Exo 2',sans-serif;font-size:11px;font-weight:700;cursor:pointer;transition:all .17s;}
+.btn-save:hover{background:rgba(0,212,255,.25);border-color:var(--acc);}
+.save-toast{font-size:10px;color:var(--green);padding:5px 0;display:none;}
+.save-toast.on{display:inline;}
+/* NOTE */
+.note-info{background:rgba(0,212,255,.06);border:1px solid rgba(0,212,255,.15);
+  border-radius:7px;padding:7px 11px;margin-bottom:6px;}
+.note-info p{font-size:11.5px;color:var(--text2);margin:0;line-height:1.6;}
+/* REACTION BOX */
+.rxn-box{font-family:'Share Tech Mono',monospace;font-size:11.5px;background:rgba(0,212,255,.05);
+  border:1px solid rgba(0,212,255,.15);border-radius:7px;padding:8px 12px;color:var(--acc);
+  line-height:1.8;margin:5px 0;}
+/* LOADING */
+#loadScreen{
+  position:fixed;inset:0;z-index:99999;
+  background:linear-gradient(135deg,#02060f 0%,#060f1e 50%,#0b1a30 100%);
+  display:flex;flex-direction:column;align-items:center;justify-content:center;gap:0;
+  transition:opacity .6s ease;
+}
+#loadScreen.hide{opacity:0;pointer-events:none;}
+.load-logo{font-family:'Orbitron',monospace;font-size:48px;color:var(--acc);margin-bottom:8px;text-shadow:0 0 30px rgba(0,212,255,.5);}
+.load-title{font-family:'Orbitron',monospace;font-size:clamp(16px,2.2vw,24px);font-weight:900;color:#fff;text-align:center;margin-bottom:3px;}
+.load-sub{font-family:'Share Tech Mono',monospace;font-size:11px;color:var(--acc);letter-spacing:.15em;text-transform:uppercase;text-align:center;margin-bottom:24px;}
+.load-bar-wrap{width:clamp(250px,32vw,380px);height:5px;background:rgba(0,212,255,.12);border-radius:5px;overflow:hidden;margin-bottom:8px;}
+.load-bar-slide{height:100%;width:0%;background:linear-gradient(90deg,#0099cc,#00d4ff,#00ffcc);border-radius:5px;transition:width .08s linear;}
+.load-percent{font-family:'Share Tech Mono',monospace;font-size:14px;color:#fff;font-weight:700;margin-bottom:10px;text-align:center;}
+.load-status{font-size:11px;color:var(--text2);margin-bottom:28px;text-align:center;min-height:15px;}
+#btnMulai{display:none;background:linear-gradient(135deg,#006b99,#00d4ff);color:#fff;border:none;
+  border-radius:10px;padding:12px 32px;font-family:'Orbitron',monospace;font-size:13px;font-weight:700;
+  cursor:pointer;letter-spacing:.05em;box-shadow:0 0 25px rgba(0,212,255,.4);
+  animation:btnPop .4s cubic-bezier(.34,1.56,.64,1) forwards;transition:all .2s;}
+#btnMulai:hover{transform:translateY(-2px);box-shadow:0 0 40px rgba(0,212,255,.6);}
+@keyframes btnPop{from{opacity:0;transform:scale(.7);}to{opacity:1;transform:scale(1);}}
+/* REACTION equation style */
+sub,sup{font-size:75%;}
+/* CHIP */
+.chip{display:inline-block;padding:2px 8px;border-radius:4px;font-size:10px;font-weight:700;margin:1px;}
+.chip-b{background:rgba(0,212,255,.1);border:1px solid rgba(0,212,255,.25);color:var(--acc);}
+.chip-g{background:rgba(0,230,118,.1);border:1px solid rgba(0,230,118,.25);color:var(--green);}
+.chip-o{background:rgba(255,107,53,.1);border:1px solid rgba(255,107,53,.25);color:var(--warn);}
+/* TEORI image */
+.teori-img{float:right;width:clamp(120px,18%,200px);margin:0 0 8px 14px;border-radius:8px;
+  border:1px solid var(--border);box-shadow:0 4px 16px rgba(0,0,0,.4);}
+/* Progress bar for timer */
+.timer-bar-wrap{width:100%;height:6px;background:rgba(0,200,255,.1);border-radius:3px;overflow:hidden;margin-top:4px;}
+.timer-bar{height:100%;background:linear-gradient(90deg,var(--acc2),var(--acc));border-radius:3px;transition:width .5s linear;}
+
+/* ==========================================
+   TOUCH SCREEN / PID SUPPORT
+   ========================================== */
+/* Smooth touch scrolling */
+.inner-scroll, .sim-ctrl, .step-guide {
+  -webkit-overflow-scrolling: touch;
+  overscroll-behavior: contain;
+}
+/* Prevent accidental text selection on interactive elements */
+button, .nb, .ptab, .exp-tab, .btn-sim, .btn-save, .btn-start, #btnMulai,
+label, .ctrl-group, .eq-item, .step-item {
+  -webkit-user-select: none;
+  user-select: none;
+  -webkit-tap-highlight-color: rgba(0,212,255,0.15);
+  touch-action: manipulation;
+}
+/* Allow text selection in textareas */
+.disc-textarea { -webkit-user-select: text; user-select: text; touch-action: pan-y; }
+/* Minimum touch targets (44×44px recommended) */
+.nb { min-height: 44px; min-width: 44px; display:inline-flex; align-items:center; justify-content:center; }
+.ptab { min-height: 42px; padding: 8px 16px; }
+.btn-sim { min-height: 44px; padding: 10px 8px; font-size: 13px; }
+.btn-save { min-height: 38px; padding: 7px 16px; }
+.btn-start { min-height: 48px; }
+#btnMulai { min-height: 48px; padding: 14px 36px; font-size: 14px; }
+/* Range slider — much larger touch target */
+input[type=range] {
+  width: 100%; accent-color: var(--acc); cursor: pointer;
+  -webkit-appearance: none; appearance: none;
+  height: 28px; background: transparent;
+  touch-action: pan-x;
+  margin: 4px 0;
+}
+input[type=range]::-webkit-slider-runnable-track {
+  height: 8px; background: rgba(0,212,255,.18); border-radius: 4px;
+  border: 1px solid rgba(0,212,255,.2);
+}
+input[type=range]::-webkit-slider-thumb {
+  -webkit-appearance: none; appearance: none;
+  width: 28px; height: 28px; border-radius: 50%;
+  background: linear-gradient(135deg, #00aadd, #00d4ff);
+  border: 2px solid rgba(255,255,255,.3);
+  margin-top: -11px; cursor: pointer;
+  box-shadow: 0 2px 8px rgba(0,212,255,.4);
+}
+input[type=range]::-moz-range-track {
+  height: 8px; background: rgba(0,212,255,.18); border-radius: 4px;
+  border: 1px solid rgba(0,212,255,.2);
+}
+input[type=range]::-moz-range-thumb {
+  width: 26px; height: 26px; border-radius: 50%;
+  background: linear-gradient(135deg, #00aadd, #00d4ff);
+  border: 2px solid rgba(255,255,255,.3); cursor: pointer;
+  box-shadow: 0 2px 8px rgba(0,212,255,.4);
+}
+/* Active states for touch (replaces hover) */
+@media (hover: none) and (pointer: coarse) {
+  .nb:hover { color: var(--text2); }
+  .nb:active, .nb.active { color: var(--acc); }
+  .eq-item:hover { border-color: var(--border); background: var(--surf2); transform: none; box-shadow: none; }
+  .eq-item:active { border-color: var(--border2); background: var(--surf3); }
+  .step-item:hover { border-color: var(--border); background: var(--surf2); }
+  .step-item:active { border-color: var(--border2); background: var(--surf3); }
+  .btn-sim-start:hover { transform: none; }
+  .btn-sim-start:active { transform: scale(0.97); box-shadow: 0 2px 10px rgba(0,212,255,.5); }
+  .btn-sim-stop:hover { background: rgba(255,59,92,.12); }
+  .btn-sim-stop:active { background: rgba(255,59,92,.25); }
+  .btn-sim-reset:hover { border-color: var(--border); color: var(--text2); }
+  .btn-sim-reset:active { border-color: var(--border2); color: var(--acc); }
+  .btn-save:hover { background: linear-gradient(135deg,rgba(0,200,255,.2),rgba(0,255,204,.15)); }
+  .btn-save:active { background: rgba(0,212,255,.3); border-color: var(--acc); }
+  .ptab:active { background: rgba(0,212,255,.15); border-color: var(--border2); }
+  #btnMulai:hover { transform: none; }
+  #btnMulai:active { transform: scale(0.97); box-shadow: 0 0 30px rgba(0,212,255,.5); }
+  .btn-start:hover { transform: none; }
+  .btn-start:active { transform: scale(0.97); box-shadow: 0 0 25px rgba(0,212,255,.5); }
+  .card:hover { border-color: var(--border); }
+  .card:active { border-color: var(--border2); }
+}
+/* Larger focus outlines for accessibility */
+button:focus-visible, textarea:focus-visible, input:focus-visible {
+  outline: 2px solid var(--acc); outline-offset: 2px;
+}
+/* Textarea touch-friendly sizing */
+.disc-textarea {
+  font-size: max(12px, 16px); /* Prevent iOS zoom on focus */
+}
+</style>
+</head>
+<body>
+
+<!-- LOADING SCREEN -->
+<div id="loadScreen">
+  <img src="https://yulinestiyarum.github.io/hukumfaraday/sampul.png" style="width:clamp(140px,18vw,220px);filter:drop-shadow(0 0 24px rgba(0,212,255,.45));margin-bottom:8px;" alt="Lab Maya Kimia" onerror="this.style.display='none'">
+  <div class="load-title">Lab Maya Kimia</div>
+  <div class="load-sub">Sel Elektrolisis · Hukum I Faraday</div>
+  <div class="load-bar-wrap"><div class="load-bar-slide" id="loadBar"></div></div>
+  <div class="load-percent" id="loadPct">0%</div>
+  <div class="load-status" id="loadStat">Menyiapkan laboratorium virtual…</div>
+  <button id="btnMulai" onclick="startLab()">▶ Mulai Praktikum</button>
+</div>
+<script>
+(function(){
+  const bar=document.getElementById('loadBar'),pct=document.getElementById('loadPct'),stat=document.getElementById('loadStat');
+  const msgs=['Menyiapkan larutan elektrolit…','Memasang elektroda…','Menghubungkan catu daya…','Mengkalibrasi amperemeter…','Menyiapkan neraca analitik…','Laboratorium siap!'];
+  let v=0;const iv=setInterval(()=>{
+    v=Math.min(100,v+1.4);
+    bar.style.width=v+'%';pct.textContent=Math.floor(v)+'%';
+    stat.textContent=msgs[Math.min(msgs.length-1,Math.floor(v/17))];
+    if(v>=100){clearInterval(iv);document.getElementById('btnMulai').style.display='block';}
+  },40);
+})();
+function startLab(){
+  playChime();
+  const ls=document.getElementById('loadScreen');ls.classList.add('hide');
+  setTimeout(()=>{ls.style.display='none';},650);
+}
+</script>
+
+<header>
+  <div class="logo">
+    <div class="logo-icon">⚡</div>
+    <div>
+      <div class="logo-text">Lab Maya Kimia</div>
+      <div class="logo-sub">Sel Elektrolisis · Hukum I Faraday</div>
+    </div>
+  </div>
+  <nav id="mainNav">
+    <button class="nb active" onclick="show('sampul',this)"><span class="nb-icon">🏠</span>Sampul</button>
+    <button class="nb" onclick="show('tujuan',this)"><span class="nb-icon">🎯</span>Tujuan</button>
+    <button class="nb" onclick="show('teori',this)"><span class="nb-icon">📚</span>Teori</button>
+    <button class="nb" onclick="show('alatbahan',this)"><span class="nb-icon">🔬</span>Alat &amp; Bahan</button>
+    <button class="nb" onclick="show('prosedur',this)"><span class="nb-icon">📋</span>Prosedur</button>
+    <button class="nb" onclick="show('simulasi',this)"><span class="nb-icon">⚗️</span>Simulasi</button>
+    <button class="nb" onclick="show('diskusi',this)"><span class="nb-icon">💬</span>Diskusi</button>
+  </nav>
+</header>
+
+<div id="app">
+
+<!-- ===== SAMPUL ===== -->
+<div id="page-sampul" class="page active">
+  <div class="sampul-content">
+    <img src="https://yulinestiyarum.github.io/hukumfaraday/sampul.png" class="sampul-img" alt="Sel Elektrolisis" onerror="this.style.display='none'">
+    <div class="sampul-badge">Laboratorium Maya Kimia SMA</div>
+    <div class="sampul-title">Sel Elektrolisis<br><span>Hukum I Faraday</span></div>
+    <div class="sampul-sub">Pelajari hubungan kuantitatif antara jumlah muatan listrik dengan massa zat hasil elektrolisis melalui simulasi interaktif 4 percobaan.</div>
+    <button class="btn-start" onclick="show('tujuan',null)">Mulai Praktikum →</button>
+  </div>
+</div>
+
+<!-- ===== TUJUAN ===== -->
+<div id="page-tujuan" class="page">
+  <div class="inner-scroll">
+    <div class="card" style="margin-bottom:7px;">
+      <div class="ch"><div class="ci g">📘</div><div class="ct">Tujuan Pembelajaran</div></div>
+      <p>Menerapkan konsep reaksi oksidasi-reduksi dalam sel elektrokimia.</p>
+    </div>
+    <div class="card" style="margin-bottom:7px;">
+      <div class="ch"><div class="ci b">🎯</div><div class="ct">Tujuan Percobaan</div></div>
+      <ul class="olist">
+        <li>Menerapkan konsep reaksi oksidasi-reduksi dalam sel elektrokimia.</li>
+        <li>Menganalisis pengaruh kuat arus (i) dan waktu (t) terhadap massa endapan logam yang dihasilkan pada katoda.</li>
+        <li>Membuktikan kebenaran Hukum I Faraday dengan membandingkan hasil pengamatan simulasi dengan perhitungan teoritis.</li>
+        <li>Menyimpulkan hubungan kuantitatif antara jumlah muatan listrik dengan massa zat hasil elektrolisis.</li>
+      </ul>
+    </div>
+    <div class="two-col">
+      <div class="card">
+        <div class="ch"><div class="ci g">🧠</div><div class="ct">Pengetahuan (Kognitif)</div></div>
+        <ul class="olist">
+          <li>Mampu menerapkan konsep reaksi oksidasi-reduksi dalam sel elektrokimia.</li>
+          <li>Mampu menganalisis pengaruh kuat arus dan waktu, serta menghitung massa endapan berdasarkan Hukum I Faraday.</li>
+        </ul>
+      </div>
+      <div class="card">
+        <div class="ch"><div class="ci o">🔧</div><div class="ct">Keterampilan (Psikomotorik)</div></div>
+        <ul class="olist">
+          <li>Mampu mengoperasikan simulasi laboratorium virtual sel elektrolisis dengan lancar.</li>
+          <li>Mampu mengumpulkan data pengamatan dan menyajikan kesimpulan secara sistematis dari simulasi secara akurat.</li>
+        </ul>
+      </div>
+    </div>
+    <div class="card">
+      <div class="ch"><div class="ci p">💡</div><div class="ct">Sikap (Afektif)</div></div>
+      <p>Murid menunjukkan sikap <strong style="color:var(--acc)">teliti, objektif, dan kritis</strong> dalam mengamati serta mencatat data hasil percobaan. Murid mampu membandingkan hasil simulasi dengan teori dan menarik kesimpulan ilmiah yang valid.</p>
+    </div>
+  </div>
+</div>
+
+<!-- ===== TEORI ===== -->
+<div id="page-teori" class="page">
+  <div class="inner-scroll" style="overflow:hidden;display:flex;flex-direction:column;justify-content:flex-start;padding:6px 10px 6px;">
+    <div class="card" style="margin-bottom:4px;padding:6px 10px;">
+      <div class="ch" style="margin-bottom:3px;"><div class="ci b">📖</div><div class="ct">Hukum I Faraday pada Sel Elektrolisis</div></div>
+      <img src="https://yulinestiyarum.github.io/hukumfaraday/teori.png" class="teori-img" alt="Ilustrasi Hukum I Faraday" onerror="this.style.display='none'" style="width:clamp(80px,12%,140px);margin:0 0 4px 10px;">
+      <p style="font-size:clamp(10px,1vw,12px);line-height:1.5;margin-bottom:2px;">Pada sel elektrolisis terjadi proses penguraian suatu elektrolit oleh arus listrik searah. <strong style="color:var(--acc)">Kation (ion positif)</strong> bergerak menuju <strong style="color:var(--acc)">katoda (kutub negatif)</strong> dan mengalami <strong>reduksi</strong>.</p>
+      <p style="font-size:clamp(10px,1vw,12px);line-height:1.5;margin-bottom:2px;"><strong style="color:var(--gold)">Michael Faraday</strong> menemukan hubungan kuantitatif antara jumlah arus listrik yang mengalir dengan massa zat yang dihasilkan pada elektroda, dikenal sebagai <strong style="color:var(--acc3)">Hukum I Faraday</strong>:</p>
+      <div class="formula" style="font-size:clamp(11px,1.3vw,14px);padding:5px 10px;margin:3px 0;"><em>"Massa zat yang diendapkan atau dibebaskan pada suatu elektroda berbanding lurus dengan jumlah muatan listrik yang mengalir ke dalam sel elektrolisis."</em></div>
+      <div style="clear:both;"></div>
+    </div>
+    <div class="two-col" style="gap:4px;margin-bottom:4px;">
+      <div class="card" style="padding:6px 10px;">
+        <div class="ch" style="margin-bottom:3px;"><div class="ci g">📐</div><div class="ct">Rumus Hukum I Faraday</div></div>
+        <div class="formula" style="font-size:clamp(14px,2vw,20px);font-weight:700;padding:5px 10px;margin:2px 0;">W = (e × i × t) / 96500</div>
+        <ul class="olist" style="margin-top:3px;">
+          <li style="padding:1px 0;font-size:clamp(9.5px,0.95vw,11.5px);"><strong style="color:var(--acc)">W</strong> = massa zat yang diendapkan (gram)</li>
+          <li style="padding:1px 0;font-size:clamp(9.5px,0.95vw,11.5px);"><strong style="color:var(--acc)">e</strong> = massa ekuivalen zat</li>
+          <li style="padding:1px 0;font-size:clamp(9.5px,0.95vw,11.5px);"><strong style="color:var(--acc)">i</strong> = kuat arus listrik (Ampere)</li>
+          <li style="padding:1px 0;font-size:clamp(9.5px,0.95vw,11.5px);"><strong style="color:var(--acc)">t</strong> = waktu elektrolisis (detik)</li>
+          <li style="padding:1px 0;font-size:clamp(9.5px,0.95vw,11.5px);"><strong style="color:var(--acc)">96500</strong> = konstanta Faraday (C/mol e⁻)</li>
+        </ul>
+      </div>
+      <div class="card" style="padding:6px 10px;">
+        <div class="ch" style="margin-bottom:3px;"><div class="ci o">⚖️</div><div class="ct">Massa Ekuivalen (e)</div></div>
+        <div class="formula" style="font-size:clamp(14px,2vw,20px);font-weight:700;padding:5px 10px;margin:2px 0;">e = Ar / n</div>
+        <ul class="olist" style="margin-top:3px;">
+          <li style="padding:1px 0;font-size:clamp(9.5px,0.95vw,11.5px);"><strong style="color:var(--acc)">Ar</strong> = massa atom relatif unsur logam</li>
+          <li style="padding:1px 0;font-size:clamp(9.5px,0.95vw,11.5px);"><strong style="color:var(--acc)">n</strong> = jumlah elektron yang terlibat (valensi)</li>
+        </ul>
+        <h4 style="margin-top:4px;margin-bottom:2px;font-size:10px;">Data Percobaan:</h4>
+        <ul class="olist">
+          <li style="padding:1px 0;font-size:clamp(9.5px,0.95vw,11.5px);">P1 – K⁺: Ar=39, n=1, <strong style="color:var(--acc3)">e=39</strong></li>
+          <li style="padding:1px 0;font-size:clamp(9.5px,0.95vw,11.5px);">P2 – Ca²⁺: Ar=40, n=2, <strong style="color:var(--acc3)">e=20</strong></li>
+          <li style="padding:1px 0;font-size:clamp(9.5px,0.95vw,11.5px);">P3 – Cu²⁺: Ar=63.5, n=2, <strong style="color:var(--acc3)">e=31.75</strong></li>
+          <li style="padding:1px 0;font-size:clamp(9.5px,0.95vw,11.5px);">P4 – Ag⁺: Ar=108, n=1, <strong style="color:var(--acc3)">e=108</strong></li>
+        </ul>
+      </div>
+    </div>
+    <div class="two-col" style="gap:4px;">
+      <div class="card" style="padding:6px 10px;">
+        <div class="ch" style="margin-bottom:3px;"><div class="ci b">🔋</div><div class="ct">Prinsip Sel Elektrolisis</div></div>
+        <p style="font-size:clamp(9.5px,0.95vw,11.5px);line-height:1.45;margin-bottom:2px;"><strong style="color:var(--red)">Anoda (+):</strong> reaksi oksidasi. Anion bergerak ke anoda.</p>
+        <p style="font-size:clamp(9.5px,0.95vw,11.5px);line-height:1.45;margin-bottom:2px;"><strong style="color:var(--acc)">Katoda (–):</strong> reaksi reduksi. Kation mengendap sebagai logam.</p>
+        <div class="rxn-box" style="font-size:clamp(9.5px,1vw,11px);padding:4px 8px;margin:2px 0;line-height:1.6;">Katoda: M<sup>n+</sup> + ne<sup>−</sup> → M(s)<br>Anoda: 2Cl<sup>−</sup> → Cl₂(g) + 2e<sup>−</sup></div>
+      </div>
+      <div class="card" style="padding:6px 10px;">
+        <div class="ch" style="margin-bottom:3px;"><div class="ci p">💡</div><div class="ct">Leburan vs Larutan</div></div>
+        <p style="font-size:clamp(9.5px,0.95vw,11.5px);line-height:1.45;margin-bottom:2px;"><strong style="color:var(--gold)">Leburan</strong> (P.1&2): Hanya ion dari garam. Kation logam pasti tereduksi di katoda.</p>
+        <p style="font-size:clamp(9.5px,0.95vw,11.5px);line-height:1.45;margin-bottom:2px;"><strong style="color:var(--acc3)">Larutan</strong> (P.3&4): Ada persaingan antara kation logam dan H₂O. Logam dengan E° reduksi lebih positif lebih mudah tereduksi.</p>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ===== ALAT & BAHAN ===== -->
+<div id="page-alatbahan" class="page">
+  <div class="inner-scroll">
+    <div class="card" style="margin-bottom:7px;">
+      <div class="ch"><div class="ci b">🔧</div><div class="ct">Daftar Alat</div></div>
+      <div class="eq-grid">
+        <div class="eq-item"><img src="https://yulinestiyarum.github.io/elektrolisis/baterai.png" alt="Baterai" onerror="this.src='';this.alt='🔋'"><strong>Sumber Arus DC</strong><span>Baterai / Power Supply</span></div>
+        <div class="eq-item"><img src="https://yulinestiyarum.github.io/selvolta/kabel.png" alt="Kabel" onerror="this.src='';this.alt='🔌'"><strong>Kabel Penghubung</strong><span>Merah (+) & Hitam (–)</span></div>
+        <div class="eq-item"><img src="https://yulinestiyarum.github.io/selvolta/pipau.png" alt="Pipa U" onerror="this.src='';this.alt='🧪'"><strong>Wadah Sel</strong><span>Pipa U</span></div>
+        <div class="eq-item"><img src="https://yulinestiyarum.github.io/selvolta/voltmeter.png" alt="Amperemeter" onerror="this.src='';this.alt='📊'"><strong>Amperemeter</strong><span>Mengukur kuat arus (i)</span></div>
+        <div class="eq-item"><img src="https://yulinestiyarum.github.io/hukumfaraday/stopwatch.png" alt="Stopwatch" onerror="this.src='';this.alt='⏱️'"><strong>Stopwatch</strong><span>Mengukur waktu (t)</span></div>
+        <div class="eq-item"><img src="https://yulinestiyarum.github.io/hukumfaraday/neraca.png" alt="Neraca" onerror="this.src='';this.alt='⚖️'"><strong>Neraca Analitik</strong><span>Menimbang massa elektroda</span></div>
+        <div class="eq-item"><img src="https://yulinestiyarum.github.io/hukumfaraday/cawan.png" alt="Cawan" onerror="this.src='';this.alt='🫙'"><strong>Cawan Krus</strong><span>Wadah leburan garam</span></div>
+        <div class="eq-item"><img src="https://yulinestiyarum.github.io/hukumfaraday/tungku.png" alt="Tungku" onerror="this.src='';this.alt='🔥'"><strong>Tungku Pemanas</strong><span>Furnace suhu tinggi</span></div>
+      </div>
+    </div>
+    <div class="two-col">
+      <div class="card">
+        <div class="ch"><div class="ci g">⚗️</div><div class="ct">Bahan Percobaan 1 &amp; 2</div></div>
+        <div class="eq-grid" style="grid-template-columns:repeat(auto-fill,minmax(110px,1fr));">
+          <div class="eq-item"><img src="https://yulinestiyarum.github.io/hukumfaraday/KCl.png" alt="KCl" onerror="this.src='';this.alt='🧂'"><strong>Kristal KCl</strong><span>Kalium Klorida (P.1)</span></div>
+          <div class="eq-item"><img src="https://yulinestiyarum.github.io/elektrolisis/grafit.png" alt="Grafit" onerror="this.src='';this.alt='✏️'"><strong>Grafit / C</strong><span>Elektroda (P.1)</span></div>
+          <div class="eq-item"><img src="https://yulinestiyarum.github.io/elektrolisis/CaCl2.png" alt="CaCl2" onerror="this.src='';this.alt='🧪'"><strong>Kristal CaCl₂</strong><span>Kalsium Klorida (P.2)</span></div>
+          <div class="eq-item"><img src="https://yulinestiyarum.github.io/elektrolisis/Pt.png" alt="Platina" onerror="this.src='';this.alt='⬜'"><strong>Logam Platina</strong><span>Elektroda Pt (P.2)</span></div>
+        </div>
+      </div>
+      <div class="card">
+        <div class="ch"><div class="ci o">🧪</div><div class="ct">Bahan Percobaan 3 &amp; 4</div></div>
+        <div class="eq-grid" style="grid-template-columns:repeat(auto-fill,minmax(110px,1fr));">
+          <div class="eq-item"><img src="https://yulinestiyarum.github.io/selvolta/CuSO4.png" alt="CuSO4" onerror="this.src='';this.alt='🔵'"><strong>Larutan CuSO₄</strong><span>Tembaga(II) Sulfat (P.3)</span></div>
+          <div class="eq-item"><img src="https://yulinestiyarum.github.io/hukumfaraday/tembaga.png" alt="Tembaga" onerror="this.src='';this.alt='🟤'"><strong>Logam Tembaga</strong><span>Elektroda Cu (P.3)</span></div>
+          <div class="eq-item"><img src="https://yulinestiyarum.github.io/selvolta/AgNO3.png" alt="AgNO3" onerror="this.src='';this.alt='⚗️'"><strong>Larutan AgNO₃</strong><span>Perak Nitrat (P.4)</span></div>
+          <div class="eq-item"><img src="https://yulinestiyarum.github.io/elektrolisis/grafit.png" alt="Grafit" onerror="this.src='';this.alt='✏️'"><strong>Grafit / C</strong><span>Elektroda (P.4)</span></div>
+        </div>
+      </div>
+    </div>
+    <div class="card">
+      <div class="ch"><div class="ci p">🧴</div><div class="ct">Bahan Pendukung</div></div>
+      <div class="eq-grid" style="grid-template-columns:repeat(auto-fill,minmax(110px,1fr));">
+        <div class="eq-item"><img src="https://yulinestiyarum.github.io/termokimia/aquades.png" alt="Aquades" onerror="this.src='';this.alt='💧'"><strong>Aquades</strong><span>Air suling, bilas elektroda</span></div>
+        <div class="eq-item"><img src="https://yulinestiyarum.github.io/hukumfaraday/tisu.png" alt="Tisu" onerror="this.src='';this.alt='🧻'"><strong>Tisu</strong><span>Keringkan elektroda</span></div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ===== PROSEDUR ===== -->
+<div id="page-prosedur" class="page">
+  <div style="padding:10px 14px 0;flex-shrink:0;">
+    <div class="ptabs">
+      <button class="ptab active" onclick="switchPtab(0,this)">Percobaan 1 – Leburan KCl</button>
+      <button class="ptab" onclick="switchPtab(1,this)">Percobaan 2 – Leburan CaCl₂</button>
+      <button class="ptab" onclick="switchPtab(2,this)">Percobaan 3 – Larutan CuSO₄</button>
+      <button class="ptab" onclick="switchPtab(3,this)">Percobaan 4 – Larutan AgNO₃</button>
+    </div>
+  </div>
+  <div class="inner-scroll" style="padding-top:4px;">
+    <div class="pcontent active" id="pc0">
+      <div class="card" style="margin-bottom:6px;">
+        <div class="ch"><div class="ci b">🔬</div><div class="ct">Percobaan 1: Elektrolisis Leburan KCl dengan Elektroda Grafit (C)</div></div>
+        <div class="steps-list">
+          <div class="step-item"><div class="snum">1</div><p>Pilih menu <strong>leburan</strong> pada virtual lab dan masukkan padatan <strong>Kalium Klorida (KCl)</strong> ke dalam wadah cawan krus.</p></div>
+          <div class="step-item"><div class="snum">2</div><p>Aktifkan <strong>tungku pemanas (furnace)</strong> hingga suhu mencapai titik lelehnya (~770°C) dan padatan KCl meleleh sepenuhnya.</p></div>
+          <div class="step-item"><div class="snum">3</div><p>Pasang sepasang <strong>elektroda Grafit (C)</strong> pada dudukan alat uji dan celupkan ke dalam leburan.</p></div>
+          <div class="step-item"><div class="snum">4</div><p>Hubungkan penjepit buaya: kabel kutub <strong style="color:var(--acc)">negatif (–)</strong> ke katoda, kabel kutub <strong style="color:var(--red)">positif (+)</strong> ke anoda.</p></div>
+          <div class="step-item"><div class="snum">5</div><p>Tentukan dan atur besaran <strong>kuat arus listrik (i)</strong> pada panel amperemeter serta <strong>waktu elektrolisis (t)</strong> pada stopwatch.</p></div>
+          <div class="step-item"><div class="snum">6</div><p>Nyalakan catu daya. Amati perubahan di area <strong>katoda</strong> (endapan logam K) dan <strong>anoda</strong> (gas Cl₂) selama arus dialirkan.</p></div>
+          <div class="step-item"><div class="snum">7</div><p>Setelah waktu yang ditentukan habis, <strong>matikan catu daya</strong>.</p></div>
+          <div class="step-item"><div class="snum">8</div><p>Angkat katoda, lakukan simulasi pembersihan, lalu <strong>timbang di neraca analitik</strong> untuk mencatat massa akhir Katoda.</p></div>
+        </div>
+      </div>
+    </div>
+    <div class="pcontent" id="pc1">
+      <div class="card">
+        <div class="ch"><div class="ci o">🔬</div><div class="ct">Percobaan 2: Elektrolisis Leburan CaCl₂ dengan Elektroda Platina (Pt)</div></div>
+        <div class="steps-list">
+          <div class="step-item"><div class="snum">1</div><p>Masukkan padatan <strong>Kalsium Klorida (CaCl₂)</strong> ke dalam cawan krus.</p></div>
+          <div class="step-item"><div class="snum">2</div><p>Nyalakan pemanas (furnace) hingga padatan CaCl₂ berubah bentuk seluruhnya menjadi fase <strong>leburan</strong> (~772°C).</p></div>
+          <div class="step-item"><div class="snum">3</div><p>Pasang sepasang <strong>elektroda Platina (Pt)</strong> dan celupkan ke dalam leburan tersebut.</p></div>
+          <div class="step-item"><div class="snum">4</div><p>Rangkai sirkuit: kutub <strong style="color:var(--acc)">negatif</strong> → katoda (Pt), kutub <strong style="color:var(--red)">positif</strong> → anoda (Pt).</p></div>
+          <div class="step-item"><div class="snum">5</div><p>Atur besaran <strong>kuat arus (i)</strong> dan <strong>durasi waktu (t)</strong> yang diinginkan untuk percobaan ini.</p></div>
+          <div class="step-item"><div class="snum">6</div><p>Mulai reaksi elektrolisis dengan menyalakan catu daya. Amati endapan <strong>logam Ca</strong> di katoda dan <strong>gas Cl₂</strong> di anoda.</p></div>
+          <div class="step-item"><div class="snum">7</div><p>Setelah durasi stopwatch selesai, matikan alat dan angkat katoda Platina dari leburan.</p></div>
+          <div class="step-item"><div class="snum">8</div><p>Timbang katoda pada neraca analitik untuk mendapatkan data <strong>massa akhir Katoda</strong>.</p></div>
+        </div>
+      </div>
+    </div>
+    <div class="pcontent" id="pc2">
+      <div class="card">
+        <div class="ch"><div class="ci g">🔬</div><div class="ct">Percobaan 3: Elektrolisis Larutan CuSO₄ dengan Elektroda Tembaga (Cu)</div></div>
+        <div class="steps-list">
+          <div class="step-item"><div class="snum">1</div><p>Pilih menu <strong>larutan</strong> dan tuangkan <strong>larutan Tembaga(II) Sulfat (CuSO₄)</strong> ke dalam Pipa U.</p></div>
+          <div class="step-item"><div class="snum">2</div><p>Celupkan sepasang <strong>elektroda Tembaga (Cu)</strong> ke dalam larutan tersebut pada kedua sisi pipa.</p></div>
+          <div class="step-item"><div class="snum">3</div><p>Rangkai sirkuit listrik: elektroda Cu pertama ke kutub <strong style="color:var(--acc)">negatif (–)</strong> sebagai katoda, elektroda Cu kedua ke kutub <strong style="color:var(--red)">positif (+)</strong> sebagai anoda.</p></div>
+          <div class="step-item"><div class="snum">4</div><p>Tentukan <strong>kuat arus (i)</strong> dan <strong>durasi percobaan (t)</strong> pada panel kontrol catu daya.</p></div>
+          <div class="step-item"><div class="snum">5</div><p>Nyalakan catu daya. Amati terbentuknya <strong>endapan Cu</strong> (merah kecokelatan) pada permukaan katoda.</p></div>
+          <div class="step-item"><div class="snum">6</div><p>Setelah aliran listrik dihentikan, angkat katoda Cu dari dalam pipa.</p></div>
+          <div class="step-item"><div class="snum">7</div><p>Lakukan prosedur bilas dengan <strong>aquades</strong> dan keringkan dengan <strong>tisu</strong> secara virtual.</p></div>
+          <div class="step-item"><div class="snum">8</div><p>Timbang katoda di neraca analitik, catat <strong>massa akhir Katoda</strong> yang tertera.</p></div>
+        </div>
+      </div>
+    </div>
+    <div class="pcontent" id="pc3">
+      <div class="card">
+        <div class="ch"><div class="ci p">🔬</div><div class="ct">Percobaan 4: Elektrolisis Larutan AgNO₃ dengan Elektroda Grafit (C)</div></div>
+        <div class="steps-list">
+          <div class="step-item"><div class="snum">1</div><p>Tuangkan <strong>larutan Perak Nitrat (AgNO₃)</strong> ke dalam pipa U / gelas kimia.</p></div>
+          <div class="step-item"><div class="snum">2</div><p>Pasang dan celupkan sepasang <strong>elektroda Grafit (C)</strong> ke dalam larutan pada kedua sisi.</p></div>
+          <div class="step-item"><div class="snum">3</div><p>Hubungkan kabel sirkuit: kutub <strong style="color:var(--acc)">negatif</strong> → elektroda C (katoda), kutub <strong style="color:var(--red)">positif</strong> → elektroda C lainnya (anoda).</p></div>
+          <div class="step-item"><div class="snum">4</div><p>Masukkan nilai <strong>kuat arus listrik (i)</strong> dan atur <strong>waktu (t)</strong> pada panel kontrol catu daya.</p></div>
+          <div class="step-item"><div class="snum">5</div><p>Nyalakan sumber arus. Perhatikan <strong>endapan perak</strong> (Ag, warna putih perak) yang mulai melapisi permukaan katoda grafit.</p></div>
+          <div class="step-item"><div class="snum">6</div><p>Matikan catu daya ketika batas <strong>waktu elektrolisis</strong> telah tercapai.</p></div>
+          <div class="step-item"><div class="snum">7</div><p>Angkat katoda grafit, lakukan simulasi <strong>pembilasan</strong> (aquades) dan <strong>pengeringan</strong> (tisu) elektroda.</p></div>
+          <div class="step-item"><div class="snum">8</div><p>Timbang elektroda pada neraca analitik untuk mengetahui <strong>massa akhir katoda</strong>.</p></div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ===== SIMULASI ===== -->
+<div id="page-simulasi" class="page">
+  <div style="padding:8px 12px 0 12px;flex-shrink:0;">
+    <div class="ptabs" id="expTabs">
+      <button class="ptab active" onclick="switchExp(0,this)">⚗️ P.1 – Leburan KCl</button>
+      <button class="ptab" onclick="switchExp(1,this)">🔥 P.2 – Leburan CaCl₂</button>
+      <button class="ptab" onclick="switchExp(2,this)">💧 P.3 – Larutan CuSO₄</button>
+      <button class="ptab" onclick="switchExp(3,this)">✨ P.4 – Larutan AgNO₃</button>
+    </div>
+  </div>
+  <div style="flex:1;padding:0 12px 8px;min-height:0;display:flex;flex-direction:column;">
+    <div class="sim-layout">
+      <!-- LEFT CTRL -->
+      <div class="sim-ctrl">
+        <div class="sim-ctrl-title" id="expTitle">Percobaan 1: Leburan KCl</div>
+        <div class="ctrl-group">
+          <div class="ctrl-label">Kuat Arus (i)</div>
+          <input type="range" id="sliderI" min="0.5" max="3" step="0.1" value="1.0" oninput="updateCtrl()">
+          <div style="display:flex;justify-content:space-between;align-items:center;">
+            <span style="font-size:10px;color:var(--text3)">0.5 A</span>
+            <span class="ctrl-val" id="valI">1.0 A</span>
+            <span style="font-size:10px;color:var(--text3)">3.0 A</span>
+          </div>
+        </div>
+        <div class="ctrl-group">
+          <div class="ctrl-label">Waktu (t)</div>
+          <input type="range" id="sliderT" min="60" max="600" step="30" value="120" oninput="updateCtrl()">
+          <div style="display:flex;justify-content:space-between;align-items:center;">
+            <span style="font-size:10px;color:var(--text3)">1 min</span>
+            <span class="ctrl-val" id="valT">120 s</span>
+            <span style="font-size:10px;color:var(--text3)">10 min</span>
+          </div>
+        </div>
+        <button class="btn-sim btn-sim-start" id="btnStart" onclick="startSim()">▶ Mulai Elektrolisis</button>
+        <button class="btn-sim btn-sim-stop" id="btnStop" onclick="stopSim()" disabled>⏹ Hentikan</button>
+        <button class="btn-sim btn-sim-reset" id="btnReset" onclick="resetSim()">↺ Reset</button>
+        <div class="data-box">
+          <div class="data-box-title">📊 Data Pengamatan</div>
+          <div class="data-row"><span class="data-lbl">Arus (i)</span><span class="data-val" id="dI">–</span></div>
+          <div class="data-row"><span class="data-lbl">Waktu (t)</span><span class="data-val" id="dT">–</span></div>
+          <div class="data-row"><span class="data-lbl">Masa Awal Katoda</span><span class="data-val" id="dM0">–</span></div>
+          <div class="data-row"><span class="data-lbl">Massa Akhir Katoda</span><span class="data-val green" id="dM1">–</span></div>
+          <div class="data-row"><span class="data-lbl">Δ Massa (Eksp.)</span><span class="data-val green" id="dDelta">–</span></div>
+          <div class="data-row"><span class="data-lbl">Δ Massa (Teoritis)</span><span class="data-val" id="dTeori">–</span></div>
+        </div>
+        <div class="ctrl-label" style="margin-top:2px;">Status</div>
+        <div id="simStatus" style="font-size:11px;color:var(--text3);padding:5px 8px;background:var(--surf2);border-radius:6px;border:1px solid var(--border);">Siap melakukan percobaan</div>
+        <div class="timer-bar-wrap"><div class="timer-bar" id="timerBar" style="width:0%"></div></div>
+      </div>
+      <!-- RIGHT CANVAS -->
+      <div class="sim-canvas-wrap">
+        <div class="sim-canvas-header">
+          <div class="sim-canvas-title" id="simCanvasTitle">Sel Elektrolisis</div>
+          <div class="sim-status" id="simStatusDot">● Idle</div>
+        </div>
+        <div class="sim-canvas-body">
+          <canvas id="simCanvas"></canvas>
+          <div class="sim-data-panel">
+            <div class="step-guide">
+              <div class="step-guide-title">Langkah Percobaan</div>
+              <div id="stepGuide"></div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ===== DISKUSI ===== -->
+<div id="page-diskusi" class="page">
+  <div class="inner-scroll" style="overflow:hidden;display:flex;flex-direction:column;padding:6px 10px 6px;">
+    <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:4px;flex-shrink:0;">
+      <div class="note-info" style="margin:0;flex:1;padding:4px 10px;"><p style="font-size:10.5px;margin:0;">✏️ Jawablah pertanyaan diskusi berikut berdasarkan hasil simulasi. Klik <strong>Simpan</strong> untuk menyimpan jawaban secara lokal.</p></div>
+      <button class="btn-save" onclick="downloadDiskusiPDF()" style="margin-left:8px;background:linear-gradient(135deg,rgba(255,107,53,.2),rgba(255,150,53,.15));border-color:rgba(255,107,53,.4);color:var(--warn);padding:6px 16px;white-space:nowrap;flex-shrink:0;">📄 Unduh PDF</button>
+    </div>
+    <div style="display:grid;grid-template-columns:1fr 1fr;grid-template-rows:1fr 1fr;gap:5px;flex:1;min-height:0;">
+      <div class="disc-q" style="margin:0;padding:7px 10px;display:flex;flex-direction:column;overflow:hidden;">
+        <div class="disc-q-num" style="margin-bottom:2px;">DISKUSI 01</div>
+        <div class="disc-q-text" style="font-size:clamp(9.5px,1vw,11.5px);line-height:1.45;margin-bottom:4px;">Tuliskan persamaan setengah reaksi <strong>reduksi</strong> di <strong>katoda</strong> dan <strong>oksidasi</strong> di <strong>anoda</strong> untuk masing-masing zat uji (KCl leburan, CaCl₂ leburan, CuSO₄ larutan, AgNO₃ larutan)!</div>
+        <textarea class="disc-textarea" id="ans1" placeholder="Tuliskan jawaban..." style="flex:1;height:auto;min-height:0;font-size:11px;"></textarea>
+        <div class="disc-actions" style="margin-top:3px;">
+          <button class="btn-save" onclick="saveAns(1)" style="padding:3px 10px;font-size:10px;">💾 Simpan</button>
+          <span class="save-toast" id="toast1">✅ Tersimpan!</span>
+        </div>
+      </div>
+      <div class="disc-q" style="margin:0;padding:7px 10px;display:flex;flex-direction:column;overflow:hidden;">
+        <div class="disc-q-num" style="margin-bottom:2px;">DISKUSI 02</div>
+        <div class="disc-q-text" style="font-size:clamp(9.5px,1vw,11.5px);line-height:1.45;margin-bottom:4px;">Analisislah mengapa spesi yang tereduksi pada katoda di percobaan <strong>larutan</strong> (P.3 &amp; P.4) berbeda perilakunya dibandingkan logam alkali/alkali tanah, hubungkan dengan <strong>E°</strong>!</div>
+        <textarea class="disc-textarea" id="ans2" placeholder="Tuliskan jawaban..." style="flex:1;height:auto;min-height:0;font-size:11px;"></textarea>
+        <div class="disc-actions" style="margin-top:3px;">
+          <button class="btn-save" onclick="saveAns(2)" style="padding:3px 10px;font-size:10px;">💾 Simpan</button>
+          <span class="save-toast" id="toast2">✅ Tersimpan!</span>
+        </div>
+      </div>
+      <div class="disc-q" style="margin:0;padding:7px 10px;display:flex;flex-direction:column;overflow:hidden;">
+        <div class="disc-q-num" style="margin-bottom:2px;">DISKUSI 03</div>
+        <div class="disc-q-text" style="font-size:clamp(9.5px,1vw,11.5px);line-height:1.45;margin-bottom:4px;">Bagaimana kecenderungan massa endapan logam ketika <strong>kuat arus (i) diperbesar</strong> pada waktu tetap? Apa yang terjadi jika <strong>waktu (t) diperpanjang</strong> dengan arus konstan? Jelaskan berdasarkan pergerakan elektron!</div>
+        <textarea class="disc-textarea" id="ans3" placeholder="Tuliskan jawaban..." style="flex:1;height:auto;min-height:0;font-size:11px;"></textarea>
+        <div class="disc-actions" style="margin-top:3px;">
+          <button class="btn-save" onclick="saveAns(3)" style="padding:3px 10px;font-size:10px;">💾 Simpan</button>
+          <span class="save-toast" id="toast3">✅ Tersimpan!</span>
+        </div>
+      </div>
+      <div class="disc-q" style="margin:0;padding:7px 10px;display:flex;flex-direction:column;overflow:hidden;">
+        <div class="disc-q-num" style="margin-bottom:2px;">DISKUSI 04</div>
+        <div class="disc-q-text" style="font-size:clamp(9.5px,1vw,11.5px);line-height:1.45;margin-bottom:4px;">Bandingkan <strong>Massa Endapan Eksperimen</strong> dengan <strong>Massa Endapan Teoritis</strong>. Apakah berkesesuaian? Jika di lab nyata massa eksperimen lebih kecil dari teoritis, diskusikan faktor teknisnya!</div>
+        <textarea class="disc-textarea" id="ans4" placeholder="Tuliskan jawaban..." style="flex:1;height:auto;min-height:0;font-size:11px;"></textarea>
+        <div class="disc-actions" style="margin-top:3px;">
+          <button class="btn-save" onclick="saveAns(4)" style="padding:3px 10px;font-size:10px;">💾 Simpan</button>
+          <span class="save-toast" id="toast4">✅ Tersimpan!</span>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+</div><!-- #app -->
+
+<script>
+// =========================================================
+// NAVIGATION
+// =========================================================
+function show(id, btn) {
+  document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
+  document.getElementById('page-'+id).classList.add('active');
+  document.querySelectorAll('.nb').forEach(b => b.classList.remove('active'));
+  if (btn) btn.classList.add('active');
+  else {
+    document.querySelectorAll('.nb').forEach(b => {
+      if (b.getAttribute('onclick') && b.getAttribute('onclick').includes("'"+id+"'")) b.classList.add('active');
+    });
+  }
+  playClick();
+  if (id === 'simulasi') initCanvas();
+}
+
+function switchPtab(i, btn) {
+  document.querySelectorAll('#page-prosedur .ptab').forEach(b=>b.classList.remove('active'));
+  document.querySelectorAll('.pcontent').forEach(c=>c.classList.remove('active'));
+  btn.classList.add('active');
+  document.getElementById('pc'+i).classList.add('active');
+  playClick();
+}
+
+function switchExp(i, btn) {
+  document.querySelectorAll('#expTabs .ptab').forEach(b=>b.classList.remove('active'));
+  btn.classList.add('active');
+  currentExp = i;
+  resetSim();
+  updateExpUI();
+  playClick();
+}
+
+// =========================================================
+// AUDIO ENGINE (Web Audio API)
+// =========================================================
+let audioCtx = null;
+function getAudioCtx() {
+  if (!audioCtx) audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+  return audioCtx;
+}
+
+function playClick() {
+  try {
+    const ctx = getAudioCtx();
+    const o = ctx.createOscillator(); const g = ctx.createGain();
+    o.connect(g); g.connect(ctx.destination);
+    o.frequency.value = 800; o.type = 'sine';
+    g.gain.setValueAtTime(0.06, ctx.currentTime);
+    g.gain.exponentialRampToValueAtTime(0.001, ctx.currentTime + 0.08);
+    o.start(); o.stop(ctx.currentTime + 0.08);
+  } catch(e){}
+}
+
+function playChime() {
+  try {
+    const ctx = getAudioCtx();
+    [523, 659, 784, 1047].forEach((freq, i) => {
+      const o = ctx.createOscillator(); const g = ctx.createGain();
+      o.connect(g); g.connect(ctx.destination);
+      o.frequency.value = freq; o.type = 'sine';
+      const t = ctx.currentTime + i * 0.12;
+      g.gain.setValueAtTime(0, t);
+      g.gain.linearRampToValueAtTime(0.15, t + 0.03);
+      g.gain.exponentialRampToValueAtTime(0.001, t + 0.4);
+      o.start(t); o.stop(t + 0.4);
+    });
+  } catch(e){}
+}
+
+function playCrystalPour() {
+  try {
+    const ctx = getAudioCtx();
+    const dur = 1.8;
+    const buf = ctx.createBuffer(1, ctx.sampleRate * dur, ctx.sampleRate);
+    const data = buf.getChannelData(0);
+    for (let i = 0; i < data.length; i++) {
+      const env = i < ctx.sampleRate * 0.3 ? i / (ctx.sampleRate * 0.3) : Math.exp(-(i - ctx.sampleRate * 0.3) / (ctx.sampleRate * 0.6));
+      data[i] = (Math.random() * 2 - 1) * env * 0.35;
+    }
+    const src = ctx.createBufferSource();
+    src.buffer = buf;
+    const filt = ctx.createBiquadFilter();
+    filt.type = 'bandpass'; filt.frequency.value = 4000; filt.Q.value = 2;
+    const g = ctx.createGain(); g.gain.value = 0.8;
+    src.connect(filt); filt.connect(g); g.connect(ctx.destination);
+    src.start(); src.stop(ctx.currentTime + dur);
+  } catch(e){}
+}
+
+function playFurnaceOn() {
+  try {
+    const ctx = getAudioCtx();
+    const o = ctx.createOscillator(); const g = ctx.createGain();
+    const filt = ctx.createBiquadFilter();
+    o.type = 'sawtooth'; o.frequency.value = 60;
+    filt.type = 'lowpass'; filt.frequency.value = 300;
+    o.connect(filt); filt.connect(g); g.connect(ctx.destination);
+    g.gain.setValueAtTime(0, ctx.currentTime);
+    g.gain.linearRampToValueAtTime(0.12, ctx.currentTime + 0.5);
+    g.gain.linearRampToValueAtTime(0, ctx.currentTime + 2.5);
+    o.start(); o.stop(ctx.currentTime + 2.5);
+  } catch(e){}
+}
+
+let electricNode = null, electricGain = null;
+function startElectricSound() {
+  try {
+    const ctx = getAudioCtx();
+    electricNode = ctx.createOscillator(); electricGain = ctx.createGain();
+    const filt = ctx.createBiquadFilter();
+    electricNode.type = 'sawtooth'; electricNode.frequency.value = 50;
+    filt.type = 'bandpass'; filt.frequency.value = 200; filt.Q.value = 3;
+    electricNode.connect(filt); filt.connect(electricGain); electricGain.connect(ctx.destination);
+    electricGain.gain.value = 0.04;
+    electricNode.start();
+  } catch(e){}
+}
+
+function stopElectricSound() {
+  try { if (electricGain) electricGain.gain.setValueAtTime(0, getAudioCtx().currentTime); } catch(e){}
+  try { if (electricNode) { electricNode.stop(); electricNode = null; } } catch(e){}
+}
+
+function playBubble() {
+  try {
+    const ctx = getAudioCtx();
+    const o = ctx.createOscillator(); const g = ctx.createGain();
+    o.connect(g); g.connect(ctx.destination);
+    o.frequency.setValueAtTime(600 + Math.random()*400, ctx.currentTime);
+    o.frequency.exponentialRampToValueAtTime(200, ctx.currentTime + 0.12);
+    o.type = 'sine';
+    g.gain.setValueAtTime(0.08, ctx.currentTime);
+    g.gain.exponentialRampToValueAtTime(0.001, ctx.currentTime + 0.12);
+    o.start(); o.stop(ctx.currentTime + 0.13);
+  } catch(e){}
+}
+
+function playSuccess() {
+  try {
+    const ctx = getAudioCtx();
+    [784, 988, 1175, 1568].forEach((f, i) => {
+      const o = ctx.createOscillator(); const g = ctx.createGain();
+      o.connect(g); g.connect(ctx.destination);
+      o.frequency.value = f; o.type = 'sine';
+      const t = ctx.currentTime + i * 0.1;
+      g.gain.setValueAtTime(0.12, t);
+      g.gain.exponentialRampToValueAtTime(0.001, t + 0.35);
+      o.start(t); o.stop(t + 0.35);
+    });
+  } catch(e){}
+}
+
+function playWeigh() {
+  try {
+    const ctx = getAudioCtx();
+    const o = ctx.createOscillator(); const g = ctx.createGain();
+    o.connect(g); g.connect(ctx.destination);
+    o.frequency.value = 440; o.type = 'sine';
+    g.gain.setValueAtTime(0.1, ctx.currentTime);
+    g.gain.exponentialRampToValueAtTime(0.001, ctx.currentTime + 0.6);
+    o.start(); o.stop(ctx.currentTime + 0.6);
+  } catch(e){}
+}
+
+function playPour() {
+  try {
+    const ctx = getAudioCtx();
+    const dur = 1.2;
+    const buf = ctx.createBuffer(1, ctx.sampleRate * dur, ctx.sampleRate);
+    const d = buf.getChannelData(0);
+    for (let i = 0; i < d.length; i++) {
+      d[i] = (Math.random()*2-1) * Math.min(1, i/(ctx.sampleRate*0.2)) * Math.exp(-i/(ctx.sampleRate*0.5)) * 0.4;
+    }
+    const src = ctx.createBufferSource(); src.buffer = buf;
+    const f = ctx.createBiquadFilter(); f.type='lowpass'; f.frequency.value=800;
+    const g = ctx.createGain(); g.gain.value=0.9;
+    src.connect(f); f.connect(g); g.connect(ctx.destination);
+    src.start();
+  } catch(e){}
+}
+
+// =========================================================
+// SIMULATION ENGINE
+// =========================================================
+let currentExp = 0;
+let simRunning = false;
+let simTimer = null;
+let simAnimFrame = null;
+let simElapsed = 0;
+let simDuration = 120;
+let simCurrent = 1.0;
+let simStep = 0; // 0=idle,1=pour,2=heat,3=electrode,4=wire,5=ready,6=running,7=done
+let particles = [];
+let bubbles = [];
+let depositAmt = 0;
+let heatWave = 0;
+let meltProgress = 0;
+let massInitial = 0;
+
+const expConfig = [
+  { name:'Percobaan 1', sub:'Leburan KCl + Grafit', type:'melt', e:39, n:1, metal:'K', color:'#c8c0b0', solColor:'#ffdd88', cathodeMat:'Grafit (C)', anodeMat:'Grafit (C)', anodeGas:'Cl₂', cathodeDeposit:'K(s)', meltColor:'#ffd060', steps:['Masukkan padatan KCl ke cawan krus','Aktifkan tungku pemanas (~770°C)','Pasang elektroda Grafit (C)','Hubungkan kabel (+ anoda, − katoda)','Atur kuat arus (i) dan waktu (t)','Nyalakan catu daya','Hentikan elektrolisis','Timbang katoda di neraca analitik'] },
+  { name:'Percobaan 2', sub:'Leburan CaCl₂ + Platina', type:'melt', e:20, n:2, metal:'Ca', color:'#dddddd', solColor:'#fff4e0', cathodeMat:'Platina (Pt)', anodeMat:'Platina (Pt)', anodeGas:'Cl₂', cathodeDeposit:'Ca(s)', meltColor:'#ffe8a0', steps:['Masukkan padatan CaCl₂ ke cawan krus','Nyalakan tungku pemanas (~772°C)','Pasang elektroda Platina (Pt)','Hubungkan kabel (+ anoda, − katoda)','Atur kuat arus (i) dan waktu (t)','Nyalakan catu daya','Hentikan elektrolisis','Timbang katoda di neraca analitik'] },
+  { name:'Percobaan 3', sub:'Larutan CuSO₄ + Tembaga', type:'solution', e:31.75, n:2, metal:'Cu', color:'#b87333', solColor:'#2255cc', cathodeMat:'Tembaga (Cu)', anodeMat:'Tembaga (Cu)', anodeGas:'Cu²⁺', cathodeDeposit:'Cu(s)', solutionHue:'rgba(30,90,200,0.55)', steps:['Tuangkan larutan CuSO₄ ke Pipa U','Pasang elektroda Tembaga (Cu)','Hubungkan kabel (+ anoda, − katoda)','Atur kuat arus (i) dan waktu (t)','Nyalakan catu daya','Hentikan elektrolisis','Bilas aquades, keringkan tisu','Timbang katoda di neraca analitik'] },
+  { name:'Percobaan 4', sub:'Larutan AgNO₃ + Grafit', type:'solution', e:108, n:1, metal:'Ag', color:'#e8e8e8', solColor:'#f0f0ff', cathodeMat:'Grafit (C)', anodeMat:'Grafit (C)', anodeGas:'O₂', cathodeDeposit:'Ag(s)', solutionHue:'rgba(200,200,255,0.35)', steps:['Tuangkan larutan AgNO₃ ke Pipa U','Pasang elektroda Grafit (C)','Hubungkan kabel (+ anoda, − katoda)','Atur kuat arus (i) dan waktu (t)','Nyalakan catu daya','Hentikan elektrolisis','Bilas aquades, keringkan tisu','Timbang katoda di neraca analitik'] },
+];
+
+const titles = ['Percobaan 1: Leburan KCl','Percobaan 2: Leburan CaCl₂','Percobaan 3: Larutan CuSO₄','Percobaan 4: Larutan AgNO₃'];
+
+function updateExpUI() {
+  const cfg = expConfig[currentExp];
+  document.getElementById('expTitle').textContent = cfg.name + ': ' + cfg.sub;
+  document.getElementById('simCanvasTitle').textContent = titles[currentExp];
+  renderStepGuide();
+}
+
+function updateCtrl() {
+  const i = parseFloat(document.getElementById('sliderI').value);
+  const t = parseInt(document.getElementById('sliderT').value);
+  document.getElementById('valI').textContent = i.toFixed(1) + ' A';
+  document.getElementById('valT').textContent = t + ' s';
+}
+
+function renderStepGuide() {
+  const cfg = expConfig[currentExp];
+  let html = '';
+  cfg.steps.forEach((s, i) => {
+    const st = i < simStep ? 'done' : i === simStep ? 'current' : 'pending';
+    const icon = st === 'done' ? '✓' : st === 'current' ? '▶' : (i+1);
+    html += `<div class="sg-item ${st}"><div class="sg-num">${icon}</div><div class="sg-text">${s}</div></div>`;
+  });
+  document.getElementById('stepGuide').innerHTML = html;
+}
+
+function setStatus(msg, cls) {
+  const el = document.getElementById('simStatus');
+  el.textContent = msg;
+  el.style.color = cls === 'green' ? 'var(--green)' : cls === 'warn' ? 'var(--warn)' : cls === 'acc' ? 'var(--acc)' : 'var(--text3)';
+  const dot = document.getElementById('simStatusDot');
+  dot.textContent = cls === 'green' ? '● Running' : cls === 'acc' ? '● Processing' : '● Idle';
+  dot.style.color = cls === 'green' ? 'var(--green)' : cls === 'acc' ? 'var(--acc)' : 'var(--text3)';
+  dot.className = 'sim-status' + (cls === 'green' ? ' running' : '');
+}
+
+let canvas, ctx2d;
+function initCanvas() {
+  canvas = document.getElementById('simCanvas');
+  if (!canvas) return;
+  const body = canvas.parentElement;
+  canvas.width = body.offsetWidth - 165;
+  canvas.height = body.offsetHeight;
+  ctx2d = canvas.getContext('2d');
+  if (!simAnimFrame) animLoop();
+}
+
+let animT = 0;
+function animLoop() {
+  animT++;
+  heatWave = (heatWave + 1) % 60;
+  
+  if (!canvas || !ctx2d) { simAnimFrame = requestAnimationFrame(animLoop); return; }
+  
+  const W = canvas.width, H = canvas.height;
+  const cfg = expConfig[currentExp];
+  
+  ctx2d.clearRect(0,0,W,H);
+  
+  // Background
+  const bg = ctx2d.createLinearGradient(0,0,0,H);
+  bg.addColorStop(0,'#030a14'); bg.addColorStop(1,'#060f1e');
+  ctx2d.fillStyle = bg; ctx2d.fillRect(0,0,W,H);
+  
+  // Lab table surface
+  ctx2d.fillStyle = '#0e1c30'; ctx2d.fillRect(0, H*0.72, W, H*0.28);
+  ctx2d.fillStyle = '#162540'; ctx2d.fillRect(0, H*0.72, W, 3);
+  
+  // Grid lines
+  ctx2d.strokeStyle = 'rgba(0,200,255,0.04)';
+  for (let x=0;x<W;x+=40){ctx2d.beginPath();ctx2d.moveTo(x,0);ctx2d.lineTo(x,H);ctx2d.stroke();}
+  for (let y=0;y<H;y+=40){ctx2d.beginPath();ctx2d.moveTo(0,y);ctx2d.lineTo(W,y);ctx2d.stroke();}
+  
+  if (cfg.type === 'melt') drawMeltExperiment(W, H, cfg);
+  else drawSolutionExperiment(W, H, cfg);
+  
+  // Particles (falling crystals)
+  updateParticles(W, H);
+  
+  // Bubbles
+  updateBubbles(W, H, cfg);
+  
+  simAnimFrame = requestAnimationFrame(animLoop);
+}
+
+function drawMeltExperiment(W, H, cfg) {
+  const cx = W * 0.5;
+  const tableY = H * 0.72;
+  
+  // FURNACE
+  if (simStep >= 1) {
+    const fx = cx - 110, fy = tableY - 110, fw = 220, fh = 100;
+    // Furnace body
+    const fg = ctx2d.createLinearGradient(fx, fy, fx, fy+fh);
+    fg.addColorStop(0, simStep >= 2 ? '#5a1500' : '#2a1a0a');
+    fg.addColorStop(1, simStep >= 2 ? '#1a0500' : '#100c05');
+    ctx2d.fillStyle = fg; ctx2d.beginPath();
+    ctx2d.roundRect(fx, fy, fw, fh, 8); ctx2d.fill();
+    ctx2d.strokeStyle = simStep >= 2 ? 'rgba(255,100,0,.6)' : 'rgba(100,60,20,.4)';
+    ctx2d.lineWidth = 1.5; ctx2d.beginPath();
+    ctx2d.roundRect(fx, fy, fw, fh, 8); ctx2d.stroke();
+    
+    // Furnace opening (top)
+    ctx2d.fillStyle = simStep >= 2 ? '#ff5500' : '#1a1005';
+    ctx2d.beginPath(); ctx2d.ellipse(cx, fy+5, 68, 15, 0, 0, Math.PI*2); ctx2d.fill();
+    
+    // Heat glow when active
+    if (simStep >= 2) {
+      const glow = ctx2d.createRadialGradient(cx, fy, 0, cx, fy, 80);
+      glow.addColorStop(0, `rgba(255,150,0,${0.12 + 0.05*Math.sin(animT*0.1)})`);
+      glow.addColorStop(1, 'rgba(255,100,0,0)');
+      ctx2d.fillStyle = glow; ctx2d.fillRect(cx-110, fy-70, 220, 120);
+      
+      // Heat waves
+      for (let i=0;i<5;i++) {
+        const waveX = cx - 40 + i*20;
+        const waveY = fy - 10 - ((animT*1.5 + i*12) % 50);
+        const opacity = 1 - ((animT*1.5 + i*12) % 50)/50;
+        ctx2d.strokeStyle = `rgba(255,150,0,${opacity*0.4})`;
+        ctx2d.lineWidth = 1; ctx2d.beginPath();
+        ctx2d.moveTo(waveX, waveY+10);
+        ctx2d.quadraticCurveTo(waveX+8, waveY, waveX, waveY-10); ctx2d.stroke();
+      }
+    }
+    
+    // Furnace legs
+    ctx2d.fillStyle = '#1a1a2a';
+    ctx2d.fillRect(fx+10, fy+fh, 15, 10); ctx2d.fillRect(fx+fw-25, fy+fh, 15, 10);
+  }
+  
+  // CRUCIBLE (cawan krus) - on top of furnace
+  const crucY = simStep >= 1 ? H*0.72-110-45 : H*0.72-45;
+  const crucW = 130, crucH = 55;
+  const crucX = cx - crucW/2;
+  
+  // Draw crucible
+  ctx2d.fillStyle = '#2a2a3a';
+  ctx2d.beginPath();
+  ctx2d.moveTo(crucX, crucY);
+  ctx2d.lineTo(crucX+crucW, crucY);
+  ctx2d.lineTo(crucX+crucW-18, crucY+crucH);
+  ctx2d.lineTo(crucX+18, crucY+crucH);
+  ctx2d.closePath(); ctx2d.fill();
+  ctx2d.strokeStyle = '#556688'; ctx2d.lineWidth = 1.5;
+  ctx2d.stroke();
+  
+  // Crucible rim
+  ctx2d.fillStyle = '#3a3a4a';
+  ctx2d.beginPath(); ctx2d.ellipse(cx, crucY, crucW/2+3, 9, 0, 0, Math.PI*2); ctx2d.fill();
+  ctx2d.strokeStyle = '#445577'; ctx2d.stroke();
+  
+  // Content in crucible
+  if (simStep === 0) {
+    // Label
+    ctx2d.fillStyle = 'rgba(0,212,255,0.6)'; ctx2d.font = '11px Exo 2,sans-serif';
+    ctx2d.textAlign = 'center'; ctx2d.fillText('Cawan Krus', cx, crucY + crucH + 18);
+  }
+  
+  if (simStep >= 1) {
+    // Crystals or melt
+    const fillH = crucH - 10;
+    const fillY = crucY + 5;
+    
+    if (simStep === 1 && meltProgress < 1) {
+      // Crystals - white/clear solid
+      ctx2d.fillStyle = '#e8e0d0'; ctx2d.globalAlpha = 0.9;
+      ctx2d.beginPath();
+      ctx2d.moveTo(crucX+18, fillY+fillH);
+      ctx2d.lineTo(crucX+crucW-18, fillY+fillH);
+      ctx2d.lineTo(crucX+crucW-24, fillY+fillH*0.3);
+      ctx2d.lineTo(crucX+24, fillY+fillH*0.3);
+      ctx2d.closePath(); ctx2d.fill();
+      ctx2d.globalAlpha = 1;
+      
+      // Crystal sparkle
+      for (let i=0;i<7;i++) {
+        const sx = crucX+24+i*14, sy = fillY+fillH*0.4 + (i%2)*8;
+        ctx2d.fillStyle = 'rgba(255,255,255,0.8)'; ctx2d.fillRect(sx,sy,2,2);
+      }
+    } else if (simStep >= 2) {
+      // Molten - liquid
+      const liqG = ctx2d.createLinearGradient(0, fillY+fillH*0.2, 0, fillY+fillH);
+      liqG.addColorStop(0, cfg.meltColor);
+      liqG.addColorStop(1, '#cc8800');
+      ctx2d.fillStyle = liqG;
+      const wave = Math.sin(animT*0.08)*3;
+      ctx2d.beginPath();
+      ctx2d.moveTo(crucX+18, fillY+fillH);
+      ctx2d.lineTo(crucX+crucW-18, fillY+fillH);
+      ctx2d.lineTo(crucX+crucW-22, fillY+fillH*0.25+wave);
+      ctx2d.quadraticCurveTo(cx, fillY+fillH*0.2-wave, crucX+22, fillY+fillH*0.25+wave);
+      ctx2d.closePath(); ctx2d.fill();
+      
+      // Surface glow
+      ctx2d.strokeStyle = 'rgba(255,220,100,0.6)'; ctx2d.lineWidth = 1;
+      ctx2d.beginPath();
+      ctx2d.moveTo(crucX+22, fillY+fillH*0.25+wave);
+      ctx2d.quadraticCurveTo(cx, fillY+fillH*0.2-wave, crucX+crucW-22, fillY+fillH*0.25+wave);
+      ctx2d.stroke();
+    }
+  }
+  
+  // ELECTRODES
+  if (simStep >= 3) {
+    const elH = 85;
+    const cat_x = cx - 36;
+    const ano_x = cx + 36;
+    const elY = crucY;
+    
+    // Cathode (left) - BLUE/negative
+    const catG = ctx2d.createLinearGradient(cat_x-6, elY-elH, cat_x+6, elY);
+    catG.addColorStop(0, '#447799'); catG.addColorStop(1, '#223355');
+    ctx2d.fillStyle = catG;
+    ctx2d.fillRect(cat_x-6, elY-elH, 12, elH);
+    
+    // Deposit on cathode when running
+    if (simStep >= 6 && depositAmt > 0) {
+      ctx2d.fillStyle = cfg.color;
+      ctx2d.globalAlpha = Math.min(1, depositAmt/5);
+      const dH = Math.min(30, depositAmt*3.5);
+      ctx2d.fillRect(cat_x-8, elY-dH, 16, dH);
+      ctx2d.globalAlpha = 1;
+      // Glow
+      const dg = ctx2d.createRadialGradient(cat_x, elY-dH/2, 0, cat_x, elY-dH/2, 25);
+      dg.addColorStop(0, `rgba(200,255,200,0.15)`);
+      dg.addColorStop(1, 'rgba(0,255,100,0)');
+      ctx2d.fillStyle = dg; ctx2d.fillRect(cat_x-25, elY-35, 50, 50);
+    }
+    
+    ctx2d.fillStyle = '#00aaff';
+    ctx2d.font = 'bold 12px Share Tech Mono'; ctx2d.textAlign = 'center';
+    ctx2d.fillText('−', cat_x, elY - elH - 6);
+    ctx2d.fillStyle = 'rgba(0,170,255,0.7)'; ctx2d.font = '11px Exo 2';
+    ctx2d.fillText('Katoda', cat_x, elY - elH - 18);
+    
+    // Anode (right) - RED/positive
+    const anoG = ctx2d.createLinearGradient(ano_x-6, elY-elH, ano_x+6, elY);
+    anoG.addColorStop(0, '#994433'); anoG.addColorStop(1, '#552211');
+    ctx2d.fillStyle = anoG;
+    ctx2d.fillRect(ano_x-6, elY-elH, 12, elH);
+    
+    ctx2d.fillStyle = '#ff4444';
+    ctx2d.font = 'bold 12px Share Tech Mono'; ctx2d.textAlign = 'center';
+    ctx2d.fillText('+', ano_x, elY - elH - 6);
+    ctx2d.fillStyle = 'rgba(255,80,80,0.7)'; ctx2d.font = '11px Exo 2';
+    ctx2d.fillText('Anoda', ano_x, elY - elH - 18);
+  }
+  
+  // WIRES & BATTERY
+  if (simStep >= 4) drawCircuit(W, H, cx, crucY, true);
+  
+  // Step label
+  drawStepLabel(W, H, cfg);
+}
+
+function drawSolutionExperiment(W, H, cfg) {
+  const cx = W * 0.5;
+  const tableY = H * 0.72;
+  const tubeW = 160, tubeH = 180;
+  const tubeY = tableY - tubeH - 10;
+  const tubeX = cx - tubeW/2;
+  
+  // U-TUBE (complete, connected shape)
+  const armW = 34;
+  const innerR = 46; // inner radius at bottom curve
+  const outerR = innerR + armW; // = 80 = tubeW/2
+  const bottomY2 = tubeY + tubeH - 25;
+
+  // Glass body - drawn as one proper U-shaped path
+  ctx2d.fillStyle = 'rgba(20,40,70,0.65)';
+  ctx2d.beginPath();
+  ctx2d.moveTo(tubeX, tubeY);
+  ctx2d.lineTo(tubeX, bottomY2);
+  ctx2d.arc(cx, bottomY2, outerR, Math.PI, 0, true);
+  ctx2d.lineTo(tubeX + tubeW, tubeY);
+  ctx2d.lineTo(tubeX + tubeW - armW, tubeY);
+  ctx2d.lineTo(tubeX + tubeW - armW, bottomY2);
+  ctx2d.arc(cx, bottomY2, innerR, 0, Math.PI, false);
+  ctx2d.lineTo(tubeX + armW, tubeY);
+  ctx2d.closePath();
+  ctx2d.fill();
+
+  // Glass outline
+  ctx2d.strokeStyle = 'rgba(150,220,255,0.75)'; ctx2d.lineWidth = 2;
+  ctx2d.stroke();
+  
+  // Solution fill
+  if (simStep >= 1) {
+    const sh = tubeH * 0.55;
+    const sy = bottomY2 - sh;
+    
+    ctx2d.fillStyle = cfg.solutionHue;
+    // Left arm solution (inside tube bore, 3px inset from glass walls)
+    ctx2d.fillRect(tubeX+3, sy, armW-6, sh);
+    
+    // Right arm solution
+    ctx2d.fillRect(tubeX+tubeW-armW+3, sy, armW-6, sh);
+    
+    // Bottom curve solution (annular ring between outer and inner glass walls)
+    ctx2d.beginPath();
+    ctx2d.arc(cx, bottomY2, outerR-3, Math.PI, 0, true);   // outer bore edge (left→right through bottom)
+    ctx2d.arc(cx, bottomY2, innerR+3, 0, Math.PI, false);   // inner bore edge (right→left through bottom)
+    ctx2d.closePath();
+    ctx2d.fill();
+    
+    // Solution surface shimmer
+    ctx2d.strokeStyle = `rgba(100,200,255,${0.3+0.1*Math.sin(animT*0.08)})`;
+    ctx2d.lineWidth = 1;
+    ctx2d.beginPath(); ctx2d.moveTo(tubeX+3, sy); ctx2d.lineTo(tubeX+armW-3, sy); ctx2d.stroke();
+    ctx2d.beginPath(); ctx2d.moveTo(tubeX+tubeW-armW+3, sy); ctx2d.lineTo(tubeX+tubeW-3, sy); ctx2d.stroke();
+  }
+  
+  // ELECTRODES in U-tube
+  if (simStep >= 2) {
+    const cat_x = tubeX + armW/2; // center of left arm
+    const ano_x = tubeX + tubeW - armW/2; // center of right arm
+    const elTop = tubeY - 35;
+    const elBot = tubeY + tubeH * 0.52;
+    
+    // Cathode electrode
+    ctx2d.fillStyle = '#335577';
+    ctx2d.fillRect(cat_x-5, elTop, 10, elBot-elTop);
+    
+    // Deposit on cathode
+    if (simStep >= 5 && depositAmt > 0) {
+      ctx2d.fillStyle = cfg.color;
+      ctx2d.globalAlpha = Math.min(1, depositAmt/5);
+      const dH = Math.min(35, depositAmt*4);
+      ctx2d.fillRect(cat_x-7, elBot-dH, 14, dH);
+      ctx2d.globalAlpha = 1;
+      // Shine
+      const shine = ctx2d.createLinearGradient(cat_x-7, 0, cat_x+7, 0);
+      shine.addColorStop(0, 'rgba(255,255,255,0)');
+      shine.addColorStop(0.5, `rgba(255,255,255,0.3)`);
+      shine.addColorStop(1, 'rgba(255,255,255,0)');
+      ctx2d.fillStyle = shine; ctx2d.globalAlpha = Math.min(0.8, depositAmt/5);
+      ctx2d.fillRect(cat_x-7, elBot-dH, 14, dH); ctx2d.globalAlpha = 1;
+    }
+    
+    ctx2d.fillStyle = '#00aaff'; ctx2d.font = 'bold 12px Share Tech Mono'; ctx2d.textAlign='center';
+    ctx2d.fillText('−', cat_x, elTop-6);
+    ctx2d.fillStyle='rgba(0,170,255,0.7)'; ctx2d.font='11px Exo 2';
+    ctx2d.fillText('Katoda', cat_x, elTop-18);
+    
+    // Anode electrode
+    ctx2d.fillStyle = '#553322';
+    ctx2d.fillRect(ano_x-5, elTop, 10, elBot-elTop);
+    
+    ctx2d.fillStyle = '#ff4444'; ctx2d.font = 'bold 12px Share Tech Mono';
+    ctx2d.fillText('+', ano_x, elTop-6);
+    ctx2d.fillStyle='rgba(255,80,80,0.7)'; ctx2d.font='11px Exo 2';
+    ctx2d.fillText('Anoda', ano_x, elTop-18);
+  }
+  
+  // Labels
+  if (simStep === 0) {
+    ctx2d.fillStyle = 'rgba(0,212,255,0.5)'; ctx2d.font='12px Exo 2'; ctx2d.textAlign='center';
+    ctx2d.fillText('Pipa U', cx, tubeY - 10);
+  }
+  
+  // WIRES & BATTERY
+  if (simStep >= 3) {
+    const catX2 = tubeX + armW/2;
+    const anoX2 = tubeX + tubeW - armW/2;
+    drawCircuitSolution(W, H, cx, catX2, anoX2, tubeY);
+  }
+  
+  drawStepLabel(W, H, cfg);
+}
+
+function drawCircuit(W, H, cx, crucY, isMelt) {
+  const batY = crucY - 150;
+  // Battery
+  drawBattery(cx, batY);
+  
+  // Wires from battery to electrodes
+  ctx2d.lineWidth = 2;
+  // Negative wire (blue) - left
+  ctx2d.strokeStyle = '#0099ff';
+  ctx2d.setLineDash([]);
+  if (simRunning) ctx2d.shadowColor = '#00d4ff', ctx2d.shadowBlur = 4;
+  ctx2d.beginPath(); ctx2d.moveTo(cx-18, batY+30); ctx2d.lineTo(cx-18, batY+60); ctx2d.lineTo(cx-36, batY+60); ctx2d.lineTo(cx-36, crucY-85); ctx2d.stroke();
+  // Positive wire (red) - right
+  ctx2d.strokeStyle = '#ff4444';
+  ctx2d.beginPath(); ctx2d.moveTo(cx+18, batY+30); ctx2d.lineTo(cx+18, batY+60); ctx2d.lineTo(cx+36, batY+60); ctx2d.lineTo(cx+36, crucY-85); ctx2d.stroke();
+  ctx2d.shadowBlur = 0;
+  
+  // Current flow animation
+  if (simRunning) {
+    const progress = (animT * 3) % 80;
+    ctx2d.fillStyle = '#00ffcc';
+    ctx2d.beginPath(); ctx2d.arc(cx-36, crucY - 85 - progress, 3, 0, Math.PI*2); ctx2d.fill();
+    ctx2d.fillStyle = '#ff8888';
+    ctx2d.beginPath(); ctx2d.arc(cx+36, crucY - 85 - progress, 3, 0, Math.PI*2); ctx2d.fill();
+  }
+}
+
+function drawCircuitSolution(W, H, cx, catX, anoX, tubeY) {
+  const batY = tubeY - 110;
+  drawBattery(cx, batY);
+  
+  ctx2d.lineWidth = 2; ctx2d.setLineDash([]);
+  if (simRunning) ctx2d.shadowColor = '#00d4ff', ctx2d.shadowBlur = 4;
+  ctx2d.strokeStyle = '#0099ff';
+  ctx2d.beginPath(); ctx2d.moveTo(cx-18, batY+30); ctx2d.lineTo(cx-18, batY+55); ctx2d.lineTo(catX, batY+55); ctx2d.lineTo(catX, tubeY-35); ctx2d.stroke();
+  ctx2d.strokeStyle = '#ff4444';
+  ctx2d.beginPath(); ctx2d.moveTo(cx+18, batY+30); ctx2d.lineTo(cx+18, batY+55); ctx2d.lineTo(anoX, batY+55); ctx2d.lineTo(anoX, tubeY-35); ctx2d.stroke();
+  ctx2d.shadowBlur = 0;
+  
+  if (simRunning) {
+    const progress = (animT * 2.5) % 60;
+    ctx2d.fillStyle = '#00ffcc'; ctx2d.beginPath(); ctx2d.arc(catX, tubeY-35-progress, 3, 0, Math.PI*2); ctx2d.fill();
+    ctx2d.fillStyle = '#ff8888'; ctx2d.beginPath(); ctx2d.arc(anoX, tubeY-35-progress, 3, 0, Math.PI*2); ctx2d.fill();
+  }
+}
+
+function drawBattery(cx, by) {
+  // Battery body
+  const bg = ctx2d.createLinearGradient(cx-22, by, cx+22, by);
+  bg.addColorStop(0,'#1a3a5c'); bg.addColorStop(0.5,'#2a5a8c'); bg.addColorStop(1,'#1a3a5c');
+  ctx2d.fillStyle = bg;
+  ctx2d.beginPath(); ctx2d.roundRect(cx-22, by, 44, 30, 4); ctx2d.fill();
+  ctx2d.strokeStyle = 'rgba(0,212,255,0.5)'; ctx2d.lineWidth = 1;
+  ctx2d.beginPath(); ctx2d.roundRect(cx-22, by, 44, 30, 4); ctx2d.stroke();
+  // Terminals
+  ctx2d.fillStyle = '#0099ff'; ctx2d.fillRect(cx-18, by-4, 8, 6);
+  ctx2d.fillStyle = '#ff4444'; ctx2d.fillRect(cx+10, by-4, 8, 6);
+  ctx2d.fillStyle = '#00aaff'; ctx2d.font='9px Share Tech Mono'; ctx2d.textAlign='center';
+  ctx2d.fillText('−', cx-14, by+16);
+  ctx2d.fillStyle='#ff5555'; ctx2d.fillText('+', cx+14, by+16);
+  ctx2d.fillStyle='rgba(0,212,255,0.6)'; ctx2d.font='8px Share Tech Mono';
+  ctx2d.fillText('POWER SUPPLY', cx, by+27);
+  
+  // Amperemeter
+  const aX = cx + 60;
+  ctx2d.fillStyle = '#0f2240'; ctx2d.beginPath();
+  ctx2d.arc(aX, by+15, 18, 0, Math.PI*2); ctx2d.fill();
+  ctx2d.strokeStyle = 'rgba(0,212,255,0.4)'; ctx2d.lineWidth=1; ctx2d.beginPath();
+  ctx2d.arc(aX, by+15, 18, 0, Math.PI*2); ctx2d.stroke();
+  ctx2d.fillStyle = 'var(--acc)'; ctx2d.font='bold 9px Share Tech Mono'; ctx2d.textAlign='center';
+  ctx2d.fillText('A', aX, by+12);
+  ctx2d.fillStyle = '#00ff88'; ctx2d.font='7px Share Tech Mono';
+  ctx2d.fillText(simCurrent.toFixed(1)+'A', aX, by+22);
+}
+
+function drawStepLabel(W, H, cfg) {
+  // Step message at bottom
+  const msgs = [
+    'Klik "Mulai Elektrolisis" setelah menyiapkan percobaan',
+    'Menambahkan kristal ke cawan krus...',
+    'Memanaskan dengan tungku (furnace)...',
+    'Memasang elektroda...',
+    'Menghubungkan rangkaian listrik...',
+    'Siap! Atur i dan t, lalu mulai',
+    'Elektrolisis berjalan...',
+    'Elektrolisis selesai! Lihat data di panel kiri.',
+    'Menimbang katoda...',
+  ];
+  const msg = msgs[Math.min(simStep, msgs.length-1)];
+  ctx2d.fillStyle = 'rgba(0,212,255,0.6)'; ctx2d.font='11px Exo 2,sans-serif'; ctx2d.textAlign='center';
+  ctx2d.fillText(msg, W/2, H-12);
+}
+
+function updateParticles(W, H) {
+  // Crucible boundaries (trapezoid): top at crucY, bottom at crucY+crucH
+  const crucH2 = 55;
+  const pCrucY = (H * 0.72) - 110 - 45; // crucible top
+  const pCrucBottom = pCrucY + crucH2 - 2;
+  const pCX = W * 0.5;
+  
+  // Remove particles past the crucible bottom or off screen
+  particles = particles.filter(p => p.y <= pCrucBottom && p.y > -50);
+  
+  particles.forEach(p => {
+    p.y += p.vy; p.x += p.vx * 0.3;
+    p.vy += 0.2; // gravity
+    
+    // Constrain x within crucible (trapezoid: max half-width = 63 at top, 45 at bottom)
+    const fracY = Math.max(0, Math.min(1, (p.y - pCrucY) / crucH2));
+    const maxHW = 63 - fracY * 18;
+    p.x = Math.max(pCX - maxHW, Math.min(pCX + maxHW, p.x));
+    
+    // Stop at crucible bottom
+    if (p.y >= pCrucBottom) {
+      p.y = pCrucBottom;
+      p.vy = 0; p.vx = 0;
+    }
+    
+    ctx2d.fillStyle = p.color;
+    ctx2d.globalAlpha = p.alpha;
+    ctx2d.fillRect(p.x, p.y, p.size, p.size);
+    ctx2d.globalAlpha = 1;
+  });
+}
+
+function spawnCrystals(cx, crucY) {
+  for (let i=0; i<3; i++) {
+    particles.push({
+      x: cx + (Math.random()-0.5)*50,
+      y: crucY - 90 - Math.random()*30,
+      vx: (Math.random()-0.5)*1.5,
+      vy: Math.random()*2+1,
+      size: 2+Math.random()*4,
+      color: ['#ffffff','#e8ddc8','#f0e8d8'][Math.floor(Math.random()*3)],
+      alpha: 0.7+Math.random()*0.3
+    });
+  }
+}
+
+function updateBubbles(W, H, cfg) {
+  if (!simRunning) { bubbles = bubbles.filter(b => b.y > 0); }
+  bubbles = bubbles.filter(b => b.y > 0 && b.alpha > 0.05);
+  bubbles.forEach(b => {
+    b.y -= b.vy; 
+    // Stop bubbles at topY (just below Katoda/Anoda text)
+    if (b.topY && b.y <= b.topY) {
+      b.y = b.topY;
+      b.vy = 0;
+      b.alpha *= 0.9; // fade out quickly at top
+    }
+    // Clamp x to stay within electrode bounds
+    const drift = Math.sin(b.y * 0.05 + b.phase) * 0.3;
+    b.x += drift;
+    const hw = b.elecHW || 5;
+    const bx0 = b.bornX || b.x;
+    b.x = Math.max(bx0 - hw, Math.min(bx0 + hw, b.x));
+    b.alpha *= 0.99;
+    ctx2d.strokeStyle = `rgba(${b.r},${b.g},${b.b},${b.alpha})`;
+    ctx2d.lineWidth = 1; ctx2d.beginPath();
+    ctx2d.arc(b.x, b.y, b.size, 0, Math.PI*2); ctx2d.stroke();
+  });
+}
+
+function spawnBubbles(cfg) {
+  if (!simRunning) return;
+  if (Math.random() > 0.3) return;
+  
+  const W = canvas.width, H = canvas.height;
+  const cx = W * 0.5;
+  const tableY = H * 0.72;
+  
+  let anoX, anoYTop, anoYBot, elecHW, bubbleTopY;
+  if (cfg.type === 'melt') {
+    const crucY = tableY - 110 - 45;
+    anoX = cx + 36;
+    anoYTop = crucY - 85; // top of anode electrode
+    anoYBot = crucY;      // bottom of anode (at molten surface)
+    elecHW = 6;           // half-width of electrode
+    bubbleTopY = crucY - 85; // stop just below Katoda/Anoda text
+  } else {
+    const tubeW2 = 160, tubeH2 = 180;
+    const tubeY2 = tableY - tubeH2 - 10;
+    const tubeX2 = cx - tubeW2/2;
+    const armW2 = 34;
+    anoX = tubeX2 + tubeW2 - armW2/2;
+    anoYTop = tubeY2 - 35;  // top of electrode (above tube)
+    anoYBot = tubeY2 + tubeH2 * 0.52; // bottom of electrode (inside solution)
+    elecHW = 5;
+    bubbleTopY = tubeY2 - 35; // stop just below Katoda/Anoda text
+  }
+  
+  // Spawn bubble somewhere along the electrode, within electrode bounds
+  const bY = anoYBot - Math.random() * (anoYBot - anoYTop) * 0.5;
+  const bX = anoX + (Math.random() - 0.5) * elecHW * 2;
+
+  const isAnodeO2 = cfg.anodeGas === 'O₂';
+  const r = isAnodeO2 ? 180 : 200;
+  const g2 = isAnodeO2 ? 180 : 200;
+  const b2 = isAnodeO2 ? 180 : 50;
+  
+  bubbles.push({x:bX, y:bY, vy:0.8+Math.random()*0.5,
+    size:2+Math.random()*3, alpha:0.8, r, g:g2, b:b2, phase:Math.random()*Math.PI*2,
+    bornX:anoX, elecHW:elecHW, topY:bubbleTopY});
+  
+  if (Math.random() > 0.5) playBubble();
+}
+
+// =========================================================
+// SIM CONTROLS
+// =========================================================
+let stepTimeout = null;
+let pourInterval = null;
+
+function startSim() {
+  if (simRunning) return;
+  playClick();
+  
+  simCurrent = parseFloat(document.getElementById('sliderI').value);
+  simDuration = parseInt(document.getElementById('sliderT').value);
+  massInitial = parseFloat((10 + Math.random()*5).toFixed(4));
+  depositAmt = 0;
+  
+  document.getElementById('dI').textContent = simCurrent.toFixed(1) + ' A';
+  document.getElementById('dT').textContent = simDuration + ' s';
+  document.getElementById('dM0').textContent = massInitial.toFixed(4) + ' g';
+  document.getElementById('dM1').textContent = '–';
+  document.getElementById('dDelta').textContent = '–';
+  document.getElementById('dTeori').textContent = '–';
+  
+  document.getElementById('btnStart').disabled = true;
+  document.getElementById('btnStop').disabled = false;
+  document.getElementById('sliderI').disabled = true;
+  document.getElementById('sliderT').disabled = true;
+  
+  // Run through steps
+  runSteps();
+}
+
+function runSteps() {
+  const cfg = expConfig[currentExp];
+  simStep = 0; renderStepGuide();
+  setStatus('Menambahkan bahan ke wadah...', 'acc');
+  
+  // Step 1: Pour/add material
+  setTimeout(() => {
+    simStep = 1; renderStepGuide();
+    if (cfg.type === 'melt') {
+      playCrystalPour();
+      // Spawn crystals
+      let count = 0;
+      pourInterval = setInterval(() => {
+        const crucY = canvas.height * 0.72 - 110 - 45;
+        spawnCrystals(canvas.width*0.5, crucY);
+        if (++count > 40) clearInterval(pourInterval);
+      }, 50);
+    } else {
+      playPour();
+    }
+  }, 500);
+  
+  // Step 2: Heat (melt) or proceed
+  setTimeout(() => {
+    simStep = 2; renderStepGuide();
+    if (cfg.type === 'melt') {
+      playFurnaceOn();
+      setStatus('Memanaskan tungku hingga titik leleh...', 'warn');
+      meltProgress = 0;
+      const meltInt = setInterval(() => {
+        meltProgress = Math.min(1, meltProgress+0.02);
+        if (meltProgress >= 1) clearInterval(meltInt);
+      }, 80);
+    }
+  }, 2000);
+  
+  // Step 3: Insert electrode
+  setTimeout(() => {
+    simStep = 3; renderStepGuide();
+    setStatus('Memasang elektroda...', 'acc');
+    playClick();
+  }, 4500);
+  
+  // Step 4: Wire
+  setTimeout(() => {
+    simStep = 4; renderStepGuide();
+    setStatus('Menghubungkan rangkaian listrik...', 'acc');
+  }, 5500);
+  
+  // Step 5: Ready + run electrolysis
+  setTimeout(() => {
+    simStep = 5; renderStepGuide();
+    setStatus('Menjalankan elektrolisis...', 'green');
+    runElectrolysis();
+  }, 6500);
+}
+
+function runElectrolysis() {
+  simRunning = true;
+  simElapsed = 0;
+  simStep = 6; renderStepGuide();
+  startElectricSound();
+  
+  const cfg = expConfig[currentExp];
+  const teoritis = (cfg.e * simCurrent * simDuration) / 96500;
+  document.getElementById('dTeori').textContent = teoritis.toFixed(4) + ' g';
+  
+  const interval = 200; // ms
+  simTimer = setInterval(() => {
+    simElapsed += interval/1000;
+    const pct = simElapsed / simDuration;
+    document.getElementById('timerBar').style.width = Math.min(100, pct*100) + '%';
+    setStatus(`Elektrolisis berjalan... ${Math.round(simElapsed)}/${simDuration} s`, 'green');
+    
+    depositAmt = (simElapsed / simDuration) * 8;
+    spawnBubbles(cfg);
+    
+    if (simElapsed >= simDuration) {
+      finishElectrolysis();
+    }
+  }, interval);
+}
+
+function finishElectrolysis() {
+  clearInterval(simTimer);
+  simRunning = false;
+  stopElectricSound();
+  
+  const cfg = expConfig[currentExp];
+  const teoritis = (cfg.e * simCurrent * simDuration) / 96500;
+  const variation = (Math.random()*0.02 - 0.01) * teoritis;
+  const eksperimen = teoritis + variation;
+  const massAkhir = massInitial + eksperimen;
+  
+  document.getElementById('dM1').textContent = massAkhir.toFixed(4) + ' g';
+  document.getElementById('dDelta').textContent = eksperimen.toFixed(4) + ' g';
+  document.getElementById('dTeori').textContent = teoritis.toFixed(4) + ' g';
+  
+  simStep = 7; renderStepGuide();
+  
+  // Rinse step for solution experiments
+  if (cfg.type === 'solution') {
+    setTimeout(() => {
+      simStep = 8; renderStepGuide();
+      setStatus('Membersihkan dan menimbang katoda...', 'acc');
+      setTimeout(() => {
+        playWeigh();
+        setStatus('✅ Selesai! Data tersimpan di panel kiri.', 'green');
+        playSuccess();
+        document.getElementById('btnStart').disabled = false;
+        document.getElementById('sliderI').disabled = false;
+        document.getElementById('sliderT').disabled = false;
+        document.getElementById('btnStop').disabled = true;
+        document.getElementById('timerBar').style.width = '100%';
+      }, 1500);
+    }, 800);
+  } else {
+    setTimeout(() => {
+      playWeigh();
+      setStatus('✅ Selesai! Data tersimpan di panel kiri.', 'green');
+      playSuccess();
+      document.getElementById('btnStart').disabled = false;
+      document.getElementById('sliderI').disabled = false;
+      document.getElementById('sliderT').disabled = false;
+      document.getElementById('btnStop').disabled = true;
+      document.getElementById('timerBar').style.width = '100%';
+    }, 1000);
+  }
+}
+
+function stopSim() {
+  if (!simRunning) return;
+  clearInterval(simTimer); simRunning = false; stopElectricSound();
+  setStatus('Dihentikan oleh pengguna.', '');
+  document.getElementById('btnStart').disabled = false;
+  document.getElementById('btnStop').disabled = true;
+  document.getElementById('sliderI').disabled = false;
+  document.getElementById('sliderT').disabled = false;
+  playClick();
+}
+
+function resetSim() {
+  clearInterval(simTimer); clearInterval(pourInterval);
+  simRunning = false; simStep = 0; depositAmt = 0; meltProgress = 0;
+  particles = []; bubbles = []; simElapsed = 0;
+  stopElectricSound();
+  document.getElementById('btnStart').disabled = false;
+  document.getElementById('btnStop').disabled = true;
+  document.getElementById('sliderI').disabled = false;
+  document.getElementById('sliderT').disabled = false;
+  document.getElementById('timerBar').style.width = '0%';
+  ['dI','dT','dM0','dM1','dDelta','dTeori'].forEach(id => document.getElementById(id).textContent = '–');
+  setStatus('Siap melakukan percobaan', '');
+  renderStepGuide();
+  playClick();
+}
+
+// =========================================================
+// DISKUSI SAVE
+// =========================================================
+function saveAns(n) {
+  const val = document.getElementById('ans'+n).value;
+  try { localStorage.setItem('faraday_ans'+n, val); } catch(e){}
+  const toast = document.getElementById('toast'+n);
+  toast.classList.add('on');
+  setTimeout(() => toast.classList.remove('on'), 2000);
+  playChime();
+}
+
+// =========================================================
+// PDF DOWNLOAD
+// =========================================================
+function downloadDiskusiPDF() {
+  playClick();
+  const questions = [
+    'Diskusi 01: Tuliskan persamaan setengah reaksi reduksi di katoda dan oksidasi di anoda untuk masing-masing zat uji (KCl leburan, CaCl2 leburan, CuSO4 larutan, AgNO3 larutan).',
+    'Diskusi 02: Analisislah mengapa spesi yang tereduksi pada katoda di percobaan larutan (P.3 & P.4) berbeda perilakunya dibandingkan logam alkali/alkali tanah, hubungkan dengan potensial reduksi standar (E).',
+    'Diskusi 03: Bagaimana kecenderungan massa endapan logam ketika kuat arus (i) diperbesar pada waktu tetap? Apa yang terjadi jika waktu (t) diperpanjang dengan arus konstan? Jelaskan berdasarkan pergerakan elektron.',
+    'Diskusi 04: Bandingkan Massa Endapan Eksperimen dengan Massa Endapan Teoritis. Apakah berkesesuaian? Jika di lab nyata massa eksperimen lebih kecil dari teoritis, diskusikan faktor teknisnya.'
+  ];
+  const answers = [];
+  for (let i = 1; i <= 4; i++) {
+    const el = document.getElementById('ans' + i);
+    answers.push(el ? el.value || '(Belum dijawab)' : '(Belum dijawab)');
+  }
+  
+  const now = new Date();
+  const dateStr = now.toLocaleDateString('id-ID', {day:'numeric',month:'long',year:'numeric'});
+  const timeStr = now.toLocaleTimeString('id-ID', {hour:'2-digit',minute:'2-digit'});
+  
+  const printHTML = `<!DOCTYPE html><html><head><meta charset="UTF-8"><title>Hasil Diskusi - Hukum I Faraday</title>
+<style>
+@page{size:A4;margin:20mm 18mm;}
+body{font-family:'Segoe UI',Tahoma,sans-serif;color:#1a1a2e;line-height:1.7;font-size:12pt;background:#fff;}
+h1{text-align:center;font-size:16pt;color:#003366;margin-bottom:2px;letter-spacing:0.5px;}
+h2{text-align:center;font-size:13pt;color:#0066aa;margin:0 0 12px;font-weight:400;}
+.meta{text-align:center;font-size:10pt;color:#666;margin-bottom:20px;border-bottom:2px solid #003366;padding-bottom:10px;}
+.qblock{margin-bottom:18px;page-break-inside:avoid;}
+.qnum{font-size:10pt;font-weight:700;color:#fff;background:#003366;display:inline-block;padding:2px 12px;border-radius:4px;margin-bottom:5px;}
+.qtxt{font-size:11pt;color:#333;margin-bottom:6px;font-style:italic;}
+.ans{font-size:11pt;color:#1a1a2e;background:#f4f8fc;border-left:3px solid #0066aa;padding:8px 14px;border-radius:0 6px 6px 0;white-space:pre-wrap;word-wrap:break-word;min-height:30px;}
+.footer{margin-top:24px;text-align:center;font-size:9pt;color:#999;border-top:1px solid #ddd;padding-top:8px;}
+@media print{body{-webkit-print-color-adjust:exact;print-color-adjust:exact;}}
+</style></head><body>
+<h1>Hasil Diskusi Praktikum</h1>
+<h2>Sel Elektrolisis &mdash; Hukum I Faraday</h2>
+<div class="meta">Lab Maya Kimia &bull; Dicetak pada: ${dateStr}, ${timeStr}</div>
+${questions.map((q,i)=>`<div class="qblock"><div class="qnum">DISKUSI 0${i+1}</div><div class="qtxt">${q}</div><div class="ans">${answers[i].replace(/</g,'&lt;').replace(/>/g,'&gt;')}</div></div>`).join('')}
+<div class="footer">Dokumen ini dihasilkan secara otomatis dari Lab Maya Kimia &mdash; Sel Elektrolisis: Hukum I Faraday</div>
+</body></html>`;
+  
+  const printWin = window.open('', '_blank');
+  if (printWin) {
+    printWin.document.write(printHTML);
+    printWin.document.close();
+    setTimeout(() => { printWin.print(); }, 500);
+  } else {
+    // Fallback: download as HTML file
+    const blob = new Blob([printHTML], {type: 'text/html'});
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url; a.download = 'Diskusi_Hukum_I_Faraday.html';
+    document.body.appendChild(a); a.click(); document.body.removeChild(a);
+    URL.revokeObjectURL(url);
+  }
+  playChime();
+}
+
+// Load saved answers
+window.addEventListener('load', () => {
+  for (let i=1;i<=4;i++) {
+    try {
+      const v = localStorage.getItem('faraday_ans'+i);
+      if (v) document.getElementById('ans'+i).value = v;
+    } catch(e){}
+  }
+  updateCtrl();
+  updateExpUI();
+  
+  // Resize canvas on window resize
+  window.addEventListener('resize', () => {
+    if (canvas) {
+      const body = canvas.parentElement;
+      canvas.width = body.offsetWidth - 165;
+      canvas.height = body.offsetHeight;
+    }
+  });
+});
+
+// =========================================================
+// CANVAS INIT on tab switch
+// =========================================================
+document.querySelectorAll('.nb').forEach(b => {
+  b.addEventListener('click', () => {
+    if (b.getAttribute('onclick') && b.getAttribute('onclick').includes("'simulasi'")) {
+      setTimeout(initCanvas, 50);
+    }
+  });
+});
+
+// Click sound on all buttons
+document.addEventListener('click', e => {
+  const el = e.target.closest('button');
+  if (el && el.id !== 'btnMulai' && !el.classList.contains('btn-sim-start') && !el.classList.contains('btn-sim-reset') && !el.classList.contains('btn-sim-stop') && !el.classList.contains('btn-save')) {
+    // already handled in specific functions
+  }
+});
+
+// =========================================================
+// TOUCH SCREEN / PID SUPPORT
+// =========================================================
+(function() {
+  // 1. Resume AudioContext on first touch (required by browsers)
+  let touchAudioResumed = false;
+  function resumeAudioOnTouch() {
+    if (touchAudioResumed) return;
+    touchAudioResumed = true;
+    try {
+      if (audioCtx && audioCtx.state === 'suspended') audioCtx.resume();
+    } catch(e) {}
+  }
+  document.addEventListener('touchstart', resumeAudioOnTouch, { once: true, passive: true });
+  document.addEventListener('mousedown', resumeAudioOnTouch, { once: true, passive: true });
+
+  // 2. Range slider: ensure oninput fires on touch move (some browsers only fire on touchend)
+  document.querySelectorAll('input[type=range]').forEach(slider => {
+    let touching = false;
+    slider.addEventListener('touchstart', function(e) {
+      touching = true;
+      updateSliderFromTouch(this, e);
+    }, { passive: true });
+    slider.addEventListener('touchmove', function(e) {
+      if (!touching) return;
+      updateSliderFromTouch(this, e);
+    }, { passive: true });
+    slider.addEventListener('touchend', function() {
+      touching = false;
+    }, { passive: true });
+  });
+
+  function updateSliderFromTouch(slider, e) {
+    const touch = e.touches[0];
+    if (!touch) return;
+    const rect = slider.getBoundingClientRect();
+    const pct = Math.max(0, Math.min(1, (touch.clientX - rect.left) / rect.width));
+    const min = parseFloat(slider.min);
+    const max = parseFloat(slider.max);
+    const step = parseFloat(slider.step) || 1;
+    let val = min + pct * (max - min);
+    val = Math.round(val / step) * step;
+    val = Math.max(min, Math.min(max, val));
+    slider.value = val;
+    slider.dispatchEvent(new Event('input', { bubbles: true }));
+  }
+
+  // 3. Prevent double-tap zoom on interactive elements
+  let lastTap = 0;
+  document.addEventListener('touchend', function(e) {
+    const target = e.target;
+    if (target.closest('button, .ptab, .nb, .exp-tab, .btn-sim, .btn-save, input[type=range]')) {
+      const now = Date.now();
+      if (now - lastTap < 300) {
+        e.preventDefault();
+      }
+      lastTap = now;
+    }
+  }, { passive: false });
+
+  // 4. Auto-resize canvas on orientation change (PID may rotate)
+  window.addEventListener('orientationchange', function() {
+    setTimeout(() => {
+      if (canvas) {
+        const body = canvas.parentElement;
+        canvas.width = body.offsetWidth - 165;
+        canvas.height = body.offsetHeight;
+      }
+    }, 300);
+  });
+
+  // 5. Prevent pull-to-refresh and overscroll on the whole app
+  document.body.addEventListener('touchmove', function(e) {
+    const target = e.target;
+    // Allow scrolling inside scrollable containers
+    if (target.closest('.inner-scroll, .sim-ctrl, .step-guide, .disc-textarea')) return;
+    // Prevent overscroll on everything else
+    if (!target.closest('input[type=range]')) {
+      e.preventDefault();
+    }
+  }, { passive: false });
+
+  // 6. Nav horizontal scroll via touch drag
+  const nav = document.getElementById('mainNav');
+  if (nav) {
+    let navTouchX = 0;
+    nav.addEventListener('touchstart', function(e) {
+      navTouchX = e.touches[0].clientX;
+    }, { passive: true });
+    nav.addEventListener('touchmove', function(e) {
+      const dx = navTouchX - e.touches[0].clientX;
+      nav.scrollLeft += dx;
+      navTouchX = e.touches[0].clientX;
+    }, { passive: true });
+  }
+
+  // 7. Touch feedback — brief visual pulse on button tap
+  document.addEventListener('touchstart', function(e) {
+    const btn = e.target.closest('button, .ptab, .exp-tab');
+    if (btn) {
+      btn.style.opacity = '0.8';
+      setTimeout(() => { btn.style.opacity = ''; }, 150);
+    }
+  }, { passive: true });
+})();
+</script>
+</body>
+</html>
